@@ -375,9 +375,11 @@ export default function HomePage() {
               </div>
               <h3 className="font-display font-bold text-2xl text-white mb-2">{settings?.founderName || "Zohaib"}</h3>
               <p className="text-[#E63950] font-mono text-sm mb-6">Founder & CEO</p>
-              <div className="text-lg text-white/80 mb-8 relative z-10 space-y-4">
+              <div className="text-lg text-white/80 mb-8 relative z-10 space-y-6">
                 {(settings?.founderBio || "We build software that actually moves the needle. No bloated timelines, no over-engineered mess. Just clean architecture, AI acceleration, and relentless execution.")
                   .split("\n\n")
+                  .map(p => p.trim())
+                  .filter(p => p.length > 0)
                   .map((para, i) => <p key={i}>{para}</p>)}
               </div>
             </div>
