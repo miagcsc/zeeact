@@ -1,0 +1,1236 @@
+Build a world-class single-page website for ZeeActs — a premium 
+IT solutions company. This must be the fastest, most modern, 
+most responsive single-page site possible.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CRITICAL PERFORMANCE RULES — READ FIRST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Single index.html file — HTML + CSS + JS all in one file
+2. ZERO external libraries except:
+   - Google Fonts (preconnected, font-display:swap)
+   - GSAP + ScrollTrigger from CDN (defer loaded, 
+     used ONLY for hero timeline and scroll triggers)
+   - Everything else: pure CSS + vanilla JS
+3. NO jQuery. NO Bootstrap. NO unnecessary dependencies.
+4. All animations: prefer CSS transforms and opacity only
+   (GPU-accelerated, never animate width/height/top/left)
+5. Use CSS custom properties (variables) for ALL colors, 
+   fonts, spacing — makes editing one-line changes
+6. Intersection Observer API for all scroll reveals —
+   faster than ScrollTrigger for simple fade-ins
+7. Images: zero external images — use CSS gradients + 
+   emoji + SVG inline only
+8. Preload critical fonts in <head>
+9. All JS at bottom of body with defer attribute
+10. Respect prefers-reduced-motion media query — 
+    disable all animations if user has set this
+11. Target scores: LCP under 1.5s, CLS 0, FID under 50ms
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+HEAD SECTION — EXACT CODE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, 
+        initial-scale=1.0">
+  <meta name="description" content="ZeeActs builds custom 
+        software, SaaS products, and AI-powered automation. 
+        Elite developers. AI-augmented delivery. 62% lower 
+        cost. Get a free quote.">
+  <meta name="keywords" content="custom software development, 
+        SaaS development, AI consultancy, business automation, 
+        marketing automation, IT solutions">
+  <meta property="og:title" content="ZeeActs — Software. 
+        SaaS. AI. Done Right.">
+  <meta property="og:description" content="ZeeActs builds 
+        custom software, SaaS products, and AI-powered 
+        automation for businesses that want to move fast.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://zeeacts.com">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ZeeActs — Software. 
+        SaaS. AI. Done Right.">
+  <title>ZeeActs — Custom Software, SaaS & AI Consultancy</title>
+  
+  <!-- Preconnect for fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" 
+        crossorigin>
+  <link href="https://fonts.googleapis.com/css2?
+        family=Syne:wght@700;800&
+        family=Outfit:wght@400;500;600&
+        display=swap" rel="stylesheet">
+  
+  <!-- Canonical -->
+  <link rel="canonical" href="https://zeeacts.com">
+  
+  <!-- Schema.org structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "ZeeActs",
+    "description": "Custom Software, SaaS & AI Consultancy",
+    "url": "https://zeeacts.com",
+    "email": "hello@zeeacts.com",
+    "founder": {"@type": "Person", "name": "Zohaib"},
+    "serviceType": ["Custom Software Development",
+      "SaaS Development", "AI Consultancy",
+      "Business Automation", "Marketing Automation"]
+  }
+  </script>
+</head>
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CSS ARCHITECTURE — EXACT VARIABLES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+:root {
+  /* Colors */
+  --crimson:      #E63950;
+  --crimson-dark: #B52C3E;
+  --crimson-pale: rgba(230,57,80,0.08);
+  --black:        #0A0A0F;
+  --white:        #F5F5F0;
+  --gray-100:     #F0F0EB;
+  --gray-200:     #E0E0DA;
+  --gray-400:     #A0A099;
+  --gray-500:     #707068;
+  --gray-700:     #3A3A35;
+
+  /* Typography */
+  --font-display: 'Syne', sans-serif;
+  --font-body:    'Outfit', sans-serif;
+  --font-mono:    'Space Mono', 'Courier New', monospace;
+
+  /* Spacing scale */
+  --space-xs:  4px;
+  --space-sm:  8px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-xl:  40px;
+  --space-2xl: 64px;
+  --space-3xl: 120px;
+
+  /* Layout */
+  --max-width:  1160px;
+  --nav-height: 68px;
+  --radius-sm:  8px;
+  --radius-md:  14px;
+  --radius-lg:  20px;
+
+  /* Transitions */
+  --ease-out:   cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring:cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast:   0.15s;
+  --dur-base:   0.3s;
+  --dur-slow:   0.6s;
+}
+
+/* Global reset */
+*, *::before, *::after {
+  margin: 0; padding: 0;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+  /* Custom scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: var(--crimson) var(--black);
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--white);
+  color: var(--black);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Scroll progress bar — 3px crimson line at top */
+#scroll-progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  width: 0%;
+  background: var(--crimson);
+  z-index: 9999;
+  transition: width 0.1s linear;
+}
+
+/* Custom cursor — desktop only */
+#cursor {
+  position: fixed;
+  width: 12px; height: 12px;
+  background: var(--white);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: transform 0.1s var(--ease-out),
+              width 0.3s var(--ease-spring),
+              height 0.3s var(--ease-spring),
+              background 0.3s;
+  mix-blend-mode: difference;
+}
+#cursor.hover {
+  width: 44px; height: 44px;
+}
+@media (hover: none) { #cursor { display: none; } }
+
+/* Reduced motion — disable all animations */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .reveal { opacity: 1 !important; 
+            transform: none !important; }
+}
+
+/* Reveal animation classes — 
+   added by IntersectionObserver */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity var(--dur-slow) var(--ease-out),
+              transform var(--dur-slow) var(--ease-out);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* Stagger delays for grid children */
+.reveal-grid > *:nth-child(1){transition-delay:0s}
+.reveal-grid > *:nth-child(2){transition-delay:0.1s}
+.reveal-grid > *:nth-child(3){transition-delay:0.2s}
+.reveal-grid > *:nth-child(4){transition-delay:0.3s}
+.reveal-grid > *:nth-child(5){transition-delay:0.4s}
+.reveal-grid > *:nth-child(6){transition-delay:0.5s}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+LOGO MARK — CSS ONLY (no images)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Build the logo mark entirely in HTML + CSS:
+
+HTML structure:
+<div class="logo" onclick="scrollTo('#hero')">
+  <div class="logo-zbox">
+    <span>Z</span>
+  </div>
+  <div class="logo-arrows">
+    <div class="logo-arrow"></div>
+    <div class="logo-arrow"></div>
+    <div class="logo-arrow"></div>
+  </div>
+  <div class="logo-wordmark">
+    <span class="logo-zee">Zee</span>
+    <span class="logo-acts">Acts</span>
+  </div>
+</div>
+
+CSS:
+.logo { display:flex; align-items:center; 
+        gap:10px; cursor:pointer; }
+
+.logo-zbox {
+  width:36px; height:36px; flex-shrink:0;
+  background:var(--white);
+  display:flex; align-items:center; 
+  justify-content:center;
+  position:relative; overflow:hidden;
+}
+/* Crimson corner cut */
+.logo-zbox::after {
+  content:'';
+  position:absolute; bottom:0; right:0;
+  border-left:11px solid transparent;
+  border-bottom:11px solid var(--crimson);
+}
+.logo-zbox span {
+  font-family:var(--font-display);
+  font-size:22px; font-weight:800;
+  color:var(--black); line-height:1;
+  position:relative; z-index:1;
+}
+
+.logo-arrows {
+  display:flex; flex-direction:column; gap:3px;
+}
+/* Each arrow: bar + CSS triangle tip */
+.logo-arrow {
+  height:2.5px;
+  background:var(--crimson);
+  border-radius:1px;
+  position:relative;
+}
+.logo-arrow::after {
+  content:'';
+  position:absolute; right:-5px; top:50%;
+  transform:translateY(-50%);
+  border-left:6px solid var(--crimson);
+  border-top:3.5px solid transparent;
+  border-bottom:3.5px solid transparent;
+}
+/* Tapering widths and opacity */
+.logo-arrow:nth-child(1){width:18px; opacity:1.0;}
+.logo-arrow:nth-child(2){width:13px; opacity:0.6;}
+.logo-arrow:nth-child(3){width: 8px; opacity:0.35;}
+
+.logo-wordmark {
+  font-family:var(--font-display);
+  font-size:20px; font-weight:800;
+  letter-spacing:-0.5px;
+}
+.logo-zee  { color:var(--white); }
+.logo-acts { color:var(--crimson); }
+
+/* Light version for light sections */
+.logo.light .logo-zbox  { background:var(--black); }
+.logo.light .logo-zbox span { color:var(--white); }
+.logo.light .logo-zee   { color:var(--black); }
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+NAVIGATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+<nav id="nav" role="navigation" aria-label="Main navigation">
+
+Position: fixed, top 0, full width
+Height: var(--nav-height) = 68px
+Background: rgba(10,10,15,0.88)
+Backdrop-filter: blur(24px) saturate(180%)
+Border-bottom: 1px solid rgba(255,255,255,0.06)
+Z-index: 1000
+Transition: box-shadow 0.3s var(--ease-out)
+
+When scrolled past 20px add class "scrolled":
+  box-shadow: 0 4px 32px rgba(0,0,0,0.4)
+
+Inner wrap: max-width var(--max-width), 
+  centered, padding 0 5%,
+  display:flex, align-items:center, 
+  justify-content:space-between, height:100%
+
+LEFT: Logo mark (dark version — white Z, white Zee, crimson Acts)
+
+CENTER: Nav links (hide on mobile)
+  <ul role="list"> with 6 <li><a> items
+  Each: smooth scroll to anchor on click
+  href="#hero" | "#about" | "#services" | 
+       "#portfolio" | "#blog" | "#contact"
+  Text: Home | About | Services | Portfolio | Blog | Contact
+  
+  Link CSS:
+    font-family:var(--font-body); font-size:14px;
+    font-weight:500; color:rgba(255,255,255,0.55);
+    padding:8px 14px; border-radius:var(--radius-sm);
+    transition:color var(--dur-fast), 
+               background var(--dur-fast);
+    text-decoration:none;
+  Link hover: color white, 
+              background rgba(255,255,255,0.07)
+  Link.active (via IntersectionObserver): color white
+  No underlines ever
+
+RIGHT: 
+  "Get a Free Quote →" button
+  Scrolls to #contact on click
+  CSS: background var(--crimson), color white,
+       font-family var(--font-display), 
+       font-weight:700, font-size:13px,
+       padding:10px 22px, 
+       border-radius:var(--radius-sm),
+       border:none, cursor:pointer,
+       transition: background var(--dur-base),
+                   transform var(--dur-base);
+  Hover: background var(--crimson-dark),
+         transform:translateY(-1px)
+  Active: transform:translateY(0)
+
+  Plus hamburger button (hidden on desktop):
+  3 bars, 22px wide, 2px height each, 5px gap
+  aria-label="Toggle menu"
+  aria-expanded="false/true"
+
+MOBILE MENU:
+  Full-screen overlay: position fixed, inset 0,
+  z-index 999, background rgba(10,10,15,0.98),
+  backdrop-filter blur(20px)
+  display:none → display:flex when open
+  flex-direction:column, justify-content:center,
+  align-items:flex-start, padding:40px
+  gap:8px
+
+  Links: Syne 800, 40px, white, display block,
+    padding:12px 0, border-bottom 1px rgba white 0.06
+  
+  Hamburger animates to X:
+    Bar 1: rotate(45deg) translateY(7px)
+    Bar 2: opacity 0, scaleX(0)
+    Bar 3: rotate(-45deg) translateY(-7px)
+  
+  CSS transition on all bar transforms: 0.3s ease
+
+  Close on: link click, Escape key, 
+            outside click, scroll
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION: HERO  id="hero"
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+min-height:100svh (svh = safe viewport height, 
+  handles mobile browser chrome correctly)
+padding-top: var(--nav-height)
+background: var(--black)
+position:relative; overflow:hidden
+display:flex; align-items:center
+
+BACKGROUND LAYERS (CSS only, no images):
+Layer 1 — Crimson glow blobs:
+  2 absolutely positioned divs with 
+  border-radius:50% and filter:blur(80px)
+  Top-right: rgba(230,57,80,0.15), 600px circle
+  Bottom-left: rgba(230,57,80,0.10), 500px circle
+  pointer-events:none; z-index:0
+
+Layer 2 — Grid overlay:
+  position:absolute; inset:0; z-index:0
+  background-image: 
+    linear-gradient(rgba(255,255,255,0.03) 
+      1px, transparent 1px),
+    linear-gradient(90deg, 
+      rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 64px 64px;
+
+Inner wrap: max-width var(--max-width), 
+  centered, padding 60px 5%,
+  display:grid, 
+  grid-template-columns:1fr 420px, 
+  gap:60px, align-items:center,
+  position:relative; z-index:1
+
+LEFT COLUMN — Hero content:
+All elements start opacity:0, transform:translateY(24px)
+GSAP timeline animates them in on load:
+  gsap.timeline().from(elements, {
+    opacity:0, y:24, duration:0.7, 
+    ease:'power3.out', stagger:0.12
+  })
+
+Elements in order:
+
+1. BADGE — pill with pulsing dot:
+   <div class="hero-badge">
+     <span class="badge-dot"></span>
+     <span>IT Solutions · SaaS · AI Consultancy</span>
+   </div>
+   
+   CSS: inline-flex, align-items:center, gap:8px
+   background:rgba(230,57,80,0.12)
+   border:1px solid rgba(230,57,80,0.25)
+   padding:6px 16px, border-radius:20px
+   font-family:var(--font-mono); font-size:10px
+   letter-spacing:3px; text-transform:uppercase
+   color:var(--crimson); margin-bottom:24px
+   
+   Dot: width:7px; height:7px; 
+        background:var(--crimson); border-radius:50%
+   Pulse animation (CSS keyframes):
+   @keyframes pulse {
+     0%,100%{opacity:1; transform:scale(1)}
+     50%{opacity:0.5; transform:scale(0.85)}
+   }
+   animation: pulse 2s ease infinite
+
+2. H1 tag (NOT div — semantic HTML):
+   <h1 class="hero-h1">
+     Software That<br>
+     <span class="text-crimson">Builds.</span>
+     AI That<br>
+     <span class="text-crimson">Scales.</span>
+   </h1>
+   
+   CSS: font-family:var(--font-display)
+   font-size: clamp(42px, 6vw, 76px)
+   font-weight:800; letter-spacing:-2.5px
+   line-height:1.0; color:var(--white)
+   margin-bottom:24px
+   
+   .text-crimson { color:var(--crimson); 
+                   display:block; }
+
+3. SUBHEADLINE <p> tag:
+   "ZeeActs delivers custom software, business-ready 
+   SaaS, and AI-powered automation — built by elite 
+   developers, delivered faster and at a fraction 
+   of the cost."
+   
+   CSS: font-size:17px; color:rgba(255,255,255,0.5)
+   line-height:1.75; max-width:500px; 
+   margin-bottom:36px
+
+4. CTA BUTTONS — <div class="hero-btns">:
+   Primary <button>: "Get a Free Quote →"
+     onclick scrolls to #contact
+     role="button", aria-label
+     CSS: background var(--crimson), white text,
+     font-family display, font-weight 700, 14px,
+     padding:14px 28px, border-radius 10px,
+     border:none, cursor:pointer,
+     transition:all var(--dur-base) var(--ease-out)
+     Hover:background var(--crimson-dark),
+           transform:translateY(-2px),
+           box-shadow:0 12px 32px rgba(230,57,80,0.35)
+   
+   Secondary <button>: "See Our Work"
+     onclick scrolls to #portfolio
+     CSS: border:1.5px solid rgba(255,255,255,0.2)
+     color:rgba(255,255,255,0.8); 
+     background:transparent,
+     same padding/radius/font
+     Hover: border-color rgba(white,0.5), color white,
+            transform:translateY(-2px)
+
+5. SOCIAL PROOF strip:
+   4 overlapping avatars + text
+   Avatars: 32px circles, border:2px solid black
+     Overlap: margin-left -8px on 2nd-4th
+     Colors: #e63950 / #2d6a4f / #1d3557 / #7b2d8b
+     Letters: A / M / S / R, Syne 800 12px white
+   Text: "50+ businesses powered by ZeeActs software & AI"
+     14px, rgba(white,0.5)
+
+RIGHT COLUMN — Floating dashboard card:
+  CSS animation (pure CSS, no JS for the float):
+  @keyframes float {
+    0%,100%{ transform:translateY(0) }
+    50%    { transform:translateY(-14px) }
+  }
+  animation:float 4s ease-in-out infinite
+  
+  Card CSS:
+    background:rgba(255,255,255,0.04)
+    border:1px solid rgba(255,255,255,0.09)
+    border-radius:var(--radius-lg); padding:28px
+    backdrop-filter:blur(10px)
+  
+  INSIDE THE CARD:
+  
+  a. Header row: title "Project Delivery Dashboard" 
+     (Syne 700 13px white) + "LIVE" badge
+     LIVE badge: bg var(--crimson), mono 8px white, 
+     padding 3px 8px, border-radius 20px,
+     letter-spacing 2px
+     Pulsing green dot before "LIVE" text:
+       width:6px; height:6px; bg:#27c93f;
+       border-radius:50%; animation pulse 1.5s infinite
+  
+  b. 2-col KPI grid:
+     Each tile: bg rgba(white,0.04), border-radius 10px,
+     padding 14px, border 1px solid rgba(white,0.06)
+     Label: 10px rgba(white,0.35)
+     Value: Syne 800 20px white
+     Trend: "+40%" or "62%" in crimson, Outfit 11px
+     
+     Tile 1: "Projects Shipped" — "127" — "+40%↑"
+     Tile 2: "Cost Savings via AI" — "62%" — "faster↑"
+  
+  c. Chart area:
+     Label: mono 8px rgba(white,0.3) "DELIVERY SPEED"
+     7 bars in flex row, align-items:flex-end, height:52px
+     Each bar: flex:1, border-radius:3px top
+     Heights: 30% 45% 38% 60% 52% 75% 100%
+     Colors: first 6 rgba(crimson, 0.15 to 0.5 increasing)
+             last bar: var(--crimson) full opacity
+     Bars animate height from 0 on page load (CSS):
+     @keyframes barGrow {
+       from { transform:scaleY(0); }
+       to   { transform:scaleY(1); }
+     }
+     transform-origin: bottom
+     Each bar: animation barGrow 0.8s ease-out forwards
+     animation-delay: 0.1s per bar (0.1s, 0.2s...0.7s)
+  
+  d. Activity feed: 3 items
+     Each: flex row, gap 10px, align-items center
+     Dot: 6px circle, flex-shrink:0
+     Text: 11px rgba(white,0.45), flex:1
+     Time: mono 9px rgba(white,0.2)
+     
+     Green dot  | "SaaS MVP deployed — LogiCore"      | 5m ago
+     Crimson dot| "AI module — 3× faster processing"  | 22m ago
+     Yellow dot | "Automation saved 18hrs/week"        | 1h ago
+
+SCROLL INDICATOR (bottom center of hero):
+  <div class="scroll-indicator" aria-hidden="true">
+    <div class="scroll-mouse">
+      <div class="scroll-wheel"></div>
+    </div>
+    <span>Scroll</span>
+  </div>
+  
+  CSS: position absolute, bottom 32px, 
+  left 50%, transform:translateX(-50%)
+  display:flex, flex-direction:column, 
+  align-items:center, gap:8px
+  opacity:0.4, transition:opacity 0.3s
+  
+  Mouse shape: 20px wide, 32px tall, 
+  border:2px solid rgba(white,0.4), 
+  border-radius:10px
+  
+  Wheel: 4px × 8px, bg rgba(white,0.6), 
+  border-radius:2px, margin:4px auto
+  @keyframes scrollWheel {
+    0%  { transform:translateY(0); opacity:1 }
+    100%{ transform:translateY(10px); opacity:0 }
+  }
+  animation: scrollWheel 1.5s ease infinite
+  
+  Fades to opacity:0 when user scrolls past 100px
+  JS: window.addEventListener('scroll', () => {
+    indicator.style.opacity = 
+      window.scrollY > 100 ? '0' : '0.4'
+  })
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MARQUEE  (crimson ticker between hero & about)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+<section aria-label="Services ticker" aria-hidden="true">
+
+Background:var(--crimson); height:52px; 
+overflow:hidden; display:flex; align-items:center
+
+Inner: 2 identical spans side by side (for seamless loop):
+  @keyframes marquee {
+    from { transform:translateX(0) }
+    to   { transform:translateX(-50%) }
+  }
+  display:flex; white-space:nowrap;
+  animation:marquee 28s linear infinite
+
+Items: Syne 700, 13px, rgba(white,0.85), 
+  uppercase, letter-spacing:1px, padding:0 32px
+  Separator: "·" in rgba(white,0.4)
+
+Text: Custom Software Development · SaaS Solutions · 
+  AI Consultancy · Business Automation · 
+  Marketing Automation · AI-Powered Delivery · 
+  Digital Transformation · AI Adoption & Training
+
+Pause animation on hover:
+  .marquee-track:hover { animation-play-state:paused }
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ABOUT SECTION  id="about"
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+<section id="about" aria-labelledby="about-heading">
+
+Background:var(--black); padding:var(--space-3xl) 0
+
+Section eyebrow pattern (reuse everywhere):
+<div class="eyebrow">
+  <span class="eyebrow-line" aria-hidden="true"></span>
+  <span class="eyebrow-text">01 — About</span>
+</div>
+
+.eyebrow { display:flex; align-items:center; gap:12px;
+           margin-bottom:16px; }
+.eyebrow-line { width:24px; height:2px; 
+                background:var(--crimson); flex-shrink:0; }
+.eyebrow-text { font-family:var(--font-mono); font-size:10px;
+                letter-spacing:4px; text-transform:uppercase;
+                color:var(--crimson); }
+
+<h2 id="about-heading" class="section-title light">
+  The Z stands for <span class="text-crimson">Execution.</span>
+</h2>
+
+.section-title {
+  font-family:var(--font-display);
+  font-size:clamp(32px, 4.5vw, 54px);
+  font-weight:800; letter-spacing:-1.5px;
+  line-height:1.05; color:var(--black);
+  margin-bottom:var(--space-xl);
+}
+.section-title.light { color:var(--white); }
+
+2-column grid: 1fr 1fr, gap:80px, align-items:center
+
+LEFT — Founder card (.reveal class for scroll animation):
+  Position:relative, overflow:hidden
+  Background:rgba(255,255,255,0.03)
+  Border:1px solid rgba(255,255,255,0.07)
+  Border-top:4px solid var(--crimson)
+  Border-radius:var(--radius-lg); padding:40px
+  
+  Watermark Z:
+    position:absolute; bottom:-20px; right:-10px
+    font-family:var(--font-display); font-size:200px
+    font-weight:800; color:rgba(255,255,255,0.03)
+    line-height:1; pointer-events:none;
+    user-select:none; aria-hidden:true
+  
+  Content (position:relative; z-index:1):
+    Pill tag: "Zohaib · Founder & CEO" crimson bg
+    Name: Syne 800 32px white
+    Quote paragraph: Outfit 14px rgba(white,0.5) 
+      line-height:1.7
+      "I started ZeeActs because I kept watching 
+      businesses pay for strategy that never got 
+      executed. The Z in ZeeActs is me — and it 
+      means we show up and build."
+    
+    2×2 stats grid (margin-top:24px):
+      Each stat: bg rgba(white,0.04), 
+      border-radius:10px, padding:16px, 
+      text-align:center
+      Number: Syne 800 26px crimson
+      Label: mono 10px rgba(white,0.35)
+      
+      "6+"  → Years / "50+" → Products
+      "$2M+" → Value / "98%" → Satisfaction
+
+RIGHT — Text content (.reveal with delay):
+  3 paragraphs, gap:18px between them
+  Outfit 16px rgba(white,0.6) line-height:1.8
+  
+  2×2 values grid (margin-top:36px):
+    White background, border:1px solid var(--gray-200)
+    Border-radius:12px; padding:20px
+    emoji + title Syne 700 14px + desc Outfit 12px gray
+    Hover:border-color rgba(crimson,0.2), 
+          box-shadow 0 8px 24px rgba(0,0,0,0.06)
+          transition 0.3s
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STATS BAR (between about & services)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+<section aria-label="Key statistics">
+
+Background:var(--crimson); padding:64px 0
+Diagonal stripe overlay using CSS only
+
+4 stats, CSS grid repeat(4,1fr)
+Dividers: gap 1px, background rgba(white,0.2)
+overflow:hidden (shows thin white lines)
+
+Each stat: padding:32px; background var(--crimson)
+text-align:center
+
+Number: <span class="counter" data-target="50">0</span>+
+  Syne 800, clamp(36px,5vw,54px), white
+  Counter animates from 0 to target when visible
+  IntersectionObserver triggers:
+  function animateCounter(el) {
+    const target = +el.dataset.target;
+    const duration = 2000;
+    const step = target / (duration/16);
+    let current = 0;
+    const timer = setInterval(() => {
+      current = Math.min(current+step, target);
+      el.textContent = Math.floor(current);
+      if(current >= target) clearInterval(timer);
+    }, 16);
+  }
+
+Label: mono 10px rgba(white,0.65), 
+letter-spacing:3px, uppercase, margin-top:8px
+
+Stats: 50+ PRODUCTS / 62% COST SAVING / 
+       3× FASTER / 98% SATISFACTION
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SERVICES SECTION  id="services"
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+<section id="services" aria-labelledby="services-heading">
+Background:var(--gray-100); padding:var(--space-3xl) 0
+
+3-column grid, gap:20px (.reveal-grid for stagger)
+
+Each card: <article class="service-card reveal">
+  role implied by article
+  tabindex="0" (keyboard focusable)
+  
+  CSS: background white; border:1px solid var(--gray-200)
+  border-radius:var(--radius-md); padding:36px
+  position:relative; overflow:hidden; cursor:pointer
+  transition:transform var(--dur-base) var(--ease-out),
+             border-color var(--dur-base),
+             box-shadow var(--dur-base)
+  
+  Top border animation:
+    .service-card::before {
+      content:''; position:absolute;
+      top:0; left:0; right:0; height:3px;
+      background:var(--crimson);
+      transform:scaleX(0); transform-origin:left;
+      transition:transform 0.35s var(--ease-out);
+    }
+    .service-card:hover::before,
+    .service-card:focus-visible::before {
+      transform:scaleX(1);
+    }
+    .service-card:hover,.service-card:focus-visible {
+      transform:translateY(-5px);
+      border-color:rgba(230,57,80,0.2);
+      box-shadow:0 20px 60px rgba(0,0,0,0.09);
+      outline:none;
+    }
+  
+  Content:
+    Faded number: aria-hidden="true"
+    Icon: role="img" aria-label="[service name] icon"
+    <h3> title: Syne 700 20px
+    <p> description: Outfit 14px gray
+    <ul> features: aria-label="Key features"
+      Each <li>: 13px, crimson → prefix
+
+  6 cards — same content as before
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WHY ZEEACTS (Results metrics section)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Background:var(--black); padding:var(--space-3xl) 0
+
+2-col grid (1fr 1fr, gap 80px)
+
+LEFT — Metric bar cards (.reveal):
+  Each bar-fill: transition:width 1.4s var(--ease-out)
+  IntersectionObserver sets width to final %:
+  Default width:0%
+  When visible: el.style.width = el.dataset.width
+
+RIGHT — Content (.reveal delay 0.2s):
+  Eyebrow + title + 3 icon rows + CTA button
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PROCESS SECTION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Background:var(--white); padding:var(--space-3xl) 0
+
+4-column grid separated by 1px gray dividers
+(.reveal-grid for stagger animation)
+
+Each step: <article class="process-step">
+  Number (aria-hidden) + icon + 
+  <h3> title + <p> desc
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PORTFOLIO SECTION  id="portfolio"
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+<section id="portfolio" aria-labelledby="portfolio-heading">
+Background:var(--white); padding:var(--space-3xl) 0
+
+Filter tabs: role="tablist" 
+Each button: role="tab", aria-selected="true/false"
+  aria-controls="portfolio-grid"
+
+Portfolio items: role="tabpanel" id="portfolio-grid"
+
+Each item: <article class="pf-item" data-cat="saas crm">
+  2-col layout: visual (dark, 45%) + info (white, 55%)
+
+Filter animation (vanilla JS, no library):
+  function filterPortfolio(cat) {
+    items.forEach(item => {
+      const cats = item.dataset.cat;
+      const show = cat === 'all' || cats.includes(cat);
+      item.style.transition = 'opacity 0.3s, transform 0.3s';
+      if(show) {
+        item.style.opacity = '1';
+        item.style.transform = 'translateY(0)';
+        item.style.display = '';
+      } else {
+        item.style.opacity = '0';
+        item.style.transform = 'translateY(16px)';
+        setTimeout(() => {
+          if(!cats.includes(activeFilter)) 
+            item.style.display = 'none'
+        }, 300);
+      }
+    });
+  }
+
+Include all 6 portfolio items from the previous prompt
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TESTIMONIALS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Background:var(--black); padding:var(--space-3xl) 0
+
+3-col grid (.reveal-grid)
+Each: <blockquote class="testi-card reveal">
+  <p> quote text (semantic HTML)
+  <footer> with <cite> for author name
+  Stars: aria-label="5 out of 5 stars"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLOG SECTION  id="blog"
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Background:var(--gray-100); padding:var(--space-3xl) 0
+
+CSS Grid: 
+  1 featured card (full width or 2-col span)
+  + 2×2 grid of regular cards
+
+Each card: <article class="blog-card reveal">
+  Dark top panel + white body
+  <time datetime="2026-03-10"> for dates
+  <h3> for titles
+  Hover: translateY(-4px) + border crimson + shadow
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PRICING SECTION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Background:var(--black); padding:var(--space-3xl) 0
+
+3-col grid (.reveal-grid)
+Middle card has border-top:3px solid var(--crimson)
+Include all 3 pricing tiers from previous prompt
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CONTACT SECTION  id="contact"
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+<section id="contact" aria-labelledby="contact-heading">
+Background:var(--gray-100); padding:var(--space-3xl) 0
+
+2-col layout (1fr 1.5fr, gap 60px)
+
+FORM — proper semantic HTML:
+<form id="contact-form" novalidate 
+      aria-label="Project inquiry form">
+
+  Each field group:
+  <div class="form-group">
+    <label for="firstName">First Name</label>
+    <input type="text" id="firstName" 
+           name="firstName" required
+           autocomplete="given-name"
+           aria-required="true">
+    <span class="form-error" role="alert" 
+          aria-live="polite"></span>
+  </div>
+
+  All inputs have: id, name, type, autocomplete,
+  aria-required, aria-describedby for errors
+  
+  Textarea: rows="5", resize:vertical
+  
+  Select: custom styled with CSS
+    (background image for dropdown arrow)
+  
+  Validation (vanilla JS):
+    Real-time: validate on blur
+    On submit: validate all, show errors inline
+    Success: show success message,
+             reset form after 3s
+    
+    function validateField(field) {
+      const error = field.nextElementSibling;
+      if(!field.value.trim()) {
+        error.textContent = 'This field is required';
+        field.setAttribute('aria-invalid','true');
+        return false;
+      }
+      if(field.type === 'email' && 
+         !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(field.value)) {
+        error.textContent = 'Please enter a valid email';
+        field.setAttribute('aria-invalid','true');
+        return false;
+      }
+      error.textContent = '';
+      field.setAttribute('aria-invalid','false');
+      return true;
+    }
+
+TIME SLOT PICKER — keyboard accessible:
+  Each slot: <button type="button" 
+             aria-pressed="false/true">
+  Click: aria-pressed toggled,
+         visual: border+bg crimson
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CTA STRIP (before newsletter)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Background:var(--crimson); padding:72px 0
+Diagonal stripe texture (CSS only)
+flex space-between, align-items center, gap 40px
+"Got a software idea?" heading + button "Get a Free Quote →"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+NEWSLETTER + FOOTER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Same as previous prompt but with:
+  <form> tag, proper label for email input
+  aria-label on form
+  Input type="email" with autocomplete="email"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+JAVASCRIPT — ALL AT BOTTOM, DEFER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Load order (all with defer or at end of body):
+
+1. GSAP from CDN (only for hero + complex animations)
+2. ScrollTrigger plugin from CDN
+3. Inline <script> at very bottom for everything else
+
+VANILLA JS MODULES (all in one inline script):
+
+// 1. Scroll progress bar
+const progressBar = document.getElementById('scroll-progress');
+window.addEventListener('scroll', () => {
+  const pct = window.scrollY / 
+    (document.body.scrollHeight - window.innerHeight);
+  progressBar.style.width = (pct * 100) + '%';
+}, {passive:true});
+
+// 2. Custom cursor (desktop only)
+if(window.matchMedia('(hover:hover)').matches) {
+  const cursor = document.getElementById('cursor');
+  let mx=0, my=0, cx=0, cy=0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+  });
+  function moveCursor() {
+    cx += (mx-cx) * 0.12; // lerp for smooth lag
+    cy += (my-cy) * 0.12;
+    cursor.style.left = cx + 'px';
+    cursor.style.top  = cy + 'px';
+    requestAnimationFrame(moveCursor);
+  }
+  moveCursor();
+  document.querySelectorAll('a,button,[role=button]')
+    .forEach(el => {
+      el.addEventListener('mouseenter', 
+        () => cursor.classList.add('hover'));
+      el.addEventListener('mouseleave', 
+        () => cursor.classList.remove('hover'));
+    });
+}
+
+// 3. Nav highlight on scroll (IntersectionObserver)
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-link');
+const sectionObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting) {
+      navLinks.forEach(link => {
+        link.classList.toggle('active',
+          link.getAttribute('href') === '#'+entry.target.id);
+      });
+    }
+  });
+}, {rootMargin:'-40% 0px -40% 0px'});
+sections.forEach(s => sectionObserver.observe(s));
+
+// 4. Reveal animations (IntersectionObserver)
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      revealObserver.unobserve(entry.target); // once only
+    }
+  });
+}, {threshold:0.12});
+document.querySelectorAll('.reveal')
+  .forEach(el => revealObserver.observe(el));
+
+// 5. Counter animation
+const counterObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting) {
+      animateCounter(entry.target);
+      counterObserver.unobserve(entry.target);
+    }
+  });
+}, {threshold:0.5});
+document.querySelectorAll('.counter')
+  .forEach(el => counterObserver.observe(el));
+
+// 6. Progress bar animations
+const barObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting) {
+      entry.target.style.width = 
+        entry.target.dataset.width;
+      barObserver.unobserve(entry.target);
+    }
+  });
+}, {threshold:0.3});
+document.querySelectorAll('.bar-fill')
+  .forEach(el => barObserver.observe(el));
+
+// 7. Smooth scroll for all nav links
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if(target) target.scrollIntoView({behavior:'smooth'});
+    // Close mobile nav if open
+    mobileNav.style.display = 'none';
+    hamburger.setAttribute('aria-expanded','false');
+  });
+});
+
+// 8. Mobile nav toggle
+const hamburger = document.getElementById('hamburger');
+const mobileNav = document.getElementById('mobile-nav');
+hamburger.addEventListener('click', () => {
+  const isOpen = mobileNav.style.display === 'flex';
+  mobileNav.style.display = isOpen ? 'none' : 'flex';
+  hamburger.setAttribute('aria-expanded', String(!isOpen));
+  hamburger.classList.toggle('open', !isOpen);
+});
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape') {
+    mobileNav.style.display = 'none';
+    hamburger.setAttribute('aria-expanded','false');
+    hamburger.classList.remove('open');
+  }
+});
+
+// 9. Nav shadow on scroll
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 20);
+}, {passive:true});
+
+// 10. Scroll indicator fade
+const scrollIndicator = document.querySelector('.scroll-indicator');
+window.addEventListener('scroll', () => {
+  if(scrollIndicator) 
+    scrollIndicator.style.opacity = 
+      window.scrollY > 100 ? '0' : '0.4';
+}, {passive:true});
+
+// 11. Portfolio filter
+let activeFilter = 'all';
+document.querySelectorAll('.pf-filter').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.pf-filter')
+      .forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected','false');
+      });
+    btn.classList.add('active');
+    btn.setAttribute('aria-selected','true');
+    activeFilter = btn.dataset.filter;
+    filterPortfolio(activeFilter);
+  });
+});
+
+// 12. Time slot selection
+document.querySelectorAll('.time-slot').forEach(slot => {
+  slot.addEventListener('click', () => {
+    document.querySelectorAll('.time-slot')
+      .forEach(s => s.setAttribute('aria-pressed','false'));
+    slot.setAttribute('aria-pressed','true');
+  });
+});
+
+// 13. GSAP hero animation (runs on load)
+window.addEventListener('load', () => {
+  if(typeof gsap !== 'undefined') {
+    gsap.from('.hero-badge', 
+      {opacity:0,y:20,duration:0.7,ease:'power3.out'});
+    gsap.from('.hero-h1', 
+      {opacity:0,y:28,duration:0.7,delay:0.12,
+       ease:'power3.out'});
+    gsap.from('.hero-sub', 
+      {opacity:0,y:20,duration:0.7,delay:0.24,
+       ease:'power3.out'});
+    gsap.from('.hero-btns', 
+      {opacity:0,y:16,duration:0.6,delay:0.36,
+       ease:'power3.out'});
+    gsap.from('.hero-proof', 
+      {opacity:0,y:12,duration:0.6,delay:0.46,
+       ease:'power3.out'});
+    gsap.from('.hero-widget', 
+      {opacity:0,x:30,duration:0.9,delay:0.3,
+       ease:'power3.out'});
+  }
+});
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RESPONSIVE BREAKPOINTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+/* Large screens */
+@media (min-width:1280px) {
+  :root { --max-width:1200px; }
+}
+
+/* Tablet */
+@media (max-width:1024px) {
+  .hero-grid { grid-template-columns:1fr; }
+  .hero-widget { display:none; }
+  .about-grid,.results-grid,
+  .contact-grid { grid-template-columns:1fr; gap:40px; }
+  .services-grid { grid-template-columns:repeat(2,1fr); }
+  .footer-grid { grid-template-columns:1fr 1fr; gap:32px; }
+  .newsletter-inner { grid-template-columns:1fr; gap:32px; }
+  .pricing-grid { grid-template-columns:1fr; max-width:480px; 
+                  margin-inline:auto; }
+}
+
+/* Mobile */
+@media (max-width:768px) {
+  :root { --space-3xl:80px; }
+  
+  #nav .nav-links, #nav .nav-cta { display:none; }
+  #nav .hamburger { display:flex; }
+  
+  .hero-h1 { font-size:clamp(36px,10vw,52px); }
+  .hero-btns { flex-direction:column; align-items:flex-start; }
+  
+  .services-grid { grid-template-columns:1fr; }
+  .process-grid { grid-template-columns:1fr 1fr; }
+  .testimonials-grid { grid-template-columns:1fr; }
+  .cases-grid { grid-template-columns:1fr; }
+  .blog-grid { grid-template-columns:1fr; }
+  .stats-grid { grid-template-columns:1fr 1fr; gap:1px; }
+  
+  .portfolio-item { 
+    grid-template-columns:1fr; 
+    .pf-visual { min-height:200px; }
+  }
+  
+  .cta-strip .wrap { 
+    flex-direction:column; text-align:center; 
+  }
+  .footer-grid { grid-template-columns:1fr; }
+  
+  .form-row { grid-template-columns:1fr; }
+  .slot-grid { grid-template-columns:repeat(2,1fr); }
+  
+  .nl-form { flex-direction:column; }
+}
+
+/* Small mobile */
+@media (max-width:480px) {
+  .process-grid { grid-template-columns:1fr; }
+  .about-stats { grid-template-columns:1fr 1fr; }
+}
