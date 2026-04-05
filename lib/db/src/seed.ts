@@ -45,7 +45,7 @@ async function seed() {
   const settings = [
     { key: "heroBadge", value: "Powered by AI. Delivered by Humans." },
     { key: "heroHeadline", value: "Software That Builds. AI That Scales." },
-    { key: "heroSubheadline", value: "ZeeActs builds premium software products, automates complex business processes, and integrates AI — so you can grow without growing your headcount." },
+    { key: "heroSubheadline", value: "ZeeActs solves your toughest operational hurdles by first refining your business processes to industry-leading standards. Once optimized, we build or connect our customised software and AI tools to handle the heavy lifting - giving you an enterprise-grade engine that runs on its own, so you can grow without growing your headcount." },
     { key: "aboutTitle", value: "The Z stands for Execution." },
     { key: "founderName", value: "Zohaib" },
     { key: "founderBio", value: "I started ZeeActs because I kept seeing the same problem: great business ideas held back by bad software. We fix that. Every line of code we write is optimized for speed, scale, and business outcomes — not just for making the demo look good." },
