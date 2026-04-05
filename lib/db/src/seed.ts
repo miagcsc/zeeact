@@ -6,14 +6,14 @@ import {
   siteSettingsTable,
 } from "./schema";
 
-async function seed() {
-  console.log("Seeding database...");
-
+export async function seedIfEmpty(): Promise<void> {
   const existing = await db.select().from(servicesTable).limit(1);
   if (existing.length > 0) {
     console.log("Database already seeded. Skipping.");
-    process.exit(0);
+    return;
   }
+
+  console.log("Seeding database...");
 
   await db.insert(servicesTable).values([
     { icon: "⚡", title: "Custom Software Development", description: "We build tailor-made software solutions that fit your business logic perfectly. From MVPs to enterprise platforms, we ship fast, clean code.", sortOrder: 0 },
@@ -57,10 +57,4 @@ async function seed() {
   }
 
   console.log("Seeding complete.");
-  process.exit(0);
 }
-
-seed().catch((err) => {
-  console.error("Seed failed:", err);
-  process.exit(1);
-});
