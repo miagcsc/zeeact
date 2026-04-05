@@ -201,6 +201,10 @@
   .reveal { opacity:1!important; transform:none!important; }
 }
 
+/* About body — override any hardcoded text-white classes from stored HTML */
+.about-body p { color: rgba(0,0,0,0.6) !important; margin-bottom: 1.5rem !important; }
+.about-body a { color: var(--crimson) !important; }
+
 /* Custom styles for components */
 .logo { display:flex; align-items:center; gap:10px; cursor:pointer; }
 .logo-zbox { width:36px; height:36px; flex-shrink:0; background:var(--zee-white); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; }

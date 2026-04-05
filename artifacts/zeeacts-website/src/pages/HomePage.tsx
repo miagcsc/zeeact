@@ -370,7 +370,7 @@ export default function HomePage() {
 
           <div className="grid md:grid-cols-2 gap-20 items-center">
             <div className="bg-white border border-black/08 p-10 rounded-[20px] relative overflow-hidden reveal shadow-sm">
-              <div className="absolute -right-10 -bottom-10 font-display font-extrabold text-[240px] text-black/05 leading-[0.8] select-none pointer-events-none">
+              <div className="hidden sm:block absolute -right-10 -bottom-10 font-display font-extrabold text-[240px] text-black/[0.04] leading-[0.8] select-none pointer-events-none">
                 Z
               </div>
               <h3 className="font-display font-bold text-2xl text-[#0A0A0F] mb-2">{settings?.founderName || "Zohaib"}</h3>
@@ -385,7 +385,7 @@ export default function HomePage() {
             </div>
 
             <div className="reveal">
-              <div dangerouslySetInnerHTML={{ __html: settings?.aboutBody || "<p class='text-black/60 mb-6'>ZeeActs is a premium business consultancy, software development and AI consultancy firm. We partner with ambitious businesses to build scalable products, automate operations, and integrate AI into their workflows.</p><p class='text-black/60 mb-8'>Our methodology is simple: we ship fast, we write clean code, and we use AI to multiply our output. The result? You get enterprise-grade software at a fraction of the traditional cost and time.</p>" }} />
+              <div className="about-body" dangerouslySetInnerHTML={{ __html: settings?.aboutBody || "<p>ZeeActs is a premium business consultancy, software development and AI consultancy firm. We partner with ambitious businesses to build scalable products, automate operations, and integrate AI into their workflows.</p><p>Our methodology is simple: we ship fast, we write clean code, and we use AI to multiply our output. The result? You get enterprise-grade software at a fraction of the traditional cost and time.</p>" }} />
               
               <div className="grid grid-cols-2 gap-4">
                 {[
