@@ -8,3 +8,105 @@
 export interface HealthStatus {
   status: string;
 }
+
+export interface DeleteResult {
+  success: boolean;
+}
+
+export interface Service {
+  id: number;
+  icon: string;
+  title: string;
+  description: string;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateServiceBody {
+  icon?: string;
+  title: string;
+  description: string;
+  sortOrder?: number;
+}
+
+export interface PortfolioItem {
+  id: number;
+  title: string;
+  category: string;
+  description: string;
+  techStack: string[];
+  resultMetric: string;
+  resultLabel: string;
+  accentColor: string;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreatePortfolioItemBody {
+  title: string;
+  category?: string;
+  description: string;
+  techStack?: string[];
+  resultMetric?: string;
+  resultLabel?: string;
+  accentColor?: string;
+  sortOrder?: number;
+}
+
+export interface Testimonial {
+  id: number;
+  name: string;
+  company: string;
+  role: string;
+  quote: string;
+  avatarInitials: string;
+  avatarColor: string;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateTestimonialBody {
+  name: string;
+  company: string;
+  role: string;
+  quote: string;
+  avatarInitials: string;
+  avatarColor?: string;
+  sortOrder?: number;
+}
+
+export interface ContactSubmission {
+  id: number;
+  name: string;
+  email: string;
+  company: string;
+  projectType: string;
+  budget: string;
+  message: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
+export interface SubmitContactBody {
+  name: string;
+  email: string;
+  company?: string;
+  projectType?: string;
+  budget?: string;
+  message: string;
+}
+
+export interface SiteSettings {
+  heroBadge?: string;
+  heroHeadline?: string;
+  heroSubheadline?: string;
+  aboutTitle?: string;
+  aboutBody?: string;
+  founderName?: string;
+  founderBio?: string;
+  contactEmail?: string;
+  [key: string]: string;
+}

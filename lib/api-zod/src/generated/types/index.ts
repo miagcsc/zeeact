@@ -6,4 +6,14 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from "./contactSubmission";
+export * from "./createPortfolioItemBody";
+export * from "./createServiceBody";
+export * from "./createTestimonialBody";
+export * from "./deleteResult";
 export * from "./healthStatus";
+export * from "./portfolioItem";
+export * from "./service";
+export * from "./siteSettings";
+export * from "./submitContactBody";
+export * from "./testimonial";

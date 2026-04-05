@@ -8,9 +8,339 @@
 import * as zod from "zod";
 
 /**
- * Returns server health status
  * @summary Health check
  */
 export const HealthCheckResponse = zod.object({
   status: zod.string(),
+});
+
+/**
+ * @summary List all services
+ */
+export const ListServicesResponseItem = zod.object({
+  id: zod.number(),
+  icon: zod.string(),
+  title: zod.string(),
+  description: zod.string(),
+  sortOrder: zod.number(),
+  createdAt: zod.string(),
+  updatedAt: zod.string(),
+});
+export const ListServicesResponse = zod.array(ListServicesResponseItem);
+
+/**
+ * @summary Create a service
+ */
+export const CreateServiceBody = zod.object({
+  icon: zod.string().optional(),
+  title: zod.string(),
+  description: zod.string(),
+  sortOrder: zod.number().optional(),
+});
+
+/**
+ * @summary Get a service
+ */
+export const GetServiceParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const GetServiceResponse = zod.object({
+  id: zod.number(),
+  icon: zod.string(),
+  title: zod.string(),
+  description: zod.string(),
+  sortOrder: zod.number(),
+  createdAt: zod.string(),
+  updatedAt: zod.string(),
+});
+
+/**
+ * @summary Update a service
+ */
+export const UpdateServiceParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const UpdateServiceBody = zod.object({
+  icon: zod.string().optional(),
+  title: zod.string(),
+  description: zod.string(),
+  sortOrder: zod.number().optional(),
+});
+
+export const UpdateServiceResponse = zod.object({
+  id: zod.number(),
+  icon: zod.string(),
+  title: zod.string(),
+  description: zod.string(),
+  sortOrder: zod.number(),
+  createdAt: zod.string(),
+  updatedAt: zod.string(),
+});
+
+/**
+ * @summary Delete a service
+ */
+export const DeleteServiceParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const DeleteServiceResponse = zod.object({
+  success: zod.boolean(),
+});
+
+/**
+ * @summary List all portfolio items
+ */
+export const ListPortfolioResponseItem = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  category: zod.string(),
+  description: zod.string(),
+  techStack: zod.array(zod.string()),
+  resultMetric: zod.string(),
+  resultLabel: zod.string(),
+  accentColor: zod.string(),
+  sortOrder: zod.number(),
+  createdAt: zod.string(),
+  updatedAt: zod.string(),
+});
+export const ListPortfolioResponse = zod.array(ListPortfolioResponseItem);
+
+/**
+ * @summary Create a portfolio item
+ */
+export const CreatePortfolioItemBody = zod.object({
+  title: zod.string(),
+  category: zod.string().optional(),
+  description: zod.string(),
+  techStack: zod.array(zod.string()).optional(),
+  resultMetric: zod.string().optional(),
+  resultLabel: zod.string().optional(),
+  accentColor: zod.string().optional(),
+  sortOrder: zod.number().optional(),
+});
+
+/**
+ * @summary Get a portfolio item
+ */
+export const GetPortfolioItemParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const GetPortfolioItemResponse = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  category: zod.string(),
+  description: zod.string(),
+  techStack: zod.array(zod.string()),
+  resultMetric: zod.string(),
+  resultLabel: zod.string(),
+  accentColor: zod.string(),
+  sortOrder: zod.number(),
+  createdAt: zod.string(),
+  updatedAt: zod.string(),
+});
+
+/**
+ * @summary Update a portfolio item
+ */
+export const UpdatePortfolioItemParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const UpdatePortfolioItemBody = zod.object({
+  title: zod.string(),
+  category: zod.string().optional(),
+  description: zod.string(),
+  techStack: zod.array(zod.string()).optional(),
+  resultMetric: zod.string().optional(),
+  resultLabel: zod.string().optional(),
+  accentColor: zod.string().optional(),
+  sortOrder: zod.number().optional(),
+});
+
+export const UpdatePortfolioItemResponse = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  category: zod.string(),
+  description: zod.string(),
+  techStack: zod.array(zod.string()),
+  resultMetric: zod.string(),
+  resultLabel: zod.string(),
+  accentColor: zod.string(),
+  sortOrder: zod.number(),
+  createdAt: zod.string(),
+  updatedAt: zod.string(),
+});
+
+/**
+ * @summary Delete a portfolio item
+ */
+export const DeletePortfolioItemParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const DeletePortfolioItemResponse = zod.object({
+  success: zod.boolean(),
+});
+
+/**
+ * @summary List all testimonials
+ */
+export const ListTestimonialsResponseItem = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  company: zod.string(),
+  role: zod.string(),
+  quote: zod.string(),
+  avatarInitials: zod.string(),
+  avatarColor: zod.string(),
+  sortOrder: zod.number(),
+  createdAt: zod.string(),
+  updatedAt: zod.string(),
+});
+export const ListTestimonialsResponse = zod.array(ListTestimonialsResponseItem);
+
+/**
+ * @summary Create a testimonial
+ */
+export const CreateTestimonialBody = zod.object({
+  name: zod.string(),
+  company: zod.string(),
+  role: zod.string(),
+  quote: zod.string(),
+  avatarInitials: zod.string(),
+  avatarColor: zod.string().optional(),
+  sortOrder: zod.number().optional(),
+});
+
+/**
+ * @summary Update a testimonial
+ */
+export const UpdateTestimonialParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const UpdateTestimonialBody = zod.object({
+  name: zod.string(),
+  company: zod.string(),
+  role: zod.string(),
+  quote: zod.string(),
+  avatarInitials: zod.string(),
+  avatarColor: zod.string().optional(),
+  sortOrder: zod.number().optional(),
+});
+
+export const UpdateTestimonialResponse = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  company: zod.string(),
+  role: zod.string(),
+  quote: zod.string(),
+  avatarInitials: zod.string(),
+  avatarColor: zod.string(),
+  sortOrder: zod.number(),
+  createdAt: zod.string(),
+  updatedAt: zod.string(),
+});
+
+/**
+ * @summary Delete a testimonial
+ */
+export const DeleteTestimonialParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const DeleteTestimonialResponse = zod.object({
+  success: zod.boolean(),
+});
+
+/**
+ * @summary Submit contact form
+ */
+export const SubmitContactBody = zod.object({
+  name: zod.string(),
+  email: zod.string(),
+  company: zod.string().optional(),
+  projectType: zod.string().optional(),
+  budget: zod.string().optional(),
+  message: zod.string(),
+});
+
+/**
+ * @summary List all contact submissions (admin)
+ */
+export const ListContactSubmissionsResponseItem = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  email: zod.string(),
+  company: zod.string(),
+  projectType: zod.string(),
+  budget: zod.string(),
+  message: zod.string(),
+  isRead: zod.boolean(),
+  createdAt: zod.string(),
+});
+export const ListContactSubmissionsResponse = zod.array(
+  ListContactSubmissionsResponseItem,
+);
+
+/**
+ * @summary Mark contact submission as read
+ */
+export const MarkContactReadParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const MarkContactReadResponse = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  email: zod.string(),
+  company: zod.string(),
+  projectType: zod.string(),
+  budget: zod.string(),
+  message: zod.string(),
+  isRead: zod.boolean(),
+  createdAt: zod.string(),
+});
+
+/**
+ * @summary Get all site settings
+ */
+export const GetSettingsResponse = zod.object({
+  heroBadge: zod.string().optional(),
+  heroHeadline: zod.string().optional(),
+  heroSubheadline: zod.string().optional(),
+  aboutTitle: zod.string().optional(),
+  aboutBody: zod.string().optional(),
+  founderName: zod.string().optional(),
+  founderBio: zod.string().optional(),
+  contactEmail: zod.string().optional(),
+});
+
+/**
+ * @summary Update site settings
+ */
+export const UpdateSettingsBody = zod.object({
+  heroBadge: zod.string().optional(),
+  heroHeadline: zod.string().optional(),
+  heroSubheadline: zod.string().optional(),
+  aboutTitle: zod.string().optional(),
+  aboutBody: zod.string().optional(),
+  founderName: zod.string().optional(),
+  founderBio: zod.string().optional(),
+  contactEmail: zod.string().optional(),
+});
+
+export const UpdateSettingsResponse = zod.object({
+  heroBadge: zod.string().optional(),
+  heroHeadline: zod.string().optional(),
+  heroSubheadline: zod.string().optional(),
+  aboutTitle: zod.string().optional(),
+  aboutBody: zod.string().optional(),
+  founderName: zod.string().optional(),
+  founderBio: zod.string().optional(),
+  contactEmail: zod.string().optional(),
 });

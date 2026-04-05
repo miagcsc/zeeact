@@ -10,13 +10,23 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: services
+    description: Service cards
+  - name: portfolio
+    description: Portfolio / case studies
+  - name: testimonials
+    description: Client testimonials
+  - name: contact
+    description: Contact form submissions
+  - name: settings
+    description: Site settings
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +34,355 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # Services
+  /services:
+    get:
+      operationId: listServices
+      tags: [services]
+      summary: List all services
+      responses:
+        "200":
+          description: List of services
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Service"
+    post:
+      operationId: createService
+      tags: [services]
+      summary: Create a service
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateServiceBody"
+      responses:
+        "201":
+          description: Created service
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+
+  /services/{id}:
+    get:
+      operationId: getService
+      tags: [services]
+      summary: Get a service
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Service
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+        "404":
+          description: Not found
+    put:
+      operationId: updateService
+      tags: [services]
+      summary: Update a service
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateServiceBody"
+      responses:
+        "200":
+          description: Updated service
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+    delete:
+      operationId: deleteService
+      tags: [services]
+      summary: Delete a service
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteResult"
+
+  # Portfolio
+  /portfolio:
+    get:
+      operationId: listPortfolio
+      tags: [portfolio]
+      summary: List all portfolio items
+      responses:
+        "200":
+          description: List of portfolio items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PortfolioItem"
+    post:
+      operationId: createPortfolioItem
+      tags: [portfolio]
+      summary: Create a portfolio item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePortfolioItemBody"
+      responses:
+        "201":
+          description: Created portfolio item
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PortfolioItem"
+
+  /portfolio/{id}:
+    get:
+      operationId: getPortfolioItem
+      tags: [portfolio]
+      summary: Get a portfolio item
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Portfolio item
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PortfolioItem"
+        "404":
+          description: Not found
+    put:
+      operationId: updatePortfolioItem
+      tags: [portfolio]
+      summary: Update a portfolio item
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePortfolioItemBody"
+      responses:
+        "200":
+          description: Updated portfolio item
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PortfolioItem"
+    delete:
+      operationId: deletePortfolioItem
+      tags: [portfolio]
+      summary: Delete a portfolio item
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteResult"
+
+  # Testimonials
+  /testimonials:
+    get:
+      operationId: listTestimonials
+      tags: [testimonials]
+      summary: List all testimonials
+      responses:
+        "200":
+          description: List of testimonials
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Testimonial"
+    post:
+      operationId: createTestimonial
+      tags: [testimonials]
+      summary: Create a testimonial
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTestimonialBody"
+      responses:
+        "201":
+          description: Created testimonial
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Testimonial"
+
+  /testimonials/{id}:
+    put:
+      operationId: updateTestimonial
+      tags: [testimonials]
+      summary: Update a testimonial
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTestimonialBody"
+      responses:
+        "200":
+          description: Updated testimonial
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Testimonial"
+    delete:
+      operationId: deleteTestimonial
+      tags: [testimonials]
+      summary: Delete a testimonial
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteResult"
+
+  # Contact Submissions
+  /contact:
+    post:
+      operationId: submitContact
+      tags: [contact]
+      summary: Submit contact form
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitContactBody"
+      responses:
+        "201":
+          description: Submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactSubmission"
+
+  /contact/submissions:
+    get:
+      operationId: listContactSubmissions
+      tags: [contact]
+      summary: List all contact submissions (admin)
+      responses:
+        "200":
+          description: List of contact submissions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ContactSubmission"
+
+  /contact/submissions/{id}/read:
+    patch:
+      operationId: markContactRead
+      tags: [contact]
+      summary: Mark contact submission as read
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactSubmission"
+
+  # Site Settings
+  /settings:
+    get:
+      operationId: getSettings
+      tags: [settings]
+      summary: Get all site settings
+      responses:
+        "200":
+          description: Site settings as key-value map
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteSettings"
+    put:
+      operationId: updateSettings
+      tags: [settings]
+      summary: Update site settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SiteSettings"
+      responses:
+        "200":
+          description: Updated settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteSettings"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +393,249 @@ components:
       required:
         - status
 
+    DeleteResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+      required:
+        - success
+
+    Service:
+      type: object
+      properties:
+        id:
+          type: integer
+        icon:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        sortOrder:
+          type: integer
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - icon
+        - title
+        - description
+        - sortOrder
+        - createdAt
+        - updatedAt
+
+    CreateServiceBody:
+      type: object
+      properties:
+        icon:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        sortOrder:
+          type: integer
+      required:
+        - title
+        - description
+
+    PortfolioItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        category:
+          type: string
+        description:
+          type: string
+        techStack:
+          type: array
+          items:
+            type: string
+        resultMetric:
+          type: string
+        resultLabel:
+          type: string
+        accentColor:
+          type: string
+        sortOrder:
+          type: integer
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - title
+        - category
+        - description
+        - techStack
+        - resultMetric
+        - resultLabel
+        - accentColor
+        - sortOrder
+        - createdAt
+        - updatedAt
+
+    CreatePortfolioItemBody:
+      type: object
+      properties:
+        title:
+          type: string
+        category:
+          type: string
+        description:
+          type: string
+        techStack:
+          type: array
+          items:
+            type: string
+        resultMetric:
+          type: string
+        resultLabel:
+          type: string
+        accentColor:
+          type: string
+        sortOrder:
+          type: integer
+      required:
+        - title
+        - description
+
+    Testimonial:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        company:
+          type: string
+        role:
+          type: string
+        quote:
+          type: string
+        avatarInitials:
+          type: string
+        avatarColor:
+          type: string
+        sortOrder:
+          type: integer
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - name
+        - company
+        - role
+        - quote
+        - avatarInitials
+        - avatarColor
+        - sortOrder
+        - createdAt
+        - updatedAt
+
+    CreateTestimonialBody:
+      type: object
+      properties:
+        name:
+          type: string
+        company:
+          type: string
+        role:
+          type: string
+        quote:
+          type: string
+        avatarInitials:
+          type: string
+        avatarColor:
+          type: string
+        sortOrder:
+          type: integer
+      required:
+        - name
+        - company
+        - role
+        - quote
+        - avatarInitials
+
+    ContactSubmission:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        company:
+          type: string
+        projectType:
+          type: string
+        budget:
+          type: string
+        message:
+          type: string
+        isRead:
+          type: boolean
+        createdAt:
+          type: string
+      required:
+        - id
+        - name
+        - email
+        - company
+        - projectType
+        - budget
+        - message
+        - isRead
+        - createdAt
+
+    SubmitContactBody:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        company:
+          type: string
+        projectType:
+          type: string
+        budget:
+          type: string
+        message:
+          type: string
+      required:
+        - name
+        - email
+        - message
+
+    SiteSettings:
+      type: object
+      properties:
+        heroBadge:
+          type: string
+        heroHeadline:
+          type: string
+        heroSubheadline:
+          type: string
+        aboutTitle:
+          type: string
+        aboutBody:
+          type: string
+        founderName:
+          type: string
+        founderBio:
+          type: string
+        contactEmail:
+          type: string
+      additionalProperties:
+        type: string
