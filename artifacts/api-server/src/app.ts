@@ -35,17 +35,30 @@ app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 
 const isProduction = process.env.NODE_ENV === "production";
 
-const ALLOWED_ORIGINS = new Set<string>(
+function buildAllowedOrigins(): Set<string> {
+  const origins = new Set<string>();
+
   (process.env.ALLOWED_ORIGINS ?? "")
     .split(",")
     .map((o) => o.trim())
-    .filter(Boolean),
-);
+    .filter(Boolean)
+    .forEach((o) => origins.add(o));
 
-const REPLIT_DEV_DOMAIN = process.env.REPLIT_DEV_DOMAIN;
-if (REPLIT_DEV_DOMAIN) {
-  ALLOWED_ORIGINS.add(`https://${REPLIT_DEV_DOMAIN}`);
+  const devDomain = process.env.REPLIT_DEV_DOMAIN;
+  if (devDomain) {
+    origins.add(`https://${devDomain}`);
+  }
+
+  (process.env.REPLIT_DOMAINS ?? "")
+    .split(",")
+    .map((d) => d.trim())
+    .filter(Boolean)
+    .forEach((d) => origins.add(`https://${d}`));
+
+  return origins;
 }
+
+const ALLOWED_ORIGINS = buildAllowedOrigins();
 
 app.use(
   cors({
@@ -56,22 +69,20 @@ app.use(
         return;
       }
 
-      let originHost: string;
+      let parsedOrigin: string;
       try {
-        originHost = new URL(origin).origin;
+        parsedOrigin = new URL(origin).origin;
       } catch {
         cb(new Error(`CORS policy: malformed origin — ${origin}`));
         return;
       }
 
-      if (isProduction) {
-        if (ALLOWED_ORIGINS.has(originHost)) {
-          cb(null, true);
-        } else {
-          cb(new Error(`CORS policy: origin not allowed — ${origin}`));
-        }
+      if (ALLOWED_ORIGINS.has(parsedOrigin)) {
+        cb(null, true);
+      } else if (!isProduction) {
+        cb(null, true);
       } else {
-        cb(null, ALLOWED_ORIGINS.size === 0 || ALLOWED_ORIGINS.has(originHost));
+        cb(new Error(`CORS policy: origin not allowed — ${origin}`));
       }
     },
   }),
