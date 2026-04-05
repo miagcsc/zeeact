@@ -10,13 +10,21 @@ const ADMIN_USER_IDS = (process.env.ADMIN_USER_IDS ?? "")
   .filter(Boolean);
 
 if (isProduction && ADMIN_USER_IDS.length === 0) {
-  logger.warn(
-    "ADMIN_USER_IDS is not set in production. All authenticated users will be treated as admins. " +
-      "Set ADMIN_USER_IDS to a comma-separated list of allowed Clerk user IDs.",
+  logger.error(
+    "FATAL: ADMIN_USER_IDS is not configured in production. " +
+      "All admin endpoints will return 503 until ADMIN_USER_IDS is set " +
+      "to a comma-separated list of permitted Clerk user IDs.",
   );
 }
 
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
+  if (isProduction && ADMIN_USER_IDS.length === 0) {
+    res.status(503).json({
+      error: "Admin access is not configured. Set ADMIN_USER_IDS on the server.",
+    });
+    return;
+  }
+
   const auth = getAuth(req);
   const userId = auth?.userId;
 
