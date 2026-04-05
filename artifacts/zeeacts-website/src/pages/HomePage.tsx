@@ -586,44 +586,54 @@ export default function HomePage() {
               Industry-Specific Software
             </h2>
             <p className="text-black/50 mb-14 max-w-xl text-base">Purpose-built platforms for specific industries — ready to deploy, fully managed, and deeply tailored to Pakistani business operations.</p>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid gap-8">
               {solutions.map((sol, idx) => {
                 const accent = sol.accentColor || "#0EA5E9";
                 return (
                   <motion.a
                     key={sol.id}
                     href={`/solutions/${sol.slug}`}
-                    initial={{ opacity: 0, y: 24 }}
+                    initial={{ opacity: 0, y: 28 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: idx * 0.1, duration: 0.5 }}
-                    className="group p-8 rounded-[24px] border border-black/08 bg-white hover:shadow-xl hover:border-black/15 transition-all hover:-translate-y-1 flex flex-col gap-4"
+                    transition={{ delay: idx * 0.07, duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
+                    className="group flex flex-col md:flex-row rounded-[24px] overflow-hidden shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1"
                   >
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center font-display font-extrabold text-lg" style={{ background: `${accent}18`, border: `1.5px solid ${accent}35` }}>
-                      <span style={{ color: accent }}>{sol.logoText?.[0] ?? sol.name[0]}</span>
+                    {/* Accent side */}
+                    <div className="md:w-[45%] p-10 flex flex-col justify-center relative overflow-hidden" style={{ backgroundColor: accent }}>
+                      <div className="absolute inset-0 opacity-20 bg-gradient-to-br from-white to-transparent mix-blend-overlay" />
+                      <div className="relative z-10">
+                        {sol.badge && (
+                          <div className="font-mono text-white/70 text-sm tracking-widest uppercase mb-4">{sol.badge}</div>
+                        )}
+                        <div className="w-14 h-14 rounded-2xl bg-white/15 border border-white/25 flex items-center justify-center mb-6">
+                          <span className="font-display font-extrabold text-2xl text-white">{sol.logoText?.[0] ?? sol.name[0]}</span>
+                        </div>
+                        <h3 className="font-display font-bold text-3xl text-white mb-2">{sol.name}</h3>
+                        <p className="text-white/70 text-base leading-relaxed">{sol.tagline}</p>
+                      </div>
                     </div>
-                    {sol.badge && (
-                      <span className="text-[10px] font-mono tracking-[3px] uppercase font-semibold" style={{ color: accent }}>{sol.badge}</span>
-                    )}
-                    <div>
-                      <h3 className="font-display font-bold text-xl text-[#0A0A0F] mb-1">{sol.name}</h3>
-                      <p className="text-sm text-black/50 font-medium">{sol.tagline}</p>
-                    </div>
-                    <div className="mt-auto flex items-center gap-2 text-xs font-semibold group-hover:gap-3 transition-all" style={{ color: accent }}>
-                      Explore solution <span>→</span>
+                    {/* White side */}
+                    <div className="md:w-[55%] bg-white p-10 flex flex-col justify-center gap-6">
+                      <p className="text-gray-500 text-lg leading-relaxed">Purpose-built for your industry — fully managed, deeply tailored to Pakistani business operations.</p>
+                      <div className="flex items-center gap-2 font-display font-bold text-base group-hover:gap-3 transition-all" style={{ color: accent }}>
+                        Explore solution <span>→</span>
+                      </div>
                     </div>
                   </motion.a>
                 );
               })}
               {/* Teaser card for upcoming solutions */}
-              <div className="p-8 rounded-[24px] border border-black/08 border-dashed bg-white/60 flex flex-col gap-4 opacity-60">
-                <div className="w-12 h-12 rounded-xl bg-black/05 border border-black/10 flex items-center justify-center">
-                  <span className="text-black/30 text-xl">+</span>
+              <div className="flex flex-col md:flex-row rounded-[24px] overflow-hidden border border-dashed border-black/12 opacity-50">
+                <div className="md:w-[45%] p-10 flex flex-col justify-center bg-black/03">
+                  <div className="w-14 h-14 rounded-2xl bg-black/05 border border-black/10 flex items-center justify-center mb-6">
+                    <span className="text-black/30 text-2xl">+</span>
+                  </div>
+                  <span className="font-mono text-[10px] tracking-[3px] uppercase font-semibold text-black/30 mb-3">Coming Soon</span>
+                  <h3 className="font-display font-bold text-3xl text-black/30">More Solutions</h3>
                 </div>
-                <span className="text-[10px] font-mono tracking-[3px] uppercase font-semibold text-black/30">Coming Soon</span>
-                <div>
-                  <h3 className="font-display font-bold text-xl text-black/40 mb-1">More Solutions</h3>
-                  <p className="text-sm text-black/30">Sales CRM, Clinic Management, Restaurant POS — and more verticals launching soon.</p>
+                <div className="md:w-[55%] p-10 flex flex-col justify-center bg-white">
+                  <p className="text-black/25 text-lg">Sales CRM, Clinic Management, Restaurant POS — and more verticals launching soon.</p>
                 </div>
               </div>
             </div>
