@@ -132,23 +132,23 @@ export default function HomePage() {
   );
 
   return (
-    <div className="bg-[#0A0A0F] text-[#F5F5F0] min-h-screen font-body overflow-x-hidden">
+    <div className="bg-white text-[#0A0A0F] min-h-screen font-body overflow-x-hidden">
       <div id="scroll-progress" className="fixed top-0 left-0 h-[3px] bg-[#E63950] z-[9999] transition-all duration-100 ease-linear w-0" />
 
       {/* Nav */}
       <nav
         id="nav"
         className={`fixed top-0 w-full h-[68px] z-[1000] transition-shadow duration-300 ${
-          isScrolled ? "shadow-[0_4px_32px_rgba(0,0,0,0.4)]" : ""
+          isScrolled ? "shadow-[0_4px_24px_rgba(0,0,0,0.08)]" : ""
         }`}
         style={{
-          background: "rgba(10,10,15,0.88)",
+          background: "rgba(255,255,255,0.92)",
           backdropFilter: "blur(24px) saturate(180%)",
-          borderBottom: "1px solid rgba(255,255,255,0.06)",
+          borderBottom: "1px solid rgba(0,0,0,0.07)",
         }}
       >
         <div className="max-w-[1160px] mx-auto px-[5%] h-full flex items-center justify-between">
-          <Logo onClick={() => scrollTo("#hero")} />
+          <Logo light onClick={() => scrollTo("#hero")} />
 
           <ul className="hidden md:flex items-center gap-2" role="list">
             {["Home", "About", "Services", "Portfolio", "Testimonials", "Contact"].map((item) => (
@@ -159,7 +159,7 @@ export default function HomePage() {
                     e.preventDefault();
                     scrollTo(`#${item.toLowerCase()}`);
                   }}
-                  className="font-body text-sm font-medium text-white/55 hover:text-white hover:bg-white/10 px-3.5 py-2 rounded-md transition-colors"
+                  className="font-body text-sm font-medium text-black/55 hover:text-black hover:bg-black/07 px-3.5 py-2 rounded-md transition-colors"
                 >
                   {item}
                 </a>
@@ -180,9 +180,9 @@ export default function HomePage() {
               onClick={() => setIsMobileMenuOpen(true)}
               aria-label="Toggle menu"
             >
-              <div className="w-[22px] h-[2px] bg-white rounded-sm" />
-              <div className="w-[22px] h-[2px] bg-white rounded-sm" />
-              <div className="w-[22px] h-[2px] bg-white rounded-sm" />
+              <div className="w-[22px] h-[2px] bg-[#0A0A0F] rounded-sm" />
+              <div className="w-[22px] h-[2px] bg-[#0A0A0F] rounded-sm" />
+              <div className="w-[22px] h-[2px] bg-[#0A0A0F] rounded-sm" />
             </button>
           </div>
         </div>
@@ -190,9 +190,9 @@ export default function HomePage() {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-[9999] bg-[#0A0A0F]/98 backdrop-blur-xl flex flex-col p-10 pt-20">
+        <div className="fixed inset-0 z-[9999] bg-white/98 backdrop-blur-xl flex flex-col p-10 pt-20">
           <button
-            className="absolute top-6 right-6 p-2 text-white"
+            className="absolute top-6 right-6 p-2 text-[#0A0A0F]"
             onClick={() => setIsMobileMenuOpen(false)}
           >
             <span className="text-2xl">✕</span>
@@ -206,7 +206,7 @@ export default function HomePage() {
                   e.preventDefault();
                   scrollTo(`#${item.toLowerCase()}`);
                 }}
-                className="font-display font-extrabold text-[40px] text-white py-3 border-b border-white/10"
+                className="font-display font-extrabold text-[40px] text-[#0A0A0F] py-3 border-b border-black/10"
               >
                 {item}
               </a>
@@ -218,10 +218,10 @@ export default function HomePage() {
       {/* Hero */}
       <section
         id="hero"
-        className="min-h-[100svh] pt-[68px] relative overflow-hidden flex items-center bg-[#0A0A0F]"
+        className="min-h-[100svh] pt-[68px] relative overflow-hidden flex items-center bg-white"
       >
-        <div className="absolute inset-0 z-0 opacity-30 pointer-events-none" style={{
-          backgroundImage: "linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",
+        <div className="absolute inset-0 z-0 opacity-40 pointer-events-none" style={{
+          backgroundImage: "linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px)",
           backgroundSize: "64px 64px"
         }} />
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#E63950]/15 rounded-full blur-[80px] pointer-events-none z-0" />
@@ -234,7 +234,7 @@ export default function HomePage() {
               <span className="leading-relaxed">{settings?.heroBadge || "IT Solutions · SaaS · AI Consultancy"}</span>
             </div>
 
-            <h1 className="font-display font-extrabold text-[clamp(42px,6vw,76px)] leading-[1.0] tracking-[-2.5px] text-white mb-6">
+            <h1 className="font-display font-extrabold text-[clamp(42px,6vw,76px)] leading-[1.0] tracking-[-2.5px] text-[#0A0A0F] mb-6">
               {settings?.heroHeadline ? (
                 settings.heroHeadline
               ) : (
@@ -247,7 +247,7 @@ export default function HomePage() {
               )}
             </h1>
 
-            <p className="text-[17px] text-white/50 leading-[1.75] max-w-[500px] mb-9">
+            <p className="text-[17px] text-black/50 leading-[1.75] max-w-[500px] mb-9">
               {settings?.heroSubheadline || "ZeeActs delivers custom software, business-ready SaaS, and AI-powered automation — built by elite developers, delivered faster and at a fraction of the cost."}
             </p>
 
@@ -255,7 +255,7 @@ export default function HomePage() {
               <button onClick={() => scrollTo("#contact")} className="bg-[#E63950] hover:bg-[#B52C3E] text-white font-display font-bold text-[14px] px-7 py-3.5 rounded-[10px] transition-all hover:-translate-y-[2px] hover:shadow-[0_12px_32px_rgba(230,57,80,0.35)]">
                 Get a Free Quote →
               </button>
-              <button onClick={() => scrollTo("#portfolio")} className="border-[1.5px] border-white/20 text-white/80 bg-transparent hover:border-white/50 hover:text-white font-display font-bold text-[14px] px-7 py-3.5 rounded-[10px] transition-all hover:-translate-y-[2px]">
+              <button onClick={() => scrollTo("#portfolio")} className="border-[1.5px] border-black/20 text-black/70 bg-transparent hover:border-black/50 hover:text-black font-display font-bold text-[14px] px-7 py-3.5 rounded-[10px] transition-all hover:-translate-y-[2px]">
                 See Our Work
               </button>
             </div>
@@ -263,18 +263,18 @@ export default function HomePage() {
             <div className="flex items-center gap-3">
               <div className="flex -space-x-2">
                 {['A', 'M', 'S', 'R'].map((l, i) => (
-                  <div key={i} className={`w-8 h-8 rounded-full border-2 border-black flex items-center justify-center text-white font-display font-extrabold text-[12px] bg-${['[#e63950]', '[#2d6a4f]', '[#1d3557]', '[#7b2d8b]'][i]}`} style={{ backgroundColor: ['#e63950', '#2d6a4f', '#1d3557', '#7b2d8b'][i] }}>
+                  <div key={i} className={`w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-white font-display font-extrabold text-[12px]`} style={{ backgroundColor: ['#e63950', '#2d6a4f', '#1d3557', '#7b2d8b'][i] }}>
                     {l}
                   </div>
                 ))}
               </div>
-              <p className="text-[14px] text-white/50">50+ businesses powered by ZeeActs Solutions</p>
+              <p className="text-[14px] text-black/50">50+ businesses powered by ZeeActs Solutions</p>
             </div>
           </div>
 
-          <div className="hidden lg:block animate-[float_4s_ease-in-out_infinite] bg-white/5 border border-white/10 rounded-[20px] p-[28px] backdrop-blur-md">
+          <div className="hidden lg:block animate-[float_4s_ease-in-out_infinite] bg-white border border-black/08 rounded-[20px] p-[28px] shadow-[0_8px_40px_rgba(0,0,0,0.10)]">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="font-display font-bold text-[13px] text-white">Project Delivery Dashboard</h3>
+              <h3 className="font-display font-bold text-[13px] text-[#0A0A0F]">Project Delivery Dashboard</h3>
               <div className="bg-[#E63950] font-mono text-[8px] text-white px-2 py-[3px] rounded-full tracking-[2px] flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 bg-[#27c93f] rounded-full animate-[pulse_1.5s_infinite]" />
                 LIVE
@@ -282,24 +282,24 @@ export default function HomePage() {
             </div>
 
             <div className="grid grid-cols-2 gap-3 mb-6">
-              <div className="bg-white/5 rounded-[10px] p-3.5 border border-white/5">
-                <p className="text-[10px] text-white/35 mb-1">Projects Shipped</p>
+              <div className="bg-[#F5F5F0] rounded-[10px] p-3.5 border border-black/05">
+                <p className="text-[10px] text-black/35 mb-1">Projects Shipped</p>
                 <div className="flex items-end gap-2">
-                  <span className="font-display font-extrabold text-[20px] text-white">127</span>
+                  <span className="font-display font-extrabold text-[20px] text-[#0A0A0F]">127</span>
                   <span className="font-body text-[11px] text-[#E63950] mb-1">+40%↑</span>
                 </div>
               </div>
-              <div className="bg-white/5 rounded-[10px] p-3.5 border border-white/5">
-                <p className="text-[10px] text-white/35 mb-1">Cost Savings via AI</p>
+              <div className="bg-[#F5F5F0] rounded-[10px] p-3.5 border border-black/05">
+                <p className="text-[10px] text-black/35 mb-1">Cost Savings via AI</p>
                 <div className="flex items-end gap-2">
-                  <span className="font-display font-extrabold text-[20px] text-white">62%</span>
+                  <span className="font-display font-extrabold text-[20px] text-[#0A0A0F]">62%</span>
                   <span className="font-body text-[11px] text-[#E63950] mb-1">faster↑</span>
                 </div>
               </div>
             </div>
 
             <div className="mb-6">
-              <p className="font-mono text-[8px] text-white/30 mb-2">DELIVERY SPEED</p>
+              <p className="font-mono text-[8px] text-black/30 mb-2">DELIVERY SPEED</p>
               <div className="flex items-end h-[52px] gap-1">
                 {[30, 45, 38, 60, 52, 75, 100].map((h, i) => (
                   <div
@@ -323,8 +323,8 @@ export default function HomePage() {
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-2.5">
                   <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-                  <p className="text-[11px] text-white/45 flex-1 truncate">{item.text}</p>
-                  <p className="font-mono text-[9px] text-white/20 shrink-0">{item.time}</p>
+                  <p className="text-[11px] text-black/45 flex-1 truncate">{item.text}</p>
+                  <p className="font-mono text-[9px] text-black/25 shrink-0">{item.time}</p>
                 </div>
               ))}
             </div>
@@ -332,10 +332,10 @@ export default function HomePage() {
         </div>
 
         <div className="scroll-indicator absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-40 transition-opacity duration-300">
-          <div className="w-[20px] h-[32px] border-2 border-white/40 rounded-[10px]">
-            <div className="w-[4px] h-[8px] bg-white/60 rounded-[2px] mx-auto mt-1 animate-[scrollWheel_1.5s_ease_infinite]" />
+          <div className="w-[20px] h-[32px] border-2 border-black/40 rounded-[10px]">
+            <div className="w-[4px] h-[8px] bg-black/60 rounded-[2px] mx-auto mt-1 animate-[scrollWheel_1.5s_ease_infinite]" />
           </div>
-          <span className="font-mono text-[10px] uppercase tracking-[2px]">Scroll</span>
+          <span className="font-mono text-[10px] uppercase tracking-[2px] text-black">Scroll</span>
         </div>
       </section>
 
@@ -355,27 +355,27 @@ export default function HomePage() {
       </section>
 
       {/* About */}
-      <section id="about" className="bg-[#0A0A0F] py-[120px]">
+      <section id="about" className="bg-[#F5F5F0] py-[120px]">
         <div className="max-w-[1160px] mx-auto px-[5%]">
           <div className="flex items-center gap-3 mb-4">
             <span className="w-6 h-[2px] bg-[#E63950] shrink-0" />
             <span className="font-mono text-[10px] tracking-[4px] uppercase text-[#E63950]">01 — About</span>
           </div>
 
-          <h2 className="font-display font-extrabold text-[clamp(32px,4.5vw,54px)] leading-[1.05] tracking-[-1.5px] text-white mb-10 reveal">
+          <h2 className="font-display font-extrabold text-[clamp(32px,4.5vw,54px)] leading-[1.05] tracking-[-1.5px] text-[#0A0A0F] mb-10 reveal">
             {settings?.aboutTitle || (
               <>The Z stands for <span className="text-[#E63950]">Execution.</span></>
             )}
           </h2>
 
           <div className="grid md:grid-cols-2 gap-20 items-center">
-            <div className="bg-white/5 border border-white/10 p-10 rounded-[20px] relative overflow-hidden reveal">
-              <div className="absolute -right-10 -bottom-10 font-display font-extrabold text-[240px] text-white/5 leading-[0.8] select-none pointer-events-none">
+            <div className="bg-white border border-black/08 p-10 rounded-[20px] relative overflow-hidden reveal shadow-sm">
+              <div className="absolute -right-10 -bottom-10 font-display font-extrabold text-[240px] text-black/05 leading-[0.8] select-none pointer-events-none">
                 Z
               </div>
-              <h3 className="font-display font-bold text-2xl text-white mb-2">{settings?.founderName || "Zohaib"}</h3>
+              <h3 className="font-display font-bold text-2xl text-[#0A0A0F] mb-2">{settings?.founderName || "Zohaib"}</h3>
               <p className="text-[#E63950] font-mono text-sm mb-6">Founder & CEO</p>
-              <div className="text-lg text-white/80 mb-8 relative z-10 space-y-6">
+              <div className="text-lg text-black/70 mb-8 relative z-10 space-y-6">
                 {(settings?.founderBio || "We build software that actually moves the needle. No bloated timelines, no over-engineered mess. Just clean architecture, AI acceleration, and relentless execution.")
                   .split("\n\n")
                   .map(p => p.trim())
@@ -385,7 +385,7 @@ export default function HomePage() {
             </div>
 
             <div className="reveal">
-              <div dangerouslySetInnerHTML={{ __html: settings?.aboutBody || "<p class='text-white/60 mb-6'>ZeeActs is a premium business consultancy, software development and AI consultancy firm. We partner with ambitious businesses to build scalable products, automate operations, and integrate AI into their workflows.</p><p class='text-white/60 mb-8'>Our methodology is simple: we ship fast, we write clean code, and we use AI to multiply our output. The result? You get enterprise-grade software at a fraction of the traditional cost and time.</p>" }} />
+              <div dangerouslySetInnerHTML={{ __html: settings?.aboutBody || "<p class='text-black/60 mb-6'>ZeeActs is a premium business consultancy, software development and AI consultancy firm. We partner with ambitious businesses to build scalable products, automate operations, and integrate AI into their workflows.</p><p class='text-black/60 mb-8'>Our methodology is simple: we ship fast, we write clean code, and we use AI to multiply our output. The result? You get enterprise-grade software at a fraction of the traditional cost and time.</p>" }} />
               
               <div className="grid grid-cols-2 gap-4">
                 {[
@@ -395,8 +395,8 @@ export default function HomePage() {
                   { title: "Scale", desc: "Built for growth" }
                 ].map((val, i) => (
                   <div key={i} className="border-l-2 border-[#E63950] pl-4">
-                    <h4 className="font-display font-bold text-white mb-1">{val.title}</h4>
-                    <p className="text-sm text-white/50">{val.desc}</p>
+                    <h4 className="font-display font-bold text-[#0A0A0F] mb-1">{val.title}</h4>
+                    <p className="text-sm text-black/50">{val.desc}</p>
                   </div>
                 ))}
               </div>
@@ -524,25 +524,25 @@ export default function HomePage() {
       </section>
 
       {/* Testimonials */}
-      <section id="testimonials" className="bg-[#0A0A0F] py-[120px]">
+      <section id="testimonials" className="bg-[#F5F5F0] py-[120px]">
         <div className="max-w-[1160px] mx-auto px-[5%]">
           <div className="flex items-center gap-3 mb-4">
             <span className="w-6 h-[2px] bg-[#E63950] shrink-0" />
             <span className="font-mono text-[10px] tracking-[4px] uppercase text-[#E63950]">04 — Testimonials</span>
           </div>
-          <h2 className="font-display font-extrabold text-[clamp(32px,4.5vw,54px)] leading-[1.05] tracking-[-1.5px] text-white mb-12 reveal">
+          <h2 className="font-display font-extrabold text-[clamp(32px,4.5vw,54px)] leading-[1.05] tracking-[-1.5px] text-[#0A0A0F] mb-12 reveal">
             Client Success
           </h2>
 
           <div className="grid md:grid-cols-3 gap-6 reveal-grid">
             {testimonials?.map((t) => (
-              <div key={t.id} className="bg-white/5 border border-white/10 p-8 rounded-[20px] flex flex-col h-full reveal">
+              <div key={t.id} className="bg-white border border-black/08 p-8 rounded-[20px] flex flex-col h-full reveal shadow-sm">
                 <div className="flex text-[#f5cb5c] mb-6">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <span key={star}>★</span>
                   ))}
                 </div>
-                <blockquote className="text-white/80 text-lg italic mb-8 flex-1">
+                <blockquote className="text-black/70 text-lg italic mb-8 flex-1">
                   "{t.quote}"
                 </blockquote>
                 <div className="flex items-center gap-4 mt-auto">
@@ -550,8 +550,8 @@ export default function HomePage() {
                     {t.avatarInitials}
                   </div>
                   <div>
-                    <div className="font-bold text-white">{t.name}</div>
-                    <div className="text-sm text-white/50">{t.role}, {t.company}</div>
+                    <div className="font-bold text-[#0A0A0F]">{t.name}</div>
+                    <div className="text-sm text-black/50">{t.role}, {t.company}</div>
                   </div>
                 </div>
               </div>
@@ -684,10 +684,10 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#0A0A0F] py-12 border-t border-white/10">
+      <footer className="bg-[#F5F5F0] py-12 border-t border-black/08">
         <div className="max-w-[1160px] mx-auto px-[5%] flex flex-col md:flex-row justify-between items-center gap-6">
-          <Logo onClick={() => scrollTo("#hero")} />
-          <div className="text-white/40 text-sm">
+          <Logo light onClick={() => scrollTo("#hero")} />
+          <div className="text-black/40 text-sm">
             © {new Date().getFullYear()} ZeeActs. All rights reserved.
           </div>
         </div>
