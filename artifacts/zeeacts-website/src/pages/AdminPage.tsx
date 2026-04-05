@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import type { Service, PortfolioItem, Testimonial, ContactSubmission, SiteSettings } from "@workspace/api-client-react";
 import { useUser, useClerk } from "@clerk/react";
 import {
   LayoutDashboard,
@@ -212,7 +213,7 @@ function ServicesView() {
     setIsDialogOpen(true);
   };
 
-  const openEdit = (service: any) => {
+  const openEdit = (service: Service) => {
     setEditingId(service.id);
     form.reset({
       title: service.title,
@@ -359,11 +360,17 @@ function PortfolioView() {
     setIsDialogOpen(true);
   };
 
-  const openEdit = (item: any) => {
+  const openEdit = (item: PortfolioItem) => {
     setEditingId(item.id);
     form.reset({
-      ...item,
+      title: item.title,
+      category: item.category,
+      description: item.description,
       techStack: item.techStack.join(", "),
+      resultMetric: item.resultMetric,
+      resultLabel: item.resultLabel,
+      accentColor: item.accentColor,
+      sortOrder: item.sortOrder,
     });
     setIsDialogOpen(true);
   };
@@ -523,9 +530,17 @@ function TestimonialsView() {
     setIsDialogOpen(true);
   };
 
-  const openEdit = (item: any) => {
+  const openEdit = (item: Testimonial) => {
     setEditingId(item.id);
-    form.reset(item);
+    form.reset({
+      name: item.name,
+      company: item.company,
+      role: item.role,
+      quote: item.quote,
+      avatarInitials: item.avatarInitials,
+      avatarColor: item.avatarColor,
+      sortOrder: item.sortOrder,
+    });
     setIsDialogOpen(true);
   };
 
@@ -657,7 +672,7 @@ function ContactsView() {
   const markRead = useMarkContactRead();
   const queryClient = useQueryClient();
 
-  const [selectedContact, setSelectedContact] = useState<any>(null);
+  const [selectedContact, setSelectedContact] = useState<ContactSubmission | null>(null);
 
   const handleMarkRead = (id: number) => {
     markRead.mutate({ id }, {
@@ -700,11 +715,14 @@ function ContactsView() {
                 <div className="text-muted-foreground text-sm mb-1">Message</div>
                 <div className="p-4 bg-muted rounded-md text-sm whitespace-pre-wrap">{selectedContact.message}</div>
               </div>
-              {!selectedContact.isRead && (
-                <Button onClick={() => { handleMarkRead(selectedContact.id); setSelectedContact(null); }} className="w-full">
-                  <CheckCircle2 className="w-4 h-4 mr-2" /> Mark as Read
-                </Button>
-              )}
+              <Button
+                variant={selectedContact.isRead ? "outline" : "default"}
+                onClick={() => { handleMarkRead(selectedContact.id); setSelectedContact(null); }}
+                className="w-full"
+              >
+                <CheckCircle2 className="w-4 h-4 mr-2" />
+                {selectedContact.isRead ? "Mark as Unread" : "Mark as Read"}
+              </Button>
             </div>
           )}
         </DialogContent>
@@ -735,8 +753,14 @@ function ContactsView() {
                 </TableCell>
                 <TableCell>{c.projectType || "-"}</TableCell>
                 <TableCell className="max-w-[200px] truncate">{c.message}</TableCell>
-                <TableCell>
-                  {!c.isRead ? <Badge className="bg-[#E63950]">New</Badge> : <Badge variant="outline">Read</Badge>}
+                <TableCell onClick={(e) => e.stopPropagation()}>
+                  <button
+                    onClick={() => handleMarkRead(c.id)}
+                    className="focus:outline-none"
+                    title={c.isRead ? "Click to mark unread" : "Click to mark read"}
+                  >
+                    {!c.isRead ? <Badge className="bg-[#E63950] cursor-pointer">New</Badge> : <Badge variant="outline" className="cursor-pointer">Read</Badge>}
+                  </button>
                 </TableCell>
               </TableRow>
             ))}
@@ -756,7 +780,7 @@ function SettingsView() {
   const updateSettings = useUpdateSettings();
   const queryClient = useQueryClient();
 
-  const [formValues, setFormValues] = useState<any>({});
+  const [formValues, setFormValues] = useState<SiteSettings>({});
 
   useEffect(() => {
     if (settings) {

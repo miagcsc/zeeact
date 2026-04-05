@@ -9,6 +9,7 @@ import {
   DeleteServiceParams,
   UpdateServiceParams,
 } from "@workspace/api-zod";
+import { requireAuth } from "../middlewares/requireAuth";
 
 const router = Router();
 
@@ -20,7 +21,7 @@ router.get("/services", async (req, res) => {
   res.json(services);
 });
 
-router.post("/services", async (req, res) => {
+router.post("/services", requireAuth, async (req, res) => {
   const body = CreateServiceBody.parse(req.body);
   const [service] = await db
     .insert(servicesTable)
@@ -39,7 +40,7 @@ router.get("/services/:id", async (req, res) => {
   res.json(service);
 });
 
-router.put("/services/:id", async (req, res) => {
+router.put("/services/:id", requireAuth, async (req, res) => {
   const { id } = UpdateServiceParams.parse({ id: Number(req.params.id) });
   const body = UpdateServiceBody.parse(req.body);
   const [service] = await db
@@ -51,7 +52,7 @@ router.put("/services/:id", async (req, res) => {
   res.json(service);
 });
 
-router.delete("/services/:id", async (req, res) => {
+router.delete("/services/:id", requireAuth, async (req, res) => {
   const { id } = DeleteServiceParams.parse({ id: Number(req.params.id) });
   await db.delete(servicesTable).where(eq(servicesTable.id, id));
   res.json({ success: true });

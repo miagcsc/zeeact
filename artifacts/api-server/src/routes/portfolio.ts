@@ -9,6 +9,7 @@ import {
   DeletePortfolioItemParams,
   UpdatePortfolioItemParams,
 } from "@workspace/api-zod";
+import { requireAuth } from "../middlewares/requireAuth";
 
 const router = Router();
 
@@ -20,7 +21,7 @@ router.get("/portfolio", async (req, res) => {
   res.json(items);
 });
 
-router.post("/portfolio", async (req, res) => {
+router.post("/portfolio", requireAuth, async (req, res) => {
   const body = CreatePortfolioItemBody.parse(req.body);
   const [item] = await db
     .insert(portfolioTable)
@@ -39,7 +40,7 @@ router.get("/portfolio/:id", async (req, res) => {
   res.json(item);
 });
 
-router.put("/portfolio/:id", async (req, res) => {
+router.put("/portfolio/:id", requireAuth, async (req, res) => {
   const { id } = UpdatePortfolioItemParams.parse({ id: Number(req.params.id) });
   const body = UpdatePortfolioItemBody.parse(req.body);
   const [item] = await db
@@ -51,7 +52,7 @@ router.put("/portfolio/:id", async (req, res) => {
   res.json(item);
 });
 
-router.delete("/portfolio/:id", async (req, res) => {
+router.delete("/portfolio/:id", requireAuth, async (req, res) => {
   const { id } = DeletePortfolioItemParams.parse({ id: Number(req.params.id) });
   await db.delete(portfolioTable).where(eq(portfolioTable.id, id));
   res.json({ success: true });

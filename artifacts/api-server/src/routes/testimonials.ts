@@ -8,6 +8,7 @@ import {
   DeleteTestimonialParams,
   UpdateTestimonialParams,
 } from "@workspace/api-zod";
+import { requireAuth } from "../middlewares/requireAuth";
 
 const router = Router();
 
@@ -19,7 +20,7 @@ router.get("/testimonials", async (req, res) => {
   res.json(items);
 });
 
-router.post("/testimonials", async (req, res) => {
+router.post("/testimonials", requireAuth, async (req, res) => {
   const body = CreateTestimonialBody.parse(req.body);
   const [item] = await db
     .insert(testimonialsTable)
@@ -28,7 +29,7 @@ router.post("/testimonials", async (req, res) => {
   res.status(201).json(item);
 });
 
-router.put("/testimonials/:id", async (req, res) => {
+router.put("/testimonials/:id", requireAuth, async (req, res) => {
   const { id } = UpdateTestimonialParams.parse({ id: Number(req.params.id) });
   const body = UpdateTestimonialBody.parse(req.body);
   const [item] = await db
@@ -40,7 +41,7 @@ router.put("/testimonials/:id", async (req, res) => {
   res.json(item);
 });
 
-router.delete("/testimonials/:id", async (req, res) => {
+router.delete("/testimonials/:id", requireAuth, async (req, res) => {
   const { id } = DeleteTestimonialParams.parse({ id: Number(req.params.id) });
   await db.delete(testimonialsTable).where(eq(testimonialsTable.id, id));
   res.json({ success: true });

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
 import { siteSettingsTable } from "@workspace/db";
-import { eq } from "drizzle-orm";
+import { requireAuth } from "../middlewares/requireAuth";
 
 const router = Router();
 
@@ -14,7 +14,7 @@ router.get("/settings", async (req, res) => {
   res.json(settings);
 });
 
-router.put("/settings", async (req, res) => {
+router.put("/settings", requireAuth, async (req, res) => {
   const body = req.body as Record<string, string>;
   for (const [key, value] of Object.entries(body)) {
     if (typeof value !== "string") continue;
