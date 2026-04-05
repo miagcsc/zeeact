@@ -48,7 +48,7 @@ async function seed() {
     { key: "heroSubheadline", value: "ZeeActs solves your toughest operational hurdles by first refining your business processes to industry-leading standards. Once optimized, we build or connect our customised software and AI tools to handle the heavy lifting - giving you an enterprise-grade engine that runs on its own, so you can grow without growing your headcount." },
     { key: "aboutTitle", value: "The Z stands for Execution." },
     { key: "founderName", value: "Zohaib" },
-    { key: "founderBio", value: "I started ZeeActs because I kept seeing the same problem: great business ideas held back by bad software. We fix that. Every line of code we write is optimized for speed, scale, and business outcomes — not just for making the demo look good." },
+    { key: "founderBio", value: "After 15 years in global corporate companies, I saw the same tragedy: great strategies dying due to \"Big Tech\" bloat. Most providers force expensive, rigid software onto teams, breaking the very adoption they were meant to fix.\n\nZeeActs exists to end that. We optimize your business process first, then connect it to tailor-made Softwares and AI tools built for speed and scale. We don't build for \"pretty demos\" -we build tech your people will love using it and your business will actually grow with." },
     { key: "contactEmail", value: "hello@zeeacts.com" },
   ];
   for (const s of settings) {
