@@ -268,7 +268,7 @@ export default function HomePage() {
                   </div>
                 ))}
               </div>
-              <p className="text-[14px] text-white/50">50+ businesses powered by ZeeActs software & AI</p>
+              <p className="text-[14px] text-white/50">50+ businesses powered by ZeeActs Solutions</p>
             </div>
           </div>
 
