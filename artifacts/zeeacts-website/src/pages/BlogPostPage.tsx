@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "wouter";
 import { ArrowLeft, Calendar, Tag } from "lucide-react";
 import { format } from "date-fns";
+import { ZeeActsLogo } from "../components/ZeeActsLogo";
 
 interface BlogPost {
   id: number;
@@ -90,9 +91,7 @@ export default function BlogPostPage() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-black/5">
         <div className="max-w-7xl mx-auto px-6 h-[68px] flex items-center justify-between">
           <Link href="/">
-            <span className="font-display font-extrabold text-2xl text-[#0A0A0F] cursor-pointer">
-              Zee<span className="text-[#E63950]">Acts</span>
-            </span>
+            <ZeeActsLogo light />
           </Link>
           <Link href="/blog">
             <span className="flex items-center gap-2 text-sm font-medium text-black/60 hover:text-black transition-colors cursor-pointer">

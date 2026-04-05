@@ -99,7 +99,7 @@ export default function SolutionPage() {
             </div>
           </a>
           <div className="flex items-center gap-4">
-            <a href="/" className="hidden sm:block">
+            <a href="/">
               <ZeeActsLogo light />
             </a>
             <a

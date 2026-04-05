@@ -194,6 +194,21 @@ export default function HomePage() {
   };
 
   useEffect(() => {
+    document.title = "ZeeActs — Premium IT Solutions & AI-Powered Software";
+    const setMeta = (name: string, content: string, prop = false) => {
+      const attr = prop ? "property" : "name";
+      let el = document.querySelector(`meta[${attr}="${name}"]`);
+      if (!el) { el = document.createElement("meta"); el.setAttribute(attr, name); document.head.appendChild(el); }
+      el.setAttribute("content", content);
+    };
+    const desc = "ZeeActs delivers premium IT solutions powered by AI — custom software, automation, ERP systems and industry-specific platforms. 50+ businesses powered across Pakistan.";
+    setMeta("description", desc);
+    setMeta("og:title", "ZeeActs — Premium IT Solutions & AI-Powered Software", true);
+    setMeta("og:description", desc, true);
+    setMeta("og:url", window.location.href, true);
+  }, []);
+
+  useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
       
