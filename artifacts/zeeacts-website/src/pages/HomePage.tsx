@@ -171,6 +171,15 @@ export default function HomePage() {
     select: (posts) => posts.slice(0, 3),
   });
 
+  const { data: solutions } = useQuery<{ id: number; slug: string; name: string; tagline: string; badge: string; accentColor: string; logoText: string }[]>({
+    queryKey: ["solutions-home"],
+    queryFn: async () => {
+      const res = await fetch(`${BASE}/api/solutions`);
+      if (!res.ok) return [];
+      return res.json();
+    },
+  });
+
   const form = useForm<z.infer<typeof contactFormSchema>>({
     resolver: zodResolver(contactFormSchema),
     defaultValues: {
@@ -268,7 +277,7 @@ export default function HomePage() {
           <Logo light onClick={() => scrollTo("#hero")} />
 
           <ul className="hidden md:flex items-center gap-2" role="list">
-            {["Home", "About", "Services", "Portfolio", "Testimonials", "Contact"].map((item) => (
+            {["Home", "About", "Services", "Solutions", "Portfolio", "Testimonials", "Contact"].map((item) => (
               <li key={item}>
                 <a
                   href={`#${item.toLowerCase()}`}
@@ -332,7 +341,7 @@ export default function HomePage() {
           {/* Scrollable nav links */}
           <div className="flex-1 overflow-y-auto px-6 py-6">
             <nav className="flex flex-col">
-              {["Home", "About", "Services", "Portfolio", "Testimonials", "Contact"].map((item) => (
+              {["Home", "About", "Services", "Solutions", "Portfolio", "Testimonials", "Contact"].map((item) => (
                 <a
                   key={item}
                   href={`#${item.toLowerCase()}`}
@@ -564,6 +573,65 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Solutions */}
+      {solutions && solutions.length > 0 && (
+        <section id="solutions" className="bg-[#0A0A0F] py-[120px]">
+          <div className="max-w-[1160px] mx-auto px-[5%]">
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
+              <div className="flex items-center gap-3">
+                <span className="w-6 h-[2px] bg-[#E63950] shrink-0" />
+                <span className="font-mono text-[10px] tracking-[4px] uppercase text-[#E63950]">Our Solutions</span>
+              </div>
+            </div>
+            <h2 className="font-display font-extrabold text-[clamp(30px,4.5vw,52px)] leading-[1.05] tracking-[-1.5px] text-white mb-4">
+              Industry-Specific Software
+            </h2>
+            <p className="text-white/50 mb-14 max-w-xl text-base">Purpose-built platforms for specific industries — ready to deploy, fully managed, and deeply tailored to Pakistani business operations.</p>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {solutions.map((sol, idx) => {
+                const accent = sol.accentColor || "#0EA5E9";
+                return (
+                  <motion.a
+                    key={sol.id}
+                    href={`/solutions/${sol.slug}`}
+                    initial={{ opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: idx * 0.1, duration: 0.5 }}
+                    className="group p-8 rounded-[24px] border border-white/08 bg-white/04 hover:bg-white/08 hover:border-white/15 transition-all hover:-translate-y-1 flex flex-col gap-4"
+                  >
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center font-display font-extrabold text-lg text-white" style={{ background: `${accent}25`, border: `1.5px solid ${accent}40` }}>
+                      <span style={{ color: accent }}>{sol.logoText?.[0] ?? sol.name[0]}</span>
+                    </div>
+                    {sol.badge && (
+                      <span className="text-[10px] font-mono tracking-[3px] uppercase font-semibold" style={{ color: accent }}>{sol.badge}</span>
+                    )}
+                    <div>
+                      <h3 className="font-display font-bold text-xl text-white group-hover:text-white mb-1">{sol.name}</h3>
+                      <p className="text-sm text-white/50 font-medium">{sol.tagline}</p>
+                    </div>
+                    <div className="mt-auto flex items-center gap-2 text-xs font-semibold group-hover:gap-3 transition-all" style={{ color: accent }}>
+                      Explore solution <span>→</span>
+                    </div>
+                  </motion.a>
+                );
+              })}
+              {/* Teaser card for upcoming solutions */}
+              <div className="p-8 rounded-[24px] border border-white/05 bg-white/02 flex flex-col gap-4 opacity-50">
+                <div className="w-12 h-12 rounded-xl bg-white/08 border border-white/10 flex items-center justify-center">
+                  <span className="text-white/40 text-xl">+</span>
+                </div>
+                <span className="text-[10px] font-mono tracking-[3px] uppercase font-semibold text-white/30">Coming Soon</span>
+                <div>
+                  <h3 className="font-display font-bold text-xl text-white/40 mb-1">More Solutions</h3>
+                  <p className="text-sm text-white/25">Sales CRM, Clinic Management, Restaurant POS — and more verticals launching soon.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Portfolio */}
       <section id="portfolio" className="bg-white py-[120px] text-[#0A0A0F]">

@@ -6,6 +6,7 @@ import testimonialsRouter from "./testimonials";
 import contactRouter from "./contact";
 import settingsRouter from "./settings";
 import blogRouter from "./blog";
+import solutionsRouter from "./solutions";
 
 const router: IRouter = Router();
 
@@ -16,5 +17,6 @@ router.use(testimonialsRouter);
 router.use(contactRouter);
 router.use(settingsRouter);
 router.use(blogRouter);
+router.use(solutionsRouter);
 
 export default router;

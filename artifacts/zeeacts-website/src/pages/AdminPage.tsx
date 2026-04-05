@@ -22,6 +22,12 @@ import {
   Globe,
   Code,
   ArrowLeft,
+  Layers,
+  Copy,
+  ChevronUp,
+  ChevronDown,
+  GripVertical,
+  ExternalLink,
 } from "lucide-react";
 import {
   useListServices,
@@ -63,7 +69,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-type View = "dashboard" | "services" | "portfolio" | "testimonials" | "contacts" | "settings" | "blog" | "seo" | "analytics";
+type View = "dashboard" | "services" | "portfolio" | "testimonials" | "contacts" | "settings" | "blog" | "seo" | "analytics" | "solutions";
 
 export default function AdminPage() {
   const [activeView, setActiveView] = useState<View>("dashboard");
@@ -72,6 +78,7 @@ export default function AdminPage() {
 
   const navItems = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { id: "solutions", label: "Solutions", icon: Layers },
     { id: "services", label: "Services", icon: Briefcase },
     { id: "portfolio", label: "Portfolio", icon: FolderKanban },
     { id: "testimonials", label: "Testimonials", icon: MessageSquareQuote },
@@ -137,6 +144,7 @@ export default function AdminPage() {
           {activeView === "portfolio" && <PortfolioView />}
           {activeView === "testimonials" && <TestimonialsView />}
           {activeView === "contacts" && <ContactsView />}
+          {activeView === "solutions" && <SolutionsView />}
           {activeView === "blog" && <BlogView />}
           {activeView === "seo" && <SeoView />}
           {activeView === "analytics" && <AnalyticsView />}
@@ -1484,6 +1492,572 @@ function SettingsView() {
           </form>
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+// =====================================================================
+// Solutions View — Elementor-style editor for solution landing pages
+// =====================================================================
+
+interface SolutionAdmin {
+  id: number;
+  slug: string;
+  status: string;
+  name: string;
+  tagline: string;
+  badge: string;
+  accentColor: string;
+  logoText: string;
+  heroHeadline: string;
+  heroSubheadline: string;
+  heroCta: string;
+  heroCtaSecondary: string;
+  heroImage: string;
+  painPoints: string;
+  features: string;
+  howItWorks: string;
+  stats: string;
+  ctaHeadline: string;
+  ctaSubheadline: string;
+  ctaButtonText: string;
+  metaTitle: string;
+  metaDescription: string;
+  sortOrder: number;
+}
+
+interface RepeaterItem { [key: string]: string }
+
+function RepeaterEditor({
+  value,
+  onChange,
+  fields,
+  addLabel,
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  fields: { key: string; label: string; placeholder?: string; multiline?: boolean }[];
+  addLabel: string;
+}) {
+  const items: RepeaterItem[] = (() => {
+    try { return JSON.parse(value) as RepeaterItem[]; } catch { return []; }
+  })();
+
+  const [editingIdx, setEditingIdx] = useState<number | null>(null);
+  const [draft, setDraft] = useState<RepeaterItem>({});
+
+  const save = (items: RepeaterItem[]) => onChange(JSON.stringify(items));
+
+  const startAdd = () => {
+    const empty: RepeaterItem = {};
+    fields.forEach((f) => (empty[f.key] = ""));
+    setDraft(empty);
+    setEditingIdx(items.length);
+  };
+
+  const startEdit = (idx: number) => {
+    setDraft({ ...items[idx] });
+    setEditingIdx(idx);
+  };
+
+  const commitEdit = () => {
+    if (editingIdx === null) return;
+    const next = [...items];
+    next[editingIdx] = draft;
+    save(next);
+    setEditingIdx(null);
+    setDraft({});
+  };
+
+  const remove = (idx: number) => {
+    save(items.filter((_, i) => i !== idx));
+    if (editingIdx === idx) { setEditingIdx(null); setDraft({}); }
+  };
+
+  const moveUp = (idx: number) => {
+    if (idx === 0) return;
+    const next = [...items];
+    [next[idx - 1], next[idx]] = [next[idx], next[idx - 1]];
+    save(next);
+  };
+
+  const moveDown = (idx: number) => {
+    if (idx === items.length - 1) return;
+    const next = [...items];
+    [next[idx], next[idx + 1]] = [next[idx + 1], next[idx]];
+    save(next);
+  };
+
+  return (
+    <div className="space-y-2">
+      {items.map((item, idx) => (
+        <div key={idx} className="border border-input rounded-lg overflow-hidden">
+          {/* Item header */}
+          <div className="flex items-center gap-2 px-3 py-2 bg-muted/40">
+            <GripVertical className="w-4 h-4 text-muted-foreground shrink-0" />
+            <span className="flex-1 text-sm font-medium truncate text-foreground">
+              {item[fields[1]?.key] || item[fields[0]?.key] || `Item ${idx + 1}`}
+            </span>
+            <div className="flex items-center gap-1">
+              <button type="button" onClick={() => moveUp(idx)} className="p-1 hover:bg-accent rounded" title="Move up"><ChevronUp className="w-3.5 h-3.5" /></button>
+              <button type="button" onClick={() => moveDown(idx)} className="p-1 hover:bg-accent rounded" title="Move down"><ChevronDown className="w-3.5 h-3.5" /></button>
+              <button type="button" onClick={() => startEdit(idx)} className="p-1.5 hover:bg-accent rounded text-xs font-medium text-foreground"><Pencil className="w-3.5 h-3.5" /></button>
+              <button type="button" onClick={() => remove(idx)} className="p-1.5 hover:bg-destructive/10 rounded text-destructive"><Trash2 className="w-3.5 h-3.5" /></button>
+            </div>
+          </div>
+          {/* Inline edit panel */}
+          {editingIdx === idx && (
+            <div className="px-4 py-3 border-t border-input bg-background space-y-3">
+              {fields.map((f) => (
+                <div key={f.key}>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">{f.label}</label>
+                  {f.multiline ? (
+                    <textarea
+                      rows={3}
+                      value={draft[f.key] ?? ""}
+                      onChange={(e) => setDraft((d) => ({ ...d, [f.key]: e.target.value }))}
+                      placeholder={f.placeholder}
+                      className="w-full text-sm border border-input rounded-md px-3 py-2 bg-background resize-none focus:outline-none focus:ring-1 focus:ring-ring"
+                    />
+                  ) : (
+                    <input
+                      type="text"
+                      value={draft[f.key] ?? ""}
+                      onChange={(e) => setDraft((d) => ({ ...d, [f.key]: e.target.value }))}
+                      placeholder={f.placeholder}
+                      className="w-full text-sm border border-input rounded-md px-3 py-2 bg-background focus:outline-none focus:ring-1 focus:ring-ring"
+                    />
+                  )}
+                </div>
+              ))}
+              <div className="flex gap-2 pt-1">
+                <button type="button" onClick={commitEdit} className="px-4 py-1.5 rounded-md bg-[#E63950] text-white text-xs font-semibold hover:bg-[#B52C3E] transition-colors">Save</button>
+                <button type="button" onClick={() => { setEditingIdx(null); setDraft({}); }} className="px-4 py-1.5 rounded-md border border-input text-xs font-semibold hover:bg-accent transition-colors">Cancel</button>
+              </div>
+            </div>
+          )}
+        </div>
+      ))}
+      {/* Add new — inline form if adding */}
+      {editingIdx === items.length && (
+        <div className="border border-dashed border-input rounded-lg px-4 py-3 space-y-3 bg-muted/20">
+          {fields.map((f) => (
+            <div key={f.key}>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">{f.label}</label>
+              {f.multiline ? (
+                <textarea
+                  rows={3}
+                  value={draft[f.key] ?? ""}
+                  onChange={(e) => setDraft((d) => ({ ...d, [f.key]: e.target.value }))}
+                  placeholder={f.placeholder}
+                  className="w-full text-sm border border-input rounded-md px-3 py-2 bg-background resize-none focus:outline-none focus:ring-1 focus:ring-ring"
+                />
+              ) : (
+                <input
+                  type="text"
+                  value={draft[f.key] ?? ""}
+                  onChange={(e) => setDraft((d) => ({ ...d, [f.key]: e.target.value }))}
+                  placeholder={f.placeholder}
+                  className="w-full text-sm border border-input rounded-md px-3 py-2 bg-background focus:outline-none focus:ring-1 focus:ring-ring"
+                />
+              )}
+            </div>
+          ))}
+          <div className="flex gap-2 pt-1">
+            <button type="button" onClick={commitEdit} className="px-4 py-1.5 rounded-md bg-[#E63950] text-white text-xs font-semibold hover:bg-[#B52C3E] transition-colors">Add</button>
+            <button type="button" onClick={() => { setEditingIdx(null); setDraft({}); }} className="px-4 py-1.5 rounded-md border border-input text-xs font-semibold hover:bg-accent transition-colors">Cancel</button>
+          </div>
+        </div>
+      )}
+      <button
+        type="button"
+        onClick={startAdd}
+        disabled={editingIdx !== null}
+        className="flex items-center gap-2 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40 disabled:cursor-not-allowed py-1"
+      >
+        <Plus className="w-3.5 h-3.5" /> {addLabel}
+      </button>
+    </div>
+  );
+}
+
+type SolutionTab = "basic" | "hero" | "painPoints" | "features" | "howItWorks" | "stats" | "cta" | "seo";
+
+function SolutionsView() {
+  const queryClient = useQueryClient();
+  const [editingSolution, setEditingSolution] = useState<SolutionAdmin | null>(null);
+  const [activeTab, setActiveTab] = useState<SolutionTab>("basic");
+  const [form, setForm] = useState<Partial<SolutionAdmin>>({});
+
+  const { data: solutions, isLoading } = useQuery<SolutionAdmin[]>({
+    queryKey: ["admin-solutions"],
+    queryFn: () => apiFetch("/api/solutions/all") as Promise<SolutionAdmin[]>,
+  });
+
+  const saveMutation = useMutation({
+    mutationFn: async (values: Partial<SolutionAdmin>) => {
+      if (editingSolution?.id) {
+        return apiFetch(`/api/solutions/${editingSolution.id}`, { method: "PUT", body: JSON.stringify(values) });
+      }
+      return apiFetch("/api/solutions", { method: "POST", body: JSON.stringify(values) });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-solutions"] });
+      toast.success(editingSolution?.id ? "Solution updated!" : "Solution created!");
+      setEditingSolution(null);
+      setForm({});
+      setActiveTab("basic");
+    },
+    onError: () => toast.error("Failed to save solution."),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => apiFetch(`/api/solutions/${id}`, { method: "DELETE" }),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["admin-solutions"] }); toast.success("Deleted."); },
+  });
+
+  const duplicateMutation = useMutation({
+    mutationFn: (id: number) => apiFetch(`/api/solutions/${id}/duplicate`, { method: "POST" }),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["admin-solutions"] }); toast.success("Duplicated as draft!"); },
+  });
+
+  const openNew = () => {
+    setEditingSolution({ id: 0 } as SolutionAdmin);
+    setForm({
+      status: "draft", name: "", slug: "", tagline: "", badge: "", accentColor: "#0EA5E9",
+      logoText: "", heroHeadline: "", heroSubheadline: "", heroCta: "Book a Demo",
+      heroCtaSecondary: "See Features", heroImage: "", painPoints: "[]", features: "[]",
+      howItWorks: "[]", stats: "[]", ctaHeadline: "", ctaSubheadline: "", ctaButtonText: "Book a Demo",
+      metaTitle: "", metaDescription: "", sortOrder: 0,
+    });
+    setActiveTab("basic");
+  };
+
+  const openEdit = (sol: SolutionAdmin) => {
+    setEditingSolution(sol);
+    setForm({ ...sol });
+    setActiveTab("basic");
+  };
+
+  const set = (key: keyof SolutionAdmin, val: string | number) => setForm((f) => ({ ...f, [key]: val }));
+
+  const tabs: { id: SolutionTab; label: string }[] = [
+    { id: "basic", label: "Basic" },
+    { id: "hero", label: "Hero" },
+    { id: "painPoints", label: "Pain Points" },
+    { id: "features", label: "Features" },
+    { id: "howItWorks", label: "How It Works" },
+    { id: "stats", label: "Stats" },
+    { id: "cta", label: "CTA" },
+    { id: "seo", label: "SEO" },
+  ];
+
+  // --- Editor view ---
+  if (editingSolution !== null) {
+    const accent = form.accentColor || "#0EA5E9";
+    return (
+      <div className="space-y-0 -m-8">
+        {/* Editor header */}
+        <div className="flex items-center justify-between px-8 py-4 border-b bg-background sticky top-0 z-10">
+          <div className="flex items-center gap-3">
+            <button type="button" onClick={() => { setEditingSolution(null); setForm({}); }} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <ArrowLeft className="w-4 h-4" /> Solutions
+            </button>
+            <span className="text-muted-foreground">/</span>
+            <span className="text-sm font-semibold">{form.name || "New Solution"}</span>
+            <Badge variant={form.status === "published" ? "default" : "secondary"} className={form.status === "published" ? "bg-green-500 text-white" : ""}>{form.status || "draft"}</Badge>
+          </div>
+          <div className="flex items-center gap-2">
+            {form.slug && editingSolution.id ? (
+              <a href={`/solutions/${form.slug}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground border border-input rounded-md px-3 py-1.5 transition-colors">
+                <ExternalLink className="w-3.5 h-3.5" /> Preview
+              </a>
+            ) : null}
+            <Button size="sm" variant="outline" onClick={() => set("status", form.status === "published" ? "draft" : "published")}>
+              {form.status === "published" ? "Unpublish" : "Publish"}
+            </Button>
+            <Button size="sm" onClick={() => saveMutation.mutate(form)} disabled={saveMutation.isPending} className="bg-[#E63950] hover:bg-[#B52C3E] text-white">
+              {saveMutation.isPending ? "Saving..." : editingSolution.id ? "Save Changes" : "Create Solution"}
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex min-h-[calc(100vh-130px)]">
+          {/* Section tabs sidebar */}
+          <div className="w-44 border-r bg-muted/30 flex flex-col py-4 px-2 gap-0.5 shrink-0">
+            {tabs.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setActiveTab(t.id)}
+                className={`text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${activeTab === t.id ? "bg-[#E63950]/10 text-[#E63950]" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Tab content */}
+          <div className="flex-1 p-8 overflow-y-auto space-y-6 max-w-3xl">
+            {activeTab === "basic" && (
+              <>
+                <h3 className="font-semibold text-lg">Basic Settings</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Solution Name *</label>
+                    <Input value={form.name ?? ""} onChange={(e) => set("name", e.target.value)} placeholder="e.g. AeroSoft OS" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Slug (URL) *</label>
+                    <Input value={form.slug ?? ""} onChange={(e) => set("slug", e.target.value.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""))} placeholder="e.g. hvac" />
+                    <p className="text-xs text-muted-foreground mt-1">Public URL: /solutions/{form.slug || "slug"}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Tagline</label>
+                    <Input value={form.tagline ?? ""} onChange={(e) => set("tagline", e.target.value)} placeholder="e.g. HVAC Control Hub" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Badge Label</label>
+                    <Input value={form.badge ?? ""} onChange={(e) => set("badge", e.target.value)} placeholder="e.g. HVAC Field Service" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Logo Text</label>
+                    <Input value={form.logoText ?? ""} onChange={(e) => set("logoText", e.target.value)} placeholder="e.g. AeroSoft" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Accent Color</label>
+                    <div className="flex gap-2 items-center">
+                      <input type="color" value={form.accentColor ?? "#0EA5E9"} onChange={(e) => set("accentColor", e.target.value)} className="w-10 h-9 rounded border border-input cursor-pointer" />
+                      <Input value={form.accentColor ?? ""} onChange={(e) => set("accentColor", e.target.value)} placeholder="#0EA5E9" className="flex-1" />
+                    </div>
+                    <div className="mt-2 h-8 rounded-md flex items-center justify-center text-xs text-white font-bold" style={{ background: accent }}>
+                      Preview: {form.name || "Solution"}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Sort Order</label>
+                    <Input type="number" value={form.sortOrder ?? 0} onChange={(e) => set("sortOrder", parseInt(e.target.value) || 0)} placeholder="0" />
+                    <p className="text-xs text-muted-foreground mt-1">Lower numbers appear first</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Status</label>
+                    <select value={form.status ?? "draft"} onChange={(e) => set("status", e.target.value)} className="w-full text-sm border border-input rounded-md px-3 py-2 bg-background">
+                      <option value="draft">Draft</option>
+                      <option value="published">Published</option>
+                    </select>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {activeTab === "hero" && (
+              <>
+                <h3 className="font-semibold text-lg">Hero Section</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Headline *</label>
+                    <Input value={form.heroHeadline ?? ""} onChange={(e) => set("heroHeadline", e.target.value)} placeholder="e.g. Stop Losing Jobs to WhatsApp Chaos" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Subheadline</label>
+                    <Textarea rows={3} value={form.heroSubheadline ?? ""} onChange={(e) => set("heroSubheadline", e.target.value)} placeholder="Describe what the solution does in 2-3 sentences..." />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Primary CTA Button</label>
+                      <Input value={form.heroCta ?? ""} onChange={(e) => set("heroCta", e.target.value)} placeholder="Book a Demo" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Secondary CTA Button</label>
+                      <Input value={form.heroCtaSecondary ?? ""} onChange={(e) => set("heroCtaSecondary", e.target.value)} placeholder="See Features" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Hero Image URL (optional)</label>
+                    <Input value={form.heroImage ?? ""} onChange={(e) => set("heroImage", e.target.value)} placeholder="https://..." />
+                    {form.heroImage && <img src={form.heroImage} alt="Hero preview" className="mt-2 rounded-lg max-h-40 object-cover w-full" />}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {activeTab === "painPoints" && (
+              <>
+                <h3 className="font-semibold text-lg">Pain Points <span className="text-muted-foreground text-sm font-normal">("Does this sound familiar?" section)</span></h3>
+                <p className="text-sm text-muted-foreground">Add the problems your target customers face. These show on the dark background section.</p>
+                <RepeaterEditor
+                  value={form.painPoints ?? "[]"}
+                  onChange={(v) => set("painPoints", v)}
+                  addLabel="Add pain point"
+                  fields={[
+                    { key: "icon", label: "Emoji Icon", placeholder: "💬" },
+                    { key: "title", label: "Title", placeholder: "Complaints lost in WhatsApp groups" },
+                    { key: "description", label: "Description", placeholder: "Describe the problem...", multiline: true },
+                  ]}
+                />
+              </>
+            )}
+
+            {activeTab === "features" && (
+              <>
+                <h3 className="font-semibold text-lg">Features <span className="text-muted-foreground text-sm font-normal">("What You Get" section)</span></h3>
+                <p className="text-sm text-muted-foreground">Add the key features/capabilities of the solution. Shown as a grid of cards.</p>
+                <RepeaterEditor
+                  value={form.features ?? "[]"}
+                  onChange={(v) => set("features", v)}
+                  addLabel="Add feature"
+                  fields={[
+                    { key: "icon", label: "Emoji Icon", placeholder: "🎫" },
+                    { key: "title", label: "Feature Name", placeholder: "Smart Complaint Management" },
+                    { key: "description", label: "Description", placeholder: "Describe what this feature does...", multiline: true },
+                  ]}
+                />
+              </>
+            )}
+
+            {activeTab === "howItWorks" && (
+              <>
+                <h3 className="font-semibold text-lg">How It Works <span className="text-muted-foreground text-sm font-normal">("Step by step" section)</span></h3>
+                <p className="text-sm text-muted-foreground">Add numbered steps showing how the solution works from start to finish.</p>
+                <RepeaterEditor
+                  value={form.howItWorks ?? "[]"}
+                  onChange={(v) => set("howItWorks", v)}
+                  addLabel="Add step"
+                  fields={[
+                    { key: "step", label: "Step Number", placeholder: "01" },
+                    { key: "title", label: "Step Title", placeholder: "Customer logs a complaint" },
+                    { key: "description", label: "Step Description", placeholder: "Explain what happens in this step...", multiline: true },
+                  ]}
+                />
+              </>
+            )}
+
+            {activeTab === "stats" && (
+              <>
+                <h3 className="font-semibold text-lg">Stats Bar <span className="text-muted-foreground text-sm font-normal">(Key metrics shown below the hero)</span></h3>
+                <p className="text-sm text-muted-foreground">Add 2–4 impressive numbers that will be shown in a stats bar below the hero section.</p>
+                <RepeaterEditor
+                  value={form.stats ?? "[]"}
+                  onChange={(v) => set("stats", v)}
+                  addLabel="Add stat"
+                  fields={[
+                    { key: "value", label: "Value", placeholder: "60%" },
+                    { key: "label", label: "Label", placeholder: "Reduction in customer calls" },
+                  ]}
+                />
+              </>
+            )}
+
+            {activeTab === "cta" && (
+              <>
+                <h3 className="font-semibold text-lg">Call to Action Section</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">CTA Headline</label>
+                    <Input value={form.ctaHeadline ?? ""} onChange={(e) => set("ctaHeadline", e.target.value)} placeholder="Ready to get started?" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">CTA Subheadline</label>
+                    <Textarea rows={2} value={form.ctaSubheadline ?? ""} onChange={(e) => set("ctaSubheadline", e.target.value)} placeholder="A compelling reason to act now..." />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">CTA Button Text</label>
+                    <Input value={form.ctaButtonText ?? ""} onChange={(e) => set("ctaButtonText", e.target.value)} placeholder="Book a Demo" />
+                  </div>
+                </div>
+              </>
+            )}
+
+            {activeTab === "seo" && (
+              <>
+                <h3 className="font-semibold text-lg">SEO Settings</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Meta Title</label>
+                    <Input value={form.metaTitle ?? ""} onChange={(e) => set("metaTitle", e.target.value)} placeholder="Overrides page title in search results" />
+                    <p className="text-xs text-muted-foreground mt-1">{(form.metaTitle?.length ?? 0)}/60 chars recommended</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Meta Description</label>
+                    <Textarea rows={3} value={form.metaDescription ?? ""} onChange={(e) => set("metaDescription", e.target.value)} placeholder="Appears in Google search results under the page title. Aim for 150-160 chars." />
+                    <p className="text-xs text-muted-foreground mt-1">{(form.metaDescription?.length ?? 0)}/160 chars recommended</p>
+                  </div>
+                </div>
+              </>
+            )}
+
+            <div className="pt-4 border-t flex justify-end gap-2">
+              <Button variant="outline" onClick={() => { setEditingSolution(null); setForm({}); }}>Cancel</Button>
+              <Button onClick={() => saveMutation.mutate(form)} disabled={saveMutation.isPending} className="bg-[#E63950] hover:bg-[#B52C3E] text-white">
+                {saveMutation.isPending ? "Saving..." : editingSolution.id ? "Save Changes" : "Create Solution"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // --- List view ---
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-display font-bold flex items-center gap-2"><Layers className="w-7 h-7 text-[#E63950]" /> Solutions</h1>
+          <p className="text-muted-foreground text-sm mt-1">Manage solution landing pages. Each solution gets its own full-page site at /solutions/slug.</p>
+        </div>
+        <Button onClick={openNew} className="bg-[#E63950] hover:bg-[#B52C3E] text-white">
+          <Plus className="w-4 h-4 mr-2" /> New Solution
+        </Button>
+      </div>
+
+      {isLoading && <p className="text-muted-foreground">Loading...</p>}
+
+      {!isLoading && solutions && solutions.length === 0 && (
+        <div className="text-center py-20 text-muted-foreground">
+          <Layers className="w-12 h-12 mx-auto mb-4 opacity-30" />
+          <p className="font-medium mb-1">No solutions yet</p>
+          <p className="text-sm">Create your first solution landing page.</p>
+          <Button onClick={openNew} className="mt-4 bg-[#E63950] hover:bg-[#B52C3E] text-white"><Plus className="w-4 h-4 mr-2" /> Create Solution</Button>
+        </div>
+      )}
+
+      <div className="grid gap-4">
+        {solutions?.map((sol) => {
+          const accent = sol.accentColor || "#0EA5E9";
+          return (
+            <div key={sol.id} className="flex items-center gap-4 p-5 rounded-xl border bg-background hover:shadow-sm transition-shadow">
+              <div className="w-11 h-11 rounded-xl flex items-center justify-center font-display font-extrabold text-base text-white shrink-0" style={{ background: accent }}>
+                {sol.logoText?.[0] ?? sol.name[0]}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <span className="font-display font-bold text-base">{sol.name}</span>
+                  <Badge variant={sol.status === "published" ? "default" : "secondary"} className={`text-[10px] ${sol.status === "published" ? "bg-green-500 text-white" : ""}`}>
+                    {sol.status}
+                  </Badge>
+                </div>
+                <p className="text-sm text-muted-foreground truncate">{sol.tagline}</p>
+                <p className="text-xs text-muted-foreground/60 mt-0.5 font-mono">/solutions/{sol.slug}</p>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <a href={`/solutions/${sol.slug}`} target="_blank" rel="noopener noreferrer" title="View page" className="p-2 hover:bg-accent rounded-md transition-colors">
+                  <ExternalLink className="w-4 h-4 text-muted-foreground" />
+                </a>
+                <button type="button" title="Duplicate" onClick={() => duplicateMutation.mutate(sol.id)} className="p-2 hover:bg-accent rounded-md transition-colors">
+                  <Copy className="w-4 h-4 text-muted-foreground" />
+                </button>
+                <Button size="sm" variant="outline" onClick={() => openEdit(sol)}>
+                  <Pencil className="w-3.5 h-3.5 mr-1.5" /> Edit
+                </Button>
+                <button type="button" onClick={() => { if (confirm("Delete this solution?")) deleteMutation.mutate(sol.id); }} className="p-2 hover:bg-destructive/10 rounded-md text-destructive transition-colors">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

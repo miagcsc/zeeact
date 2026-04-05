@@ -9,6 +9,7 @@ import HomePage from "@/pages/HomePage";
 import AdminPage from "@/pages/AdminPage";
 import BlogPage from "@/pages/BlogPage";
 import BlogPostPage from "@/pages/BlogPostPage";
+import SolutionPage from "@/pages/SolutionPage";
 import AnalyticsInjector from "@/components/AnalyticsInjector";
 
 const queryClient = new QueryClient();
@@ -93,6 +94,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/" component={HomePage} />
             <Route path="/blog" component={BlogPage} />
             <Route path="/blog/:slug" component={BlogPostPage} />
+            <Route path="/solutions/:slug" component={SolutionPage} />
             <Route path="/sign-in/*?" component={SignInPage} />
             <Route path="/sign-up/*?"><Redirect to="/sign-in" /></Route>
             <Route path="/admin" component={AdminRoute} />
