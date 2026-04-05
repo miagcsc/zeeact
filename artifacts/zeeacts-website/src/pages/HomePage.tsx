@@ -385,7 +385,7 @@ export default function HomePage() {
             </div>
 
             <div className="reveal">
-              <div dangerouslySetInnerHTML={{ __html: settings?.aboutBody || "<p class='text-white/60 mb-6'>ZeeActs is a premium software development and AI consultancy firm. We partner with ambitious businesses to build scalable SaaS products, automate operations, and integrate AI into their workflows.</p><p class='text-white/60 mb-8'>Our methodology is simple: we ship fast, we write clean code, and we use AI to multiply our output. The result? You get enterprise-grade software at a fraction of the traditional cost and time.</p>" }} />
+              <div dangerouslySetInnerHTML={{ __html: settings?.aboutBody || "<p class='text-white/60 mb-6'>ZeeActs is a premium business consultancy, software development and AI consultancy firm. We partner with ambitious businesses to build scalable products, automate operations, and integrate AI into their workflows.</p><p class='text-white/60 mb-8'>Our methodology is simple: we ship fast, we write clean code, and we use AI to multiply our output. The result? You get enterprise-grade software at a fraction of the traditional cost and time.</p>" }} />
               
               <div className="grid grid-cols-2 gap-4">
                 {[

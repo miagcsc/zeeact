@@ -49,6 +49,7 @@ async function seed() {
     { key: "aboutTitle", value: "The Z stands for Execution." },
     { key: "founderName", value: "Zohaib" },
     { key: "founderBio", value: "After 15 years in global corporate companies, I saw the same tragedy: great strategies dying due to \"Big Tech\" bloat. Most providers force expensive, rigid software onto teams, breaking the very adoption they were meant to fix.\n\nZeeActs exists to end that. We optimize your business process first, then connect it to tailor-made Softwares and AI tools built for speed and scale. We don't build for \"pretty demos\" -we build tech your people will love using it and your business will actually grow with." },
+    { key: "aboutBody", value: "<p class='text-white/60 mb-6'>ZeeActs is a premium business consultancy, software development and AI consultancy firm. We partner with ambitious businesses to build scalable products, automate operations, and integrate AI into their workflows.</p><p class='text-white/60 mb-8'>Our methodology is simple: we ship fast, we write clean code, and we use AI to multiply our output. The result? You get enterprise-grade software at a fraction of the traditional cost and time.</p>" },
     { key: "contactEmail", value: "hello@zeeacts.com" },
   ];
   for (const s of settings) {
