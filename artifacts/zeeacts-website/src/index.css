@@ -201,6 +201,14 @@
   .reveal { opacity:1!important; transform:none!important; }
 }
 
+/* Hide Clerk development mode banner (yellow bar on mobile) */
+[data-clerk-dev-mode-banner],
+.__dev_mode_bar,
+.cl-devBrowser,
+[id^="clerk"] + [style*="background: rgb(255, 200"] {
+  display: none !important;
+}
+
 /* About body — override any hardcoded text-white classes from stored HTML */
 .about-body p { color: rgba(0,0,0,0.6) !important; margin-bottom: 1.5rem !important; }
 .about-body a { color: var(--crimson) !important; }
