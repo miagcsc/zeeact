@@ -4,6 +4,7 @@ import { trackConversion } from "@/components/AnalyticsInjector";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useQuery } from "@tanstack/react-query";
 import {
   useListServices,
   useListPortfolio,
@@ -159,6 +160,17 @@ export default function HomePage() {
   const { data: settings } = useGetSettings();
   const submitContact = useSubmitContact();
 
+  const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+  const { data: blogPosts } = useQuery<{ id: number; title: string; slug: string; excerpt: string | null; tags: string | null; publishedAt: string | null; coverImage: string | null }[]>({
+    queryKey: ["blog-home"],
+    queryFn: async () => {
+      const res = await fetch(`${BASE}/api/blog`);
+      if (!res.ok) return [];
+      return res.json();
+    },
+    select: (posts) => posts.slice(0, 3),
+  });
+
   const form = useForm<z.infer<typeof contactFormSchema>>({
     resolver: zodResolver(contactFormSchema),
     defaultValues: {
@@ -303,34 +315,56 @@ export default function HomePage() {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-[9999] bg-white/98 backdrop-blur-xl flex flex-col p-10 pt-20">
-          <button
-            className="absolute top-6 right-6 p-2 text-[#0A0A0F]"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            <span className="text-2xl">✕</span>
-          </button>
-          <div className="flex flex-col gap-2 mt-10">
-            {["Home", "About", "Services", "Portfolio", "Testimonials", "Contact"].map((item) => (
-              <a
-                key={item}
-                href={`#${item.toLowerCase()}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setIsMobileMenuOpen(false);
-                  scrollTo(`#${item.toLowerCase()}`);
-                }}
-                className="font-display font-extrabold text-[40px] text-[#0A0A0F] py-3 border-b border-black/10"
-              >
-                {item}
-              </a>
-            ))}
-            <a
-              href="/blog"
-              className="font-display font-extrabold text-[40px] text-[#0A0A0F] py-3 border-b border-black/10"
+        <div className="fixed inset-0 z-[9999] bg-white flex flex-col">
+          {/* Header row */}
+          <div className="flex items-center justify-between px-6 h-[68px] border-b border-black/08 shrink-0">
+            <span className="font-display font-extrabold text-2xl text-[#0A0A0F]">
+              Zee<span className="text-[#E63950]">Acts</span>
+            </span>
+            <button
+              className="p-2 text-[#0A0A0F] hover:text-[#E63950] transition-colors"
+              onClick={() => setIsMobileMenuOpen(false)}
+              aria-label="Close menu"
             >
-              Blog
-            </a>
+              <span className="text-2xl leading-none">✕</span>
+            </button>
+          </div>
+          {/* Scrollable nav links */}
+          <div className="flex-1 overflow-y-auto px-6 py-6">
+            <nav className="flex flex-col">
+              {["Home", "About", "Services", "Portfolio", "Testimonials", "Contact"].map((item) => (
+                <a
+                  key={item}
+                  href={`#${item.toLowerCase()}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsMobileMenuOpen(false);
+                    scrollTo(`#${item.toLowerCase()}`);
+                  }}
+                  className="group flex items-center justify-between font-display font-extrabold text-[clamp(28px,8vw,40px)] text-[#0A0A0F] hover:text-[#E63950] py-4 border-b border-black/08 transition-colors"
+                >
+                  <span>{item}</span>
+                  <span className="text-xl text-black/20 group-hover:text-[#E63950] group-hover:translate-x-1 transition-all">→</span>
+                </a>
+              ))}
+              <a
+                href="/blog"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="group flex items-center justify-between font-display font-extrabold text-[clamp(28px,8vw,40px)] text-[#0A0A0F] hover:text-[#E63950] py-4 border-b border-black/08 transition-colors"
+              >
+                <span>Blog</span>
+                <span className="text-xl text-black/20 group-hover:text-[#E63950] group-hover:translate-x-1 transition-all">→</span>
+              </a>
+            </nav>
+          </div>
+          {/* Bottom CTA */}
+          <div className="px-6 py-6 border-t border-black/08 shrink-0">
+            <button
+              onClick={() => { setIsMobileMenuOpen(false); scrollTo("#contact"); }}
+              className="w-full bg-[#E63950] hover:bg-[#B52C3E] text-white font-display font-bold text-lg py-4 rounded-xl transition-colors"
+            >
+              Get a Free Quote →
+            </button>
           </div>
         </div>
       )}
@@ -630,13 +664,90 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Blog & News */}
+      {blogPosts && blogPosts.length > 0 && (
+        <section id="blog" className="bg-white py-[100px]">
+          <div className="max-w-[1160px] mx-auto px-[5%]">
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
+              <div className="flex items-center gap-3">
+                <span className="w-6 h-[2px] bg-[#E63950] shrink-0" />
+                <span className="font-mono text-[10px] tracking-[4px] uppercase text-[#E63950]">05 — Blog & News</span>
+              </div>
+              <a href="/blog" className="font-mono text-xs tracking-widest text-black/40 hover:text-[#E63950] transition-colors uppercase">All articles →</a>
+            </div>
+            <h2 className="font-display font-extrabold text-[clamp(30px,4.5vw,52px)] leading-[1.05] tracking-[-1.5px] text-[#0A0A0F] mb-12">
+              Latest Insights
+            </h2>
+
+            {/* Desktop grid / Mobile horizontal scroll */}
+            <div className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-4 -mx-[5%] px-[5%] md:grid md:grid-cols-3 md:overflow-visible md:pb-0 md:mx-0 md:px-0">
+              {blogPosts.map((post, idx) => {
+                const gradients = [
+                  "from-[#E63950]/15 to-[#E63950]/5",
+                  "from-[#3B82F6]/15 to-[#3B82F6]/5",
+                  "from-[#10B981]/15 to-[#10B981]/5",
+                ];
+                const iconColors = ["#E63950", "#3B82F6", "#10B981"];
+                const tags = post.tags ? post.tags.split(",").filter(Boolean) : [];
+                return (
+                  <a
+                    key={post.id}
+                    href={`/blog/${post.slug}`}
+                    className="group snap-start shrink-0 w-[80vw] md:w-auto bg-white border border-black/08 rounded-[20px] overflow-hidden hover:shadow-xl hover:shadow-black/05 hover:border-[#E63950]/20 hover:-translate-y-1 transition-all duration-300 flex flex-col"
+                  >
+                    {/* Card image / gradient top */}
+                    <div className={`h-[180px] bg-gradient-to-br ${gradients[idx % 3]} flex items-center justify-center relative overflow-hidden`}>
+                      {post.coverImage ? (
+                        <img src={post.coverImage} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      ) : (
+                        <div className="flex flex-col items-center justify-center gap-2 opacity-30">
+                          <div className="w-12 h-12 rounded-xl border-2 flex items-center justify-center" style={{ borderColor: iconColors[idx % 3] }}>
+                            <span className="font-display font-extrabold text-xl" style={{ color: iconColors[idx % 3] }}>Z</span>
+                          </div>
+                        </div>
+                      )}
+                      {/* Tags */}
+                      {tags.length > 0 && (
+                        <div className="absolute top-4 left-4 flex flex-wrap gap-1.5">
+                          {tags.slice(0, 2).map((tag) => (
+                            <span key={tag.trim()} className="text-[10px] font-semibold px-2.5 py-1 rounded-full bg-white/85 backdrop-blur-sm" style={{ color: iconColors[idx % 3] }}>
+                              {tag.trim()}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-6 flex flex-col flex-1">
+                      {post.publishedAt && (
+                        <span className="text-xs text-black/35 font-mono mb-3">
+                          {new Date(post.publishedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                        </span>
+                      )}
+                      <h3 className="font-display font-bold text-lg text-[#0A0A0F] leading-snug mb-3 group-hover:text-[#E63950] transition-colors line-clamp-2">
+                        {post.title}
+                      </h3>
+                      {post.excerpt && (
+                        <p className="text-sm text-black/50 leading-relaxed line-clamp-3 flex-1">{post.excerpt}</p>
+                      )}
+                      <div className="flex items-center gap-1.5 mt-4 text-xs font-semibold text-[#E63950] group-hover:gap-3 transition-all">
+                        Read article <span className="text-sm">→</span>
+                      </div>
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Contact */}
       <section id="contact" className="bg-[#F0F0EB] py-[120px] text-[#0A0A0F]">
         <div className="max-w-[1160px] mx-auto px-[5%] grid lg:grid-cols-2 gap-20">
           <div className="reveal">
             <div className="flex items-center gap-3 mb-4">
               <span className="w-6 h-[2px] bg-[#E63950] shrink-0" />
-              <span className="font-mono text-[10px] tracking-[4px] uppercase text-[#E63950]">05 — Contact</span>
+              <span className="font-mono text-[10px] tracking-[4px] uppercase text-[#E63950]">06 — Contact</span>
             </div>
             <h2 className="font-display font-extrabold text-[clamp(40px,5vw,64px)] leading-[1.05] tracking-[-1.5px] mb-8">
               Let's Build Something.
