@@ -36,7 +36,7 @@ router.get("/portfolio/:id", async (req, res) => {
     .select()
     .from(portfolioTable)
     .where(eq(portfolioTable.id, id));
-  if (!item) return res.status(404).json({ error: "Not found" });
+  if (!item) { res.status(404).json({ error: "Not found" }); return; }
   res.json(item);
 });
 
@@ -48,7 +48,7 @@ router.put("/portfolio/:id", requireAuth, async (req, res) => {
     .set({ ...body, updatedAt: new Date() })
     .where(eq(portfolioTable.id, id))
     .returning();
-  if (!item) return res.status(404).json({ error: "Not found" });
+  if (!item) { res.status(404).json({ error: "Not found" }); return; }
   res.json(item);
 });
 

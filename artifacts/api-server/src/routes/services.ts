@@ -36,7 +36,7 @@ router.get("/services/:id", async (req, res) => {
     .select()
     .from(servicesTable)
     .where(eq(servicesTable.id, id));
-  if (!service) return res.status(404).json({ error: "Not found" });
+  if (!service) { res.status(404).json({ error: "Not found" }); return; }
   res.json(service);
 });
 
@@ -48,7 +48,7 @@ router.put("/services/:id", requireAuth, async (req, res) => {
     .set({ ...body, updatedAt: new Date() })
     .where(eq(servicesTable.id, id))
     .returning();
-  if (!service) return res.status(404).json({ error: "Not found" });
+  if (!service) { res.status(404).json({ error: "Not found" }); return; }
   res.json(service);
 });
 

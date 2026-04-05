@@ -108,5 +108,5 @@ export interface SiteSettings {
   founderName?: string;
   founderBio?: string;
   contactEmail?: string;
-  [key: string]: string;
+  [key: string]: string | undefined;
 }

@@ -30,7 +30,7 @@ router.patch("/contact/submissions/:id/read", requireAuth, async (req, res) => {
     .select()
     .from(contactSubmissionsTable)
     .where(eq(contactSubmissionsTable.id, id));
-  if (!current) return res.status(404).json({ error: "Not found" });
+  if (!current) { res.status(404).json({ error: "Not found" }); return; }
   const [item] = await db
     .update(contactSubmissionsTable)
     .set({ isRead: !current.isRead })

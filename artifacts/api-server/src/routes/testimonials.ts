@@ -37,7 +37,7 @@ router.put("/testimonials/:id", requireAuth, async (req, res) => {
     .set({ ...body, updatedAt: new Date() })
     .where(eq(testimonialsTable.id, id))
     .returning();
-  if (!item) return res.status(404).json({ error: "Not found" });
+  if (!item) { res.status(404).json({ error: "Not found" }); return; }
   res.json(item);
 });
 
