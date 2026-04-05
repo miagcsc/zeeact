@@ -1,0 +1,26 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "dGJ2UYwCfvSYHDIZgHbrz"
+uri = "file://logo-exports/zeeacts-logo-dark.png"
+type = "image"
+title = "ZeeActs Logo — Dark Background (2700×780px)"
+
+[[outputs]]
+id = "zlV8iErG1U6lQCkgYGEAn"
+uri = "file://logo-exports/zeeacts-logo-light.png"
+type = "image"
+title = "ZeeActs Logo — Light Background (2700×780px)"
+
+[[outputs]]
+id = "VMKwo5UnCiUUK7ysjypCb"
+uri = "file://logo-exports/zeeacts-icon-dark.png"
+type = "image"
+title = "ZeeActs Icon — Dark Background (900×900px)"
+
+[[outputs]]
+id = "0tMmuXcJIWiugL5aiugLB"
+uri = "file://logo-exports/zeeacts-icon-light.png"
+type = "image"
+title = "ZeeActs Icon — Light Background (900×900px)"
