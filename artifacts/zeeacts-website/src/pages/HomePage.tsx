@@ -243,7 +243,7 @@ export default function HomePage() {
     document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
 
     return () => observer.disconnect();
-  }, [services, portfolio, testimonials]);
+  }, [services, portfolio, testimonials, activePortfolioTab]);
 
   const scrollTo = (id: string) => {
     const el = document.querySelector(id);
@@ -661,13 +661,19 @@ export default function HomePage() {
           </div>
 
           <div className="grid gap-8">
-            {filteredPortfolio?.map((item) => (
-              <div key={item.id} className="flex flex-col md:flex-row bg-[#0A0A0F] rounded-[24px] overflow-hidden reveal shadow-xl">
+            {filteredPortfolio?.map((item, idx) => (
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0, y: 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: false, amount: 0.1 }}
+                transition={{ duration: 0.55, delay: idx * 0.07, ease: [0.4, 0, 0.2, 1] }}
+                className="flex flex-col md:flex-row bg-[#0A0A0F] rounded-[24px] overflow-hidden shadow-xl"
+              >
                 <div className="md:w-[45%] p-10 flex flex-col justify-center relative overflow-hidden" style={{ backgroundColor: item.accentColor || '#1a1a24' }}>
                   <div className="absolute inset-0 opacity-20 bg-gradient-to-br from-white to-transparent mix-blend-overlay" />
                   <div className="font-mono text-white/60 text-sm tracking-widest uppercase mb-4 relative z-10">{item.category}</div>
                   <h3 className="font-display font-bold text-3xl text-white mb-6 relative z-10">{item.title}</h3>
-                  
                   <div className="mt-auto relative z-10 bg-black/20 p-4 rounded-xl backdrop-blur-sm border border-white/10 inline-block self-start">
                     <div className="font-display font-extrabold text-3xl text-white">{item.resultMetric}</div>
                     <div className="text-xs text-white/70 uppercase tracking-wider">{item.resultLabel}</div>
@@ -684,10 +690,16 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
             {filteredPortfolio?.length === 0 && (
-              <p className="text-center text-gray-500 py-10">No portfolio items found for this category.</p>
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center text-gray-500 py-10"
+              >
+                No portfolio items found for this category.
+              </motion.p>
             )}
           </div>
         </div>
