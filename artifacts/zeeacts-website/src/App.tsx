@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { ClerkProvider, SignIn, SignUp, Show, useClerk } from '@clerk/react';
+import { ClerkProvider, SignIn, Show, useClerk } from '@clerk/react';
 import { Switch, Route, useLocation, Router as WouterRouter, Redirect } from 'wouter';
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -26,15 +26,7 @@ if (!clerkPubKey) {
 function SignInPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-zinc-950">
-      <SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} />
-    </div>
-  );
-}
-
-function SignUpPage() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-950">
-      <SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} />
+      <SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={undefined} />
     </div>
   );
 }
@@ -90,7 +82,7 @@ function ClerkProviderWithRoutes() {
           <Switch>
             <Route path="/" component={HomePage} />
             <Route path="/sign-in/*?" component={SignInPage} />
-            <Route path="/sign-up/*?" component={SignUpPage} />
+            <Route path="/sign-up/*?"><Redirect to="/sign-in" /></Route>
             <Route path="/admin" component={AdminRoute} />
             <Route path="/admin/*?" component={AdminRoute} />
             <Route component={NotFound} />

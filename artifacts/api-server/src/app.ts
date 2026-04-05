@@ -33,14 +33,18 @@ app.use(
 
 app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 
-const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS ?? "")
-  .split(",")
-  .map((o) => o.trim())
-  .filter(Boolean);
+const isProduction = process.env.NODE_ENV === "production";
+
+const ALLOWED_ORIGINS = new Set<string>(
+  (process.env.ALLOWED_ORIGINS ?? "")
+    .split(",")
+    .map((o) => o.trim())
+    .filter(Boolean),
+);
 
 const REPLIT_DEV_DOMAIN = process.env.REPLIT_DEV_DOMAIN;
 if (REPLIT_DEV_DOMAIN) {
-  ALLOWED_ORIGINS.push(`https://${REPLIT_DEV_DOMAIN}`);
+  ALLOWED_ORIGINS.add(`https://${REPLIT_DEV_DOMAIN}`);
 }
 
 app.use(
@@ -51,10 +55,23 @@ app.use(
         cb(null, true);
         return;
       }
-      if (ALLOWED_ORIGINS.length === 0 || ALLOWED_ORIGINS.some((o) => origin.startsWith(o))) {
-        cb(null, true);
+
+      let originHost: string;
+      try {
+        originHost = new URL(origin).origin;
+      } catch {
+        cb(new Error(`CORS policy: malformed origin — ${origin}`));
+        return;
+      }
+
+      if (isProduction) {
+        if (ALLOWED_ORIGINS.has(originHost)) {
+          cb(null, true);
+        } else {
+          cb(new Error(`CORS policy: origin not allowed — ${origin}`));
+        }
       } else {
-        cb(new Error(`CORS policy: origin not allowed — ${origin}`));
+        cb(null, ALLOWED_ORIGINS.size === 0 || ALLOWED_ORIGINS.has(originHost));
       }
     },
   }),
