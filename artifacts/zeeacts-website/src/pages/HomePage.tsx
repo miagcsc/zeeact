@@ -19,24 +19,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Github, Twitter, Linkedin, Mail } from "lucide-react";
+import { ZeeActsLogo } from "../components/ZeeActsLogo";
 
-// The logo component based on the HTML/CSS
-const Logo = ({ light = false, onClick }: { light?: boolean; onClick?: () => void }) => (
-  <div className={`logo ${light ? "light" : ""}`} onClick={onClick}>
-    <div className="logo-zbox">
-      <span>Z</span>
-    </div>
-    <div className="logo-arrows">
-      <div className="logo-arrow"></div>
-      <div className="logo-arrow"></div>
-      <div className="logo-arrow"></div>
-    </div>
-    <div className="logo-wordmark">
-      <span className="logo-zee">Zee</span>
-      <span className="logo-acts">Acts</span>
-    </div>
-  </div>
-);
+const Logo = ZeeActsLogo;
 
 function useCountUp(target: number, duration = 1400) {
   const [count, setCount] = useState(0);
@@ -327,9 +312,7 @@ export default function HomePage() {
         <div className="fixed inset-0 z-[9999] bg-white flex flex-col">
           {/* Header row */}
           <div className="flex items-center justify-between px-6 h-[68px] border-b border-black/08 shrink-0">
-            <span className="font-display font-extrabold text-2xl text-[#0A0A0F]">
-              Zee<span className="text-[#E63950]">Acts</span>
-            </span>
+            <Logo light onClick={() => { setIsMobileMenuOpen(false); scrollTo("#hero"); }} />
             <button
               className="p-2 text-[#0A0A0F] hover:text-[#E63950] transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
@@ -350,16 +333,16 @@ export default function HomePage() {
                     setIsMobileMenuOpen(false);
                     scrollTo(`#${item.toLowerCase()}`);
                   }}
-                  className="group flex items-center justify-between font-display font-extrabold text-[clamp(28px,8vw,40px)] text-[#0A0A0F] hover:text-[#E63950] py-4 border-b border-black/08 transition-colors"
+                  className="group flex items-center justify-between font-display font-extrabold text-[22px] text-[#0A0A0F] hover:text-[#E63950] py-3.5 border-b border-black/08 transition-colors"
                 >
                   <span>{item}</span>
-                  <span className="text-xl text-black/20 group-hover:text-[#E63950] group-hover:translate-x-1 transition-all">→</span>
+                  <span className="text-base text-black/20 group-hover:text-[#E63950] group-hover:translate-x-1 transition-all">→</span>
                 </a>
               ))}
               <a
                 href="/blog"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="group flex items-center justify-between font-display font-extrabold text-[clamp(28px,8vw,40px)] text-[#0A0A0F] hover:text-[#E63950] py-4 border-b border-black/08 transition-colors"
+                className="group flex items-center justify-between font-display font-extrabold text-[22px] text-[#0A0A0F] hover:text-[#E63950] py-3.5 border-b border-black/08 transition-colors"
               >
                 <span>Blog</span>
                 <span className="text-xl text-black/20 group-hover:text-[#E63950] group-hover:translate-x-1 transition-all">→</span>
@@ -576,7 +559,7 @@ export default function HomePage() {
 
       {/* Solutions */}
       {solutions && solutions.length > 0 && (
-        <section id="solutions" className="bg-[#0A0A0F] py-[120px]">
+        <section id="solutions" className="bg-[#F5F5F0] py-[120px]">
           <div className="max-w-[1160px] mx-auto px-[5%]">
             <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
               <div className="flex items-center gap-3">
@@ -584,10 +567,10 @@ export default function HomePage() {
                 <span className="font-mono text-[10px] tracking-[4px] uppercase text-[#E63950]">Our Solutions</span>
               </div>
             </div>
-            <h2 className="font-display font-extrabold text-[clamp(30px,4.5vw,52px)] leading-[1.05] tracking-[-1.5px] text-white mb-4">
+            <h2 className="font-display font-extrabold text-[clamp(30px,4.5vw,52px)] leading-[1.05] tracking-[-1.5px] text-[#0A0A0F] mb-4">
               Industry-Specific Software
             </h2>
-            <p className="text-white/50 mb-14 max-w-xl text-base">Purpose-built platforms for specific industries — ready to deploy, fully managed, and deeply tailored to Pakistani business operations.</p>
+            <p className="text-black/50 mb-14 max-w-xl text-base">Purpose-built platforms for specific industries — ready to deploy, fully managed, and deeply tailored to Pakistani business operations.</p>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {solutions.map((sol, idx) => {
                 const accent = sol.accentColor || "#0EA5E9";
@@ -599,17 +582,17 @@ export default function HomePage() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: idx * 0.1, duration: 0.5 }}
-                    className="group p-8 rounded-[24px] border border-white/08 bg-white/04 hover:bg-white/08 hover:border-white/15 transition-all hover:-translate-y-1 flex flex-col gap-4"
+                    className="group p-8 rounded-[24px] border border-black/08 bg-white hover:shadow-xl hover:border-black/15 transition-all hover:-translate-y-1 flex flex-col gap-4"
                   >
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center font-display font-extrabold text-lg text-white" style={{ background: `${accent}25`, border: `1.5px solid ${accent}40` }}>
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center font-display font-extrabold text-lg" style={{ background: `${accent}18`, border: `1.5px solid ${accent}35` }}>
                       <span style={{ color: accent }}>{sol.logoText?.[0] ?? sol.name[0]}</span>
                     </div>
                     {sol.badge && (
                       <span className="text-[10px] font-mono tracking-[3px] uppercase font-semibold" style={{ color: accent }}>{sol.badge}</span>
                     )}
                     <div>
-                      <h3 className="font-display font-bold text-xl text-white group-hover:text-white mb-1">{sol.name}</h3>
-                      <p className="text-sm text-white/50 font-medium">{sol.tagline}</p>
+                      <h3 className="font-display font-bold text-xl text-[#0A0A0F] mb-1">{sol.name}</h3>
+                      <p className="text-sm text-black/50 font-medium">{sol.tagline}</p>
                     </div>
                     <div className="mt-auto flex items-center gap-2 text-xs font-semibold group-hover:gap-3 transition-all" style={{ color: accent }}>
                       Explore solution <span>→</span>
@@ -618,14 +601,14 @@ export default function HomePage() {
                 );
               })}
               {/* Teaser card for upcoming solutions */}
-              <div className="p-8 rounded-[24px] border border-white/05 bg-white/02 flex flex-col gap-4 opacity-50">
-                <div className="w-12 h-12 rounded-xl bg-white/08 border border-white/10 flex items-center justify-center">
-                  <span className="text-white/40 text-xl">+</span>
+              <div className="p-8 rounded-[24px] border border-black/08 border-dashed bg-white/60 flex flex-col gap-4 opacity-60">
+                <div className="w-12 h-12 rounded-xl bg-black/05 border border-black/10 flex items-center justify-center">
+                  <span className="text-black/30 text-xl">+</span>
                 </div>
-                <span className="text-[10px] font-mono tracking-[3px] uppercase font-semibold text-white/30">Coming Soon</span>
+                <span className="text-[10px] font-mono tracking-[3px] uppercase font-semibold text-black/30">Coming Soon</span>
                 <div>
-                  <h3 className="font-display font-bold text-xl text-white/40 mb-1">More Solutions</h3>
-                  <p className="text-sm text-white/25">Sales CRM, Clinic Management, Restaurant POS — and more verticals launching soon.</p>
+                  <h3 className="font-display font-bold text-xl text-black/40 mb-1">More Solutions</h3>
+                  <p className="text-sm text-black/30">Sales CRM, Clinic Management, Restaurant POS — and more verticals launching soon.</p>
                 </div>
               </div>
             </div>

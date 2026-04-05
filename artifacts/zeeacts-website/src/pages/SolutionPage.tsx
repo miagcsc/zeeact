@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useRoute } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
+import { ZeeActsLogo } from "../components/ZeeActsLogo";
 
 interface Solution {
   id: number;
@@ -67,7 +68,7 @@ export default function SolutionPage() {
   );
 
   if (isError || !solution) return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0A0A0F] text-white">
+    <div className="min-h-screen flex items-center justify-center bg-white text-[#0A0A0F]">
       <div className="text-center">
         <div className="text-5xl mb-4">🔍</div>
         <h1 className="text-2xl font-bold mb-2">Solution Not Found</h1>
@@ -98,7 +99,9 @@ export default function SolutionPage() {
             </div>
           </a>
           <div className="flex items-center gap-4">
-            <a href="/#contact" className="hidden sm:flex items-center gap-1 text-sm text-black/60 hover:text-[#0A0A0F] transition-colors font-medium">ZeeActs</a>
+            <a href="/" className="hidden sm:block">
+              <ZeeActsLogo light />
+            </a>
             <a
               href="#contact-solution"
               className="px-5 py-2.5 rounded-xl font-display font-bold text-sm text-white transition-all hover:opacity-90 hover:shadow-lg"
@@ -164,23 +167,23 @@ export default function SolutionPage() {
 
       {/* Pain points */}
       {painPoints.length > 0 && (
-        <section className="py-[100px] bg-[#0A0A0F]">
+        <section className="py-[100px] bg-[#F5F5F0]">
           <div className="max-w-[1160px] mx-auto px-[5%]">
             <div className="flex items-center gap-3 mb-4">
               <span className="w-6 h-[2px] shrink-0" style={{ background: accent }} />
               <span className="font-mono text-[10px] tracking-[4px] uppercase" style={{ color: accent }}>The Problem</span>
             </div>
-            <h2 className="font-display font-extrabold text-[clamp(28px,4vw,52px)] leading-[1.05] tracking-[-1.5px] text-white mb-4">
+            <h2 className="font-display font-extrabold text-[clamp(28px,4vw,52px)] leading-[1.05] tracking-[-1.5px] text-[#0A0A0F] mb-4">
               Does This Sound Familiar?
             </h2>
-            <p className="text-white/50 mb-14 max-w-xl text-base">Every HVAC company in Pakistan faces these exact same problems. AeroSoft OS was built to solve all of them.</p>
+            <p className="text-black/50 mb-14 max-w-xl text-base">Every HVAC company in Pakistan faces these exact same problems. AeroSoft OS was built to solve all of them.</p>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
               {painPoints.map((p, i) => (
                 <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}
-                  className="p-6 rounded-2xl border border-white/08 bg-white/04 hover:bg-white/07 transition-colors group">
+                  className="p-6 rounded-2xl border border-black/08 bg-white hover:shadow-lg hover:-translate-y-0.5 transition-all group">
                   <div className="text-3xl mb-4">{p.icon}</div>
-                  <h3 className="font-display font-bold text-base text-white mb-2 group-hover:text-white transition-colors">{p.title}</h3>
-                  <p className="text-sm text-white/45 leading-relaxed">{p.description}</p>
+                  <h3 className="font-display font-bold text-base text-[#0A0A0F] mb-2 transition-colors">{p.title}</h3>
+                  <p className="text-sm text-black/50 leading-relaxed">{p.description}</p>
                 </motion.div>
               ))}
             </div>
@@ -241,19 +244,19 @@ export default function SolutionPage() {
       )}
 
       {/* CTA / Contact */}
-      <section id="contact-solution" className="py-[100px] bg-[#0A0A0F]">
+      <section id="contact-solution" className="py-[100px] bg-[#F5F5F0]">
         <div className="max-w-[1160px] mx-auto px-[5%] text-center">
           <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
             {solution.badge && (
-              <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full text-xs font-semibold font-mono tracking-widest uppercase border" style={{ color: accent, borderColor: `${accent}40`, background: `${accent}15` }}>
+              <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full text-xs font-semibold font-mono tracking-widest uppercase border" style={{ color: accent, borderColor: `${accent}40`, background: `${accent}12` }}>
                 <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: accent }} />
                 {solution.badge}
               </div>
             )}
-            <h2 className="font-display font-extrabold text-[clamp(30px,5vw,60px)] leading-[1.05] tracking-[-2px] text-white mb-5 max-w-3xl mx-auto">
+            <h2 className="font-display font-extrabold text-[clamp(30px,5vw,60px)] leading-[1.05] tracking-[-2px] text-[#0A0A0F] mb-5 max-w-3xl mx-auto">
               {solution.ctaHeadline}
             </h2>
-            <p className="text-white/50 text-lg mb-10 max-w-xl mx-auto leading-relaxed">
+            <p className="text-black/50 text-lg mb-10 max-w-xl mx-auto leading-relaxed">
               {solution.ctaSubheadline}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -264,7 +267,7 @@ export default function SolutionPage() {
               >
                 {solution.ctaButtonText} →
               </a>
-              <a href="/" className="text-sm text-white/40 hover:text-white/70 transition-colors">
+              <a href="/" className="text-sm text-black/40 hover:text-[#0A0A0F] transition-colors">
                 Learn about ZeeActs →
               </a>
             </div>
@@ -273,10 +276,13 @@ export default function SolutionPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#0A0A0F] border-t border-white/08 py-8">
-        <div className="max-w-[1160px] mx-auto px-[5%] flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-white/30">
-          <span>A product by <a href="/" className="text-[#E63950] hover:underline">ZeeActs</a></span>
-          <span>© {new Date().getFullYear()} {solution.name}. All rights reserved.</span>
+      <footer className="bg-[#F5F5F0] border-t border-black/08 py-8">
+        <div className="max-w-[1160px] mx-auto px-[5%] flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3 text-sm text-black/40">
+            <span>A product by</span>
+            <a href="/"><ZeeActsLogo light /></a>
+          </div>
+          <span className="text-sm text-black/40">© {new Date().getFullYear()} {solution.name}. All rights reserved.</span>
         </div>
       </footer>
     </div>
