@@ -75,6 +75,12 @@ function ClerkProviderWithRoutes() {
       proxyUrl={clerkProxyUrl}
       routerPush={(to) => setLocation(stripBase(to))}
       routerReplace={(to) => setLocation(stripBase(to), { replace: true })}
+      appearance={{
+        variables: {
+          colorPrimary: "#E63950",
+          colorDanger: "#E63950",
+        },
+      }}
     >
       <QueryClientProvider client={queryClient}>
         <ClerkQueryClientCacheInvalidator />

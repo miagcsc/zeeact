@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -34,6 +35,108 @@ const Logo = ({ light = false, onClick }: { light?: boolean; onClick?: () => voi
     </div>
   </div>
 );
+
+function useCountUp(target: number, duration = 1400) {
+  const [count, setCount] = useState(0);
+  const [started, setStarted] = useState(false);
+  const start = () => setStarted(true);
+  useEffect(() => {
+    if (!started) return;
+    let frame = 0;
+    const totalFrames = Math.round(duration / 16);
+    const timer = setInterval(() => {
+      frame++;
+      setCount(Math.round((target * frame) / totalFrames));
+      if (frame === totalFrames) clearInterval(timer);
+    }, 16);
+    return () => clearInterval(timer);
+  }, [started, target, duration]);
+  return { count, start };
+}
+
+const fadeUp = (delay = 0) => ({
+  initial: { opacity: 0, y: 28 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.65, delay, ease: [0.4, 0, 0.2, 1] as const },
+});
+
+const slideLeft = { initial: { opacity: 0, x: -56 }, whileInView: { opacity: 1, x: 0 }, viewport: { once: true }, transition: { duration: 0.75, ease: [0.4, 0, 0.2, 1] as const } };
+const slideRight = { initial: { opacity: 0, x: 56 }, whileInView: { opacity: 1, x: 0 }, viewport: { once: true }, transition: { duration: 0.75, ease: [0.4, 0, 0.2, 1] as const } };
+
+const staggerContainer = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
+};
+const popIn = {
+  hidden: { opacity: 0, scale: 0.88, y: 16 },
+  show: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.45, ease: [0.4, 0, 0.2, 1] as const } },
+};
+
+function HeroDashboardCard() {
+  const projects = useCountUp(127);
+  const savings = useCountUp(62);
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 60 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.8, delay: 0.35, ease: [0.4, 0, 0.2, 1] }}
+      onAnimationComplete={() => { projects.start(); savings.start(); }}
+      className="hidden lg:block animate-[float_4s_ease-in-out_infinite] bg-white border border-black/08 rounded-[20px] p-[28px] shadow-[0_8px_40px_rgba(0,0,0,0.10)]"
+    >
+      <div className="flex justify-between items-center mb-6">
+        <h3 className="font-display font-bold text-[13px] text-[#0A0A0F]">Project Delivery Dashboard</h3>
+        <div className="bg-[#E63950] font-mono text-[8px] text-white px-2 py-[3px] rounded-full tracking-[2px] flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 bg-[#27c93f] rounded-full animate-[pulse_1.5s_infinite]" />
+          LIVE
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        <div className="bg-[#F5F5F0] rounded-[10px] p-3.5 border border-black/05">
+          <p className="text-[10px] text-black/35 mb-1">Projects Shipped</p>
+          <div className="flex items-end gap-2">
+            <span className="font-display font-extrabold text-[20px] text-[#0A0A0F]">{projects.count}</span>
+            <span className="font-body text-[11px] text-[#E63950] mb-1">+40%↑</span>
+          </div>
+        </div>
+        <div className="bg-[#F5F5F0] rounded-[10px] p-3.5 border border-black/05">
+          <p className="text-[10px] text-black/35 mb-1">Cost Savings via AI</p>
+          <div className="flex items-end gap-2">
+            <span className="font-display font-extrabold text-[20px] text-[#0A0A0F]">{savings.count}%</span>
+            <span className="font-body text-[11px] text-[#E63950] mb-1">faster↑</span>
+          </div>
+        </div>
+      </div>
+      <div className="mb-6">
+        <p className="font-mono text-[8px] text-black/30 mb-2">DELIVERY SPEED</p>
+        <div className="flex items-end h-[52px] gap-1">
+          {[30, 45, 38, 60, 52, 75, 100].map((h, i) => (
+            <motion.div
+              key={i}
+              className="flex-1 rounded-t-[3px] origin-bottom"
+              initial={{ scaleY: 0 }}
+              animate={{ scaleY: 1 }}
+              transition={{ duration: 0.6, delay: 0.6 + i * 0.07, ease: [0.4, 0, 0.2, 1] }}
+              style={{ height: `${h}%`, backgroundColor: i === 6 ? '#E63950' : `rgba(230,57,80,${0.15 + i * 0.05})` }}
+            />
+          ))}
+        </div>
+      </div>
+      <div className="space-y-3">
+        {[
+          { color: '#27c93f', text: 'SaaS MVP deployed — LogiCore', time: '5m ago' },
+          { color: '#E63950', text: 'AI module — 3× faster processing', time: '22m ago' },
+          { color: '#E63950', text: 'Automation saved 18 hrs/week', time: '1h ago' }
+        ].map((item, i) => (
+          <div key={i} className="flex items-center gap-2.5">
+            <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+            <p className="text-[11px] text-black/45 flex-1 truncate">{item.text}</p>
+            <p className="font-mono text-[9px] text-black/25 shrink-0">{item.time}</p>
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
 
 const contactFormSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -229,12 +332,12 @@ export default function HomePage() {
 
         <div className="max-w-[1160px] w-full mx-auto px-[5%] py-[60px] grid lg:grid-cols-[1fr_420px] gap-[60px] items-center relative z-10">
           <div className="hero-content">
-            <div className="inline-flex items-center gap-2 bg-[#E63950]/10 border border-[#E63950]/25 px-4 py-1.5 rounded-full mb-6 text-[#E63950] font-mono text-[10px] tracking-[1px] sm:tracking-[3px] uppercase max-w-full flex-wrap">
+            <motion.div {...fadeUp(0)} className="inline-flex items-center gap-2 bg-[#E63950]/10 border border-[#E63950]/25 px-4 py-1.5 rounded-full mb-6 text-[#E63950] font-mono text-[10px] tracking-[1px] sm:tracking-[3px] uppercase max-w-full flex-wrap">
               <span className="w-[7px] h-[7px] bg-[#E63950] rounded-full animate-[pulse_2s_ease_infinite] flex-shrink-0" />
               <span className="leading-relaxed">{settings?.heroBadge || "IT Solutions · SaaS · AI Consultancy"}</span>
-            </div>
+            </motion.div>
 
-            <h1 className="font-display font-extrabold text-[clamp(42px,6vw,76px)] leading-[1.0] tracking-[-2.5px] text-[#0A0A0F] mb-6">
+            <motion.h1 {...fadeUp(0.15)} className="font-display font-extrabold text-[clamp(42px,6vw,76px)] leading-[1.0] tracking-[-2.5px] text-[#0A0A0F] mb-6">
               {settings?.heroHeadline ? (
                 settings.heroHeadline
               ) : (
@@ -245,22 +348,22 @@ export default function HomePage() {
                   <span className="text-[#E63950] block">Scales.</span>
                 </>
               )}
-            </h1>
+            </motion.h1>
 
-            <p className="text-[17px] text-black/50 leading-[1.75] max-w-[500px] mb-9">
+            <motion.p {...fadeUp(0.3)} className="text-[17px] text-black/50 leading-[1.75] max-w-[500px] mb-9">
               {settings?.heroSubheadline || "ZeeActs delivers custom software, business-ready SaaS, and AI-powered automation — built by elite developers, delivered faster and at a fraction of the cost."}
-            </p>
+            </motion.p>
 
-            <div className="flex flex-wrap gap-4 mb-12">
+            <motion.div {...fadeUp(0.42)} className="flex flex-wrap gap-4 mb-12">
               <button onClick={() => scrollTo("#contact")} className="bg-[#E63950] hover:bg-[#B52C3E] text-white font-display font-bold text-[14px] px-7 py-3.5 rounded-[10px] transition-all hover:-translate-y-[2px] hover:shadow-[0_12px_32px_rgba(230,57,80,0.35)]">
                 Get a Free Quote →
               </button>
               <button onClick={() => scrollTo("#portfolio")} className="border-[1.5px] border-black/20 text-black/70 bg-transparent hover:border-black/50 hover:text-black font-display font-bold text-[14px] px-7 py-3.5 rounded-[10px] transition-all hover:-translate-y-[2px]">
                 See Our Work
               </button>
-            </div>
+            </motion.div>
 
-            <div className="flex items-center gap-3">
+            <motion.div {...fadeUp(0.55)} className="flex items-center gap-3">
               <div className="flex -space-x-2">
                 {['A', 'M', 'S', 'R'].map((l, i) => (
                   <div key={i} className={`w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-white font-display font-extrabold text-[12px]`} style={{ backgroundColor: ['#e63950', '#2d6a4f', '#1d3557', '#7b2d8b'][i] }}>
@@ -269,66 +372,10 @@ export default function HomePage() {
                 ))}
               </div>
               <p className="text-[14px] text-black/50">50+ businesses powered by ZeeActs Solutions</p>
-            </div>
+            </motion.div>
           </div>
 
-          <div className="hidden lg:block animate-[float_4s_ease-in-out_infinite] bg-white border border-black/08 rounded-[20px] p-[28px] shadow-[0_8px_40px_rgba(0,0,0,0.10)]">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="font-display font-bold text-[13px] text-[#0A0A0F]">Project Delivery Dashboard</h3>
-              <div className="bg-[#E63950] font-mono text-[8px] text-white px-2 py-[3px] rounded-full tracking-[2px] flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 bg-[#27c93f] rounded-full animate-[pulse_1.5s_infinite]" />
-                LIVE
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 mb-6">
-              <div className="bg-[#F5F5F0] rounded-[10px] p-3.5 border border-black/05">
-                <p className="text-[10px] text-black/35 mb-1">Projects Shipped</p>
-                <div className="flex items-end gap-2">
-                  <span className="font-display font-extrabold text-[20px] text-[#0A0A0F]">127</span>
-                  <span className="font-body text-[11px] text-[#E63950] mb-1">+40%↑</span>
-                </div>
-              </div>
-              <div className="bg-[#F5F5F0] rounded-[10px] p-3.5 border border-black/05">
-                <p className="text-[10px] text-black/35 mb-1">Cost Savings via AI</p>
-                <div className="flex items-end gap-2">
-                  <span className="font-display font-extrabold text-[20px] text-[#0A0A0F]">62%</span>
-                  <span className="font-body text-[11px] text-[#E63950] mb-1">faster↑</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="mb-6">
-              <p className="font-mono text-[8px] text-black/30 mb-2">DELIVERY SPEED</p>
-              <div className="flex items-end h-[52px] gap-1">
-                {[30, 45, 38, 60, 52, 75, 100].map((h, i) => (
-                  <div
-                    key={i}
-                    className="flex-1 rounded-t-[3px] origin-bottom animate-[barGrow_0.8s_ease-out_forwards]"
-                    style={{
-                      height: `${h}%`,
-                      backgroundColor: i === 6 ? '#E63950' : `rgba(230,57,80, ${0.15 + i * 0.05})`,
-                      animationDelay: `${i * 0.1}s`
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              {[
-                { color: '#27c93f', text: 'SaaS MVP deployed — LogiCore', time: '5m ago' },
-                { color: '#E63950', text: 'AI module — 3× faster processing', time: '22m ago' },
-                { color: '#f5cb5c', text: 'Automation saved 18hrs/week', time: '1h ago' }
-              ].map((item, i) => (
-                <div key={i} className="flex items-center gap-2.5">
-                  <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-                  <p className="text-[11px] text-black/45 flex-1 truncate">{item.text}</p>
-                  <p className="font-mono text-[9px] text-black/25 shrink-0">{item.time}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+          <HeroDashboardCard />
         </div>
 
         <div className="scroll-indicator absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-40 transition-opacity duration-300">
@@ -362,14 +409,14 @@ export default function HomePage() {
             <span className="font-mono text-[10px] tracking-[4px] uppercase text-[#E63950]">01 — About</span>
           </div>
 
-          <h2 className="font-display font-extrabold text-[clamp(32px,4.5vw,54px)] leading-[1.05] tracking-[-1.5px] text-[#0A0A0F] mb-10 reveal">
+          <motion.h2 {...slideLeft} className="font-display font-extrabold text-[clamp(32px,4.5vw,54px)] leading-[1.05] tracking-[-1.5px] text-[#0A0A0F] mb-10">
             {settings?.aboutTitle || (
               <>The Z stands for <span className="text-[#E63950]">Execution.</span></>
             )}
-          </h2>
+          </motion.h2>
 
           <div className="grid md:grid-cols-2 gap-20 items-center">
-            <div className="bg-white border border-black/08 p-10 rounded-[20px] relative overflow-hidden reveal shadow-sm">
+            <motion.div {...slideLeft} transition={{ duration: 0.75, delay: 0.1, ease: [0.4, 0, 0.2, 1] }} className="bg-white border border-black/08 p-10 rounded-[20px] relative overflow-hidden shadow-sm">
               <div className="hidden sm:block absolute -right-10 -bottom-10 font-display font-extrabold text-[240px] text-black/[0.04] leading-[0.8] select-none pointer-events-none">
                 Z
               </div>
@@ -382,25 +429,31 @@ export default function HomePage() {
                   .filter(p => p.length > 0)
                   .map((para, i) => <p key={i}>{para}</p>)}
               </div>
-            </div>
+            </motion.div>
 
-            <div className="reveal">
+            <motion.div {...slideRight} transition={{ duration: 0.75, delay: 0.2, ease: [0.4, 0, 0.2, 1] }}>
               <div className="about-body" dangerouslySetInnerHTML={{ __html: settings?.aboutBody || "<p>ZeeActs is a premium business consultancy, software development and AI consultancy firm. We partner with ambitious businesses to build scalable products, automate operations, and integrate AI into their workflows.</p><p>Our methodology is simple: we ship fast, we write clean code, and we use AI to multiply our output. The result? You get enterprise-grade software at a fraction of the traditional cost and time.</p>" }} />
               
-              <div className="grid grid-cols-2 gap-4">
+              <motion.div
+                variants={staggerContainer}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true }}
+                className="grid grid-cols-2 gap-4"
+              >
                 {[
                   { title: "Speed", desc: "AI-accelerated delivery" },
                   { title: "Quality", desc: "Elite architecture" },
                   { title: "ROI", desc: "High impact solutions" },
                   { title: "Scale", desc: "Built for growth" }
                 ].map((val, i) => (
-                  <div key={i} className="border-l-2 border-[#E63950] pl-4">
+                  <motion.div key={i} variants={popIn} className="border-l-2 border-[#E63950] pl-4">
                     <h4 className="font-display font-bold text-[#0A0A0F] mb-1">{val.title}</h4>
                     <p className="text-sm text-black/50">{val.desc}</p>
-                  </div>
+                  </motion.div>
                 ))}
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -537,7 +590,7 @@ export default function HomePage() {
           <div className="grid md:grid-cols-3 gap-6 reveal-grid">
             {testimonials?.map((t) => (
               <div key={t.id} className="bg-white border border-black/08 p-8 rounded-[20px] flex flex-col h-full reveal shadow-sm">
-                <div className="flex text-[#f5cb5c] mb-6">
+                <div className="flex text-[#E63950] mb-6">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <span key={star}>★</span>
                   ))}
