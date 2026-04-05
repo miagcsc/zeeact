@@ -2,6 +2,8 @@ import express, { type Express } from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
 import { clerkMiddleware } from "@clerk/express";
+import path from "path";
+import fs from "fs";
 import {
   CLERK_PROXY_PATH,
   clerkProxyMiddleware,
@@ -91,6 +93,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(clerkMiddleware());
+
+const uploadsDir = path.join(process.cwd(), "uploads");
+if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+app.use("/api/uploads", express.static(uploadsDir));
 
 app.use("/api", router);
 

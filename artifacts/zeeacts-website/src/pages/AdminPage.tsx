@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, type ChangeEvent } from "react";
 import { RichTextEditor } from "@/components/RichTextEditor";
 import type { Service, PortfolioItem, Testimonial, ContactSubmission, SiteSettings } from "@workspace/api-client-react";
 import { useUser, useClerk } from "@clerk/react";
@@ -70,6 +70,101 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 type View = "dashboard" | "services" | "portfolio" | "testimonials" | "contacts" | "settings" | "blog" | "seo" | "analytics" | "solutions";
+
+function CoverImageUpload({ value, onChange }: { value: string; onChange: (url: string) => void }) {
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+  const convertToWebP = (file: File): Promise<Blob> =>
+    new Promise((resolve, reject) => {
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+        const canvas = document.createElement("canvas");
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        const ctx = canvas.getContext("2d")!;
+        ctx.drawImage(img, 0, 0);
+        canvas.toBlob(
+          (blob) => (blob ? resolve(blob) : reject(new Error("Conversion failed"))),
+          "image/webp",
+          0.88,
+        );
+      };
+      img.onerror = reject;
+      img.src = objectUrl;
+    });
+
+  const handleFile = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const webp = await convertToWebP(file);
+      const fd = new FormData();
+      fd.append("file", webp, `cover-${Date.now()}.webp`);
+      const res = await fetch(`${BASE}/api/upload`, { method: "POST", credentials: "include", body: fd });
+      if (!res.ok) throw new Error("Upload failed");
+      const { url: uploaded } = (await res.json()) as { url: string };
+      onChange(uploaded);
+    } catch {
+      toast.error("Image upload failed. Try again.");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      {value && (
+        <div className="relative w-full h-36 rounded-lg overflow-hidden border border-black/10 bg-gray-50">
+          <img src={value} alt="Cover preview" className="w-full h-full object-cover" />
+          <button
+            type="button"
+            onClick={() => onChange("")}
+            className="absolute top-2 right-2 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-black/80"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+      <div className="flex gap-2">
+        <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+        <button
+          type="button"
+          onClick={() => fileRef.current?.click()}
+          disabled={uploading}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg border border-dashed border-black/20 text-sm font-medium hover:border-[#E63950] hover:text-[#E63950] transition-colors disabled:opacity-50"
+        >
+          {uploading ? (
+            <>
+              <span className="w-4 h-4 rounded-full border-2 border-[#E63950] border-t-transparent animate-spin inline-block" />
+              <span>Converting to WebP…</span>
+            </>
+          ) : (
+            <>
+              <span>📁</span>
+              <span>{value ? "Replace image" : "Upload image"}</span>
+            </>
+          )}
+        </button>
+        {!value && (
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder="or paste URL…"
+            className="flex-1 text-xs h-10 px-3 border border-input rounded-md bg-background text-foreground"
+          />
+        )}
+      </div>
+      <p className="text-[11px] text-black/40">Any image format — automatically converted to WebP</p>
+    </div>
+  );
+}
 
 export default function AdminPage() {
   const [activeView, setActiveView] = useState<View>("dashboard");
@@ -972,8 +1067,8 @@ function BlogView() {
                 )} />
                 <FormField control={form.control} name="coverImage" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Cover Image URL</FormLabel>
-                    <FormControl><Input {...field} placeholder="https://..." /></FormControl>
+                    <FormLabel>Cover Image</FormLabel>
+                    <CoverImageUpload value={field.value ?? ""} onChange={field.onChange} />
                     <FormMessage />
                   </FormItem>
                 )} />

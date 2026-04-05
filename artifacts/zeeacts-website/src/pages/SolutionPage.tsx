@@ -1,7 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRoute } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ZeeActsLogo } from "../components/ZeeActsLogo";
 
 interface Solution {
@@ -42,6 +42,7 @@ function safeParse<T>(json: string, fallback: T): T {
 export default function SolutionPage() {
   const [, params] = useRoute("/solutions/:slug");
   const slug = params?.slug ?? "";
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const { data: solution, isLoading, isError } = useQuery<Solution>({
     queryKey: ["solution", slug],
@@ -89,29 +90,111 @@ export default function SolutionPage() {
       {/* Nav */}
       <nav className="fixed top-0 inset-x-0 z-50 bg-white/95 backdrop-blur-md border-b border-black/08">
         <div className="max-w-[1160px] mx-auto px-[5%] h-[68px] flex items-center justify-between">
-          <a href="/" className="flex items-center gap-3 group">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center font-display font-extrabold text-sm text-white shrink-0" style={{ background: accent }}>
-              {solution.logoText?.[0] ?? "A"}
-            </div>
-            <div>
-              <span className="font-display font-extrabold text-lg text-[#0A0A0F]">{solution.logoText || solution.name}</span>
-              {solution.tagline && <span className="hidden sm:inline text-xs text-black/40 ml-2 font-mono">— {solution.tagline}</span>}
-            </div>
-          </a>
-          <div className="flex items-center gap-4">
-            <a href="/">
+          {/* Left: solution branding (desktop) / ZeeActs logo (mobile) */}
+          <div className="flex items-center gap-3">
+            {/* Mobile: show ZeeActs logo */}
+            <a href="/" className="md:hidden">
+              <ZeeActsLogo light />
+            </a>
+            {/* Desktop: show solution branding */}
+            <a href="/" className="hidden md:flex items-center gap-3 group">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center font-display font-extrabold text-sm text-white shrink-0" style={{ background: accent }}>
+                {solution.logoText?.[0] ?? "A"}
+              </div>
+              <div>
+                <span className="font-display font-extrabold text-lg text-[#0A0A0F]">{solution.logoText || solution.name}</span>
+                {solution.tagline && <span className="hidden xl:inline text-xs text-black/40 ml-2 font-mono">— {solution.tagline}</span>}
+              </div>
+            </a>
+          </div>
+
+          {/* Right: desktop nav items / mobile hamburger */}
+          <div className="flex items-center gap-3">
+            {/* Desktop only: ZeeActs logo + CTA */}
+            <a href="/" className="hidden md:block">
               <ZeeActsLogo light />
             </a>
             <a
               href="#contact-solution"
-              className="px-5 py-2.5 rounded-xl font-display font-bold text-sm text-white transition-all hover:opacity-90 hover:shadow-lg"
+              className="hidden md:inline-flex px-5 py-2.5 rounded-xl font-display font-bold text-sm text-white transition-all hover:opacity-90 hover:shadow-lg"
               style={{ background: accent }}
             >
               {solution.heroCta}
             </a>
+            {/* Mobile hamburger */}
+            <button
+              className="md:hidden w-10 h-10 flex flex-col items-center justify-center gap-[5px]"
+              onClick={() => setMobileOpen(true)}
+              aria-label="Open menu"
+            >
+              <span className="w-5 h-[2px] bg-[#0A0A0F] rounded-full" />
+              <span className="w-5 h-[2px] bg-[#0A0A0F] rounded-full" />
+              <span className="w-3 h-[2px] bg-[#0A0A0F] rounded-full self-start ml-[4px]" />
+            </button>
           </div>
         </div>
       </nav>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[9999] bg-white flex flex-col"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 h-[68px] border-b border-black/08 shrink-0">
+              <ZeeActsLogo light onClick={() => setMobileOpen(false)} />
+              <button
+                className="p-2 text-[#0A0A0F] hover:text-[#E63950] transition-colors"
+                onClick={() => setMobileOpen(false)}
+                aria-label="Close menu"
+              >
+                <span className="text-2xl leading-none">✕</span>
+              </button>
+            </div>
+            {/* Solution badge */}
+            <div className="px-6 py-5 border-b border-black/08 shrink-0 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg flex items-center justify-center font-display font-extrabold text-base text-white shrink-0" style={{ background: accent }}>
+                {solution.logoText?.[0] ?? "A"}
+              </div>
+              <div>
+                <div className="font-display font-bold text-base text-[#0A0A0F]">{solution.logoText || solution.name}</div>
+                {solution.badge && <div className="text-[10px] font-mono tracking-[2px] uppercase" style={{ color: accent }}>{solution.badge}</div>}
+              </div>
+            </div>
+            {/* Links */}
+            <div className="flex-1 flex flex-col px-6 py-8 gap-4">
+              <a
+                href="#contact-solution"
+                onClick={() => setMobileOpen(false)}
+                className="w-full py-4 rounded-xl font-display font-bold text-base text-white text-center transition-all hover:opacity-90"
+                style={{ background: accent }}
+              >
+                {solution.heroCta} →
+              </a>
+              <a
+                href="#features"
+                onClick={() => setMobileOpen(false)}
+                className="group flex items-center justify-between font-display font-bold text-[22px] text-[#0A0A0F] hover:text-[#E63950] py-3.5 border-b border-black/08 transition-colors"
+              >
+                <span>Features</span>
+                <span className="text-base text-black/20 group-hover:text-[#E63950] group-hover:translate-x-1 transition-all">→</span>
+              </a>
+              <a
+                href="/"
+                className="group flex items-center justify-between font-display font-bold text-[22px] text-[#0A0A0F] hover:text-[#E63950] py-3.5 border-b border-black/08 transition-colors"
+              >
+                <span>Back to ZeeActs</span>
+                <span className="text-base text-black/20 group-hover:text-[#E63950] group-hover:translate-x-1 transition-all">→</span>
+              </a>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Hero */}
       <section className="pt-[120px] pb-[100px] relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${accent}0D 0%, white 60%)` }}>
