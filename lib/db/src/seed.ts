@@ -9,6 +9,12 @@ import {
 async function seed() {
   console.log("Seeding database...");
 
+  const existing = await db.select().from(servicesTable).limit(1);
+  if (existing.length > 0) {
+    console.log("Database already seeded. Skipping.");
+    process.exit(0);
+  }
+
   await db.insert(servicesTable).values([
     { icon: "⚡", title: "Custom Software Development", description: "We build tailor-made software solutions that fit your business logic perfectly. From MVPs to enterprise platforms, we ship fast, clean code.", sortOrder: 0 },
     { icon: "🚀", title: "SaaS Product Development", description: "Full-stack SaaS products built for scale. Multi-tenancy, billing, analytics, and all the infrastructure you need to grow.", sortOrder: 1 },

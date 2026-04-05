@@ -813,16 +813,16 @@ function SettingsView() {
               <h3 className="font-medium text-lg border-b pb-2">Hero Section</h3>
               <div className="grid gap-4">
                 <div>
-                  <FormLabel>Hero Badge Text</FormLabel>
+                  <label className="text-sm font-medium leading-none block mb-1">Hero Badge Text</label>
                   <Input name="heroBadge" value={formValues.heroBadge || ""} onChange={handleChange} placeholder="IT Solutions · SaaS · AI Consultancy" />
                 </div>
                 <div>
-                  <FormLabel>Hero Headline</FormLabel>
+                  <label className="text-sm font-medium leading-none block mb-1">Hero Headline</label>
                   <Textarea name="heroHeadline" value={formValues.heroHeadline || ""} onChange={handleChange} placeholder="Software That Builds. AI That Scales." rows={2} />
                   <p className="text-xs text-muted-foreground mt-1">Use HTML tags for styling if needed.</p>
                 </div>
                 <div>
-                  <FormLabel>Hero Subheadline</FormLabel>
+                  <label className="text-sm font-medium leading-none block mb-1">Hero Subheadline</label>
                   <Textarea name="heroSubheadline" value={formValues.heroSubheadline || ""} onChange={handleChange} placeholder="ZeeActs delivers custom software..." rows={3} />
                 </div>
               </div>
@@ -832,20 +832,20 @@ function SettingsView() {
               <h3 className="font-medium text-lg border-b pb-2">About Section</h3>
               <div className="grid gap-4">
                 <div>
-                  <FormLabel>About Title</FormLabel>
+                  <label className="text-sm font-medium leading-none block mb-1">About Title</label>
                   <Input name="aboutTitle" value={formValues.aboutTitle || ""} onChange={handleChange} />
                 </div>
                 <div>
-                  <FormLabel>About Body (HTML)</FormLabel>
+                  <label className="text-sm font-medium leading-none block mb-1">About Body (HTML)</label>
                   <Textarea name="aboutBody" value={formValues.aboutBody || ""} onChange={handleChange} rows={5} />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <FormLabel>Founder Name</FormLabel>
+                    <label className="text-sm font-medium leading-none block mb-1">Founder Name</label>
                     <Input name="founderName" value={formValues.founderName || ""} onChange={handleChange} />
                   </div>
                   <div>
-                    <FormLabel>Founder Bio Quote</FormLabel>
+                    <label className="text-sm font-medium leading-none block mb-1">Founder Bio Quote</label>
                     <Textarea name="founderBio" value={formValues.founderBio || ""} onChange={handleChange} rows={2} />
                   </div>
                 </div>
@@ -855,7 +855,7 @@ function SettingsView() {
             <div className="space-y-4">
               <h3 className="font-medium text-lg border-b pb-2">General</h3>
               <div>
-                <FormLabel>Contact Email</FormLabel>
+                <label className="text-sm font-medium leading-none block mb-1">Contact Email</label>
                 <Input name="contactEmail" value={formValues.contactEmail || ""} onChange={handleChange} />
               </div>
             </div>
