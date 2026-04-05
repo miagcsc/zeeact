@@ -12,7 +12,15 @@ import {
   Plus,
   Pencil,
   Trash2,
-  CheckCircle2
+  CheckCircle2,
+  BarChart2,
+  Search,
+  FileText,
+  Eye,
+  EyeOff,
+  Globe,
+  Code,
+  ArrowLeft,
 } from "lucide-react";
 import {
   useListServices,
@@ -37,7 +45,7 @@ import {
   useUpdateSettings,
   getGetSettingsQueryKey
 } from "@workspace/api-client-react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -54,7 +62,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-type View = "dashboard" | "services" | "portfolio" | "testimonials" | "contacts" | "settings";
+type View = "dashboard" | "services" | "portfolio" | "testimonials" | "contacts" | "settings" | "blog" | "seo" | "analytics";
 
 export default function AdminPage() {
   const [activeView, setActiveView] = useState<View>("dashboard");
@@ -67,6 +75,9 @@ export default function AdminPage() {
     { id: "portfolio", label: "Portfolio", icon: FolderKanban },
     { id: "testimonials", label: "Testimonials", icon: MessageSquareQuote },
     { id: "contacts", label: "Contacts", icon: Mails },
+    { id: "blog", label: "Blog", icon: FileText },
+    { id: "seo", label: "SEO", icon: Search },
+    { id: "analytics", label: "Analytics", icon: BarChart2 },
     { id: "settings", label: "Settings", icon: Settings },
   ] as const;
 
@@ -125,6 +136,9 @@ export default function AdminPage() {
           {activeView === "portfolio" && <PortfolioView />}
           {activeView === "testimonials" && <TestimonialsView />}
           {activeView === "contacts" && <ContactsView />}
+          {activeView === "blog" && <BlogView />}
+          {activeView === "seo" && <SeoView />}
+          {activeView === "analytics" && <AnalyticsView />}
           {activeView === "settings" && <SettingsView />}
         </div>
       </main>
@@ -769,6 +783,607 @@ function ContactsView() {
             )}
           </TableBody>
         </Table>
+      </Card>
+    </div>
+  );
+}
+
+// --- Blog View ---
+interface BlogPost {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  content: string;
+  coverImage: string | null;
+  tags: string | null;
+  status: string;
+  metaTitle: string | null;
+  metaDescription: string | null;
+  publishedAt: string | null;
+  createdAt: string;
+}
+
+const blogPostSchema = z.object({
+  title: z.string().min(1, "Title required"),
+  slug: z.string().min(1, "Slug required").regex(/^[a-z0-9-]+$/, "Lowercase letters, numbers and hyphens only"),
+  excerpt: z.string().default(""),
+  content: z.string().default(""),
+  coverImage: z.string().default(""),
+  tags: z.string().default(""),
+  status: z.enum(["draft", "published"]).default("draft"),
+  metaTitle: z.string().default(""),
+  metaDescription: z.string().default(""),
+});
+
+const BASE_API = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+async function apiFetch(path: string, options?: RequestInit) {
+  const headers: Record<string, string> = { "Content-Type": "application/json", ...((options?.headers as Record<string, string>) ?? {}) };
+  const res = await fetch(`${BASE_API}${path}`, { credentials: "include", ...options, headers });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+function slugify(text: string) {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+function BlogView() {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
+  const [preview, setPreview] = useState(false);
+  const queryClient = useQueryClient();
+
+  const { data: posts, isLoading } = useQuery<BlogPost[]>({
+    queryKey: ["admin-blog-posts"],
+    queryFn: () => apiFetch("/api/blog/all") as Promise<BlogPost[]>,
+  });
+
+  const form = useForm<z.infer<typeof blogPostSchema>>({
+    resolver: zodResolver(blogPostSchema),
+    defaultValues: { title: "", slug: "", excerpt: "", content: "", coverImage: "", tags: "", status: "draft", metaTitle: "", metaDescription: "" },
+  });
+
+  const watchTitle = form.watch("title");
+  useEffect(() => {
+    if (!editingPost) {
+      form.setValue("slug", slugify(watchTitle));
+    }
+  }, [watchTitle, editingPost, form]);
+
+  const saveMutation = useMutation({
+    mutationFn: async (values: z.infer<typeof blogPostSchema>) => {
+      if (editingPost) {
+        return apiFetch(`/api/blog/${editingPost.id}`, { method: "PUT", body: JSON.stringify(values) });
+      }
+      return apiFetch("/api/blog", { method: "POST", body: JSON.stringify(values) });
+    },
+    onSuccess: () => {
+      toast.success(editingPost ? "Post updated" : "Post created");
+      queryClient.invalidateQueries({ queryKey: ["admin-blog-posts"] });
+      setIsDialogOpen(false);
+    },
+    onError: () => toast.error("Failed to save post"),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => apiFetch(`/api/blog/${id}`, { method: "DELETE" }),
+    onSuccess: () => {
+      toast.success("Post deleted");
+      queryClient.invalidateQueries({ queryKey: ["admin-blog-posts"] });
+    },
+  });
+
+  const openCreate = () => {
+    setEditingPost(null);
+    setPreview(false);
+    form.reset({ title: "", slug: "", excerpt: "", content: "", coverImage: "", tags: "", status: "draft", metaTitle: "", metaDescription: "" });
+    setIsDialogOpen(true);
+  };
+
+  const openEdit = (post: BlogPost) => {
+    setEditingPost(post);
+    setPreview(false);
+    form.reset({
+      title: post.title,
+      slug: post.slug,
+      excerpt: post.excerpt ?? "",
+      content: post.content,
+      coverImage: post.coverImage ?? "",
+      tags: post.tags ?? "",
+      status: post.status as "draft" | "published",
+      metaTitle: post.metaTitle ?? "",
+      metaDescription: post.metaDescription ?? "",
+    });
+    setIsDialogOpen(true);
+  };
+
+  const contentValue = form.watch("content");
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-display font-bold">Blog</h1>
+          <p className="text-muted-foreground text-sm mt-1">Create and manage blog posts. Drafts are hidden from the public.</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <a href="/blog" target="_blank" rel="noopener noreferrer">
+            <Button variant="outline" size="sm"><Globe className="w-4 h-4 mr-2" />View Blog</Button>
+          </a>
+          <Button onClick={openCreate} className="bg-[#E63950] hover:bg-[#B52C3E] text-white">
+            <Plus className="w-4 h-4 mr-2" /> New Post
+          </Button>
+        </div>
+      </div>
+
+      {/* Editor dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{editingPost ? "Edit Post" : "New Blog Post"}</DialogTitle>
+          </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit((v) => saveMutation.mutate(v))} className="space-y-5">
+              <div className="grid grid-cols-2 gap-4">
+                <FormField control={form.control} name="title" render={({ field }) => (
+                  <FormItem className="col-span-2">
+                    <FormLabel>Title</FormLabel>
+                    <FormControl><Input {...field} placeholder="My Awesome Article" /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="slug" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Slug (URL)</FormLabel>
+                    <FormControl><Input {...field} placeholder="my-awesome-article" /></FormControl>
+                    <p className="text-xs text-muted-foreground">Public URL: /blog/{field.value || "slug"}</p>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="status" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <FormControl>
+                      <select {...field} className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm">
+                        <option value="draft">Draft</option>
+                        <option value="published">Published</option>
+                      </select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="excerpt" render={({ field }) => (
+                  <FormItem className="col-span-2">
+                    <FormLabel>Excerpt (short description for listing)</FormLabel>
+                    <FormControl><Textarea {...field} rows={2} placeholder="A brief summary of the article..." /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="coverImage" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Cover Image URL</FormLabel>
+                    <FormControl><Input {...field} placeholder="https://..." /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="tags" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tags (comma-separated)</FormLabel>
+                    <FormControl><Input {...field} placeholder="AI, SaaS, Automation" /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+              </div>
+
+              {/* Content editor */}
+              <FormField control={form.control} name="content" render={({ field }) => (
+                <FormItem>
+                  <div className="flex items-center justify-between mb-1">
+                    <FormLabel>Content (HTML)</FormLabel>
+                    <button type="button" onClick={() => setPreview(!preview)} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
+                      {preview ? <><EyeOff className="w-3.5 h-3.5" /> Edit</> : <><Eye className="w-3.5 h-3.5" /> Preview</>}
+                    </button>
+                  </div>
+                  {preview ? (
+                    <div
+                      className="min-h-[300px] border rounded-md p-4 prose prose-sm max-w-none overflow-auto"
+                      dangerouslySetInnerHTML={{ __html: contentValue || "<p class='text-muted-foreground'>Nothing to preview yet...</p>" }}
+                    />
+                  ) : (
+                    <FormControl>
+                      <Textarea {...field} rows={14} className="font-mono text-sm" placeholder="Write your article in HTML. Use <h2>, <p>, <strong>, <ul>, <li>, <blockquote>, <code>, <pre> tags for formatting..." />
+                    </FormControl>
+                  )}
+                  <p className="text-xs text-muted-foreground">Write in HTML. Use h2, h3, p, strong, em, ul, ol, li, blockquote, code, pre tags. Images: &lt;img src="..." alt="..." /&gt;</p>
+                  <FormMessage />
+                </FormItem>
+              )} />
+
+              {/* SEO section */}
+              <div className="border-t pt-4 space-y-4">
+                <h4 className="font-medium flex items-center gap-2"><Search className="w-4 h-4" />SEO (optional)</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField control={form.control} name="metaTitle" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Meta Title</FormLabel>
+                      <FormControl><Input {...field} placeholder="Overrides post title for search engines" /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={form.control} name="metaDescription" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Meta Description</FormLabel>
+                      <FormControl><Input {...field} placeholder="155 chars max for best results" /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-2">
+                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
+                <Button type="submit" disabled={saveMutation.isPending} className="bg-[#E63950] hover:bg-[#B52C3E] text-white">
+                  {saveMutation.isPending ? "Saving..." : editingPost ? "Update Post" : "Create Post"}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      <Card>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Title</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Tags</TableHead>
+              <TableHead>Published</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading && <TableRow><TableCell colSpan={5} className="text-center py-8">Loading...</TableCell></TableRow>}
+            {posts?.map((post) => (
+              <TableRow key={post.id}>
+                <TableCell>
+                  <div className="font-medium">{post.title}</div>
+                  <div className="text-xs text-muted-foreground">/blog/{post.slug}</div>
+                </TableCell>
+                <TableCell>
+                  {post.status === "published"
+                    ? <Badge className="bg-green-500 text-white">Published</Badge>
+                    : <Badge variant="outline">Draft</Badge>}
+                </TableCell>
+                <TableCell className="text-sm text-muted-foreground">{post.tags || "—"}</TableCell>
+                <TableCell className="text-sm text-muted-foreground">
+                  {post.publishedAt ? format(new Date(post.publishedAt), "MMM d, yyyy") : "—"}
+                </TableCell>
+                <TableCell className="text-right space-x-1">
+                  {post.status === "published" && (
+                    <a href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer">
+                      <Button variant="ghost" size="icon" title="View"><Globe className="w-4 h-4" /></Button>
+                    </a>
+                  )}
+                  <Button variant="ghost" size="icon" onClick={() => openEdit(post)}><Pencil className="w-4 h-4" /></Button>
+                  <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600" onClick={() => { if (confirm("Delete this post?")) deleteMutation.mutate(post.id); }}>
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+            {!isLoading && posts?.length === 0 && (
+              <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No blog posts yet. Create your first one!</TableCell></TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </Card>
+    </div>
+  );
+}
+
+// --- SEO View ---
+function SeoView() {
+  const { data: settings } = useGetSettings();
+  const updateSettings = useUpdateSettings();
+  const queryClient = useQueryClient();
+  const [formValues, setFormValues] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (settings) setFormValues(settings as Record<string, string>);
+  }, [settings]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormValues({ ...formValues, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateSettings.mutate({ data: formValues as SiteSettings }, {
+      onSuccess: () => {
+        toast.success("SEO settings saved");
+        queryClient.invalidateQueries({ queryKey: getGetSettingsQueryKey() });
+      },
+    });
+  };
+
+  const siteTitle = formValues.seo_site_title || "";
+  const metaDesc = formValues.seo_meta_description || "";
+
+  return (
+    <div className="space-y-6 max-w-3xl">
+      <div>
+        <h1 className="text-3xl font-display font-bold">SEO Settings</h1>
+        <p className="text-muted-foreground text-sm mt-1">Control how your site appears in Google and social media previews.</p>
+      </div>
+
+      <Card>
+        <CardContent className="pt-6">
+          <form onSubmit={handleSubmit} className="space-y-8">
+
+            {/* Google Preview */}
+            <div className="space-y-4">
+              <h3 className="font-medium text-lg border-b pb-2 flex items-center gap-2"><Search className="w-4 h-4" />Search Engine</h3>
+              <div className="bg-white border rounded-xl p-4 space-y-1 text-sm shadow-sm">
+                <div className="text-blue-600 font-medium truncate">{siteTitle || "ZeeActs — Premium IT Solutions & AI Consultancy"}</div>
+                <div className="text-green-700 text-xs">{formValues.seo_canonical_url || "https://zeeacts.com"}</div>
+                <div className="text-zinc-500 line-clamp-2">{metaDesc || "ZeeActs solves your toughest operational hurdles with custom software, AI tools, and automation."}</div>
+              </div>
+              <div className="grid gap-4">
+                <div>
+                  <label className="text-sm font-medium block mb-1">Site Title <span className="text-muted-foreground font-normal">(shown in browser tab & Google)</span></label>
+                  <Input name="seo_site_title" value={formValues.seo_site_title || ""} onChange={handleChange} placeholder="ZeeActs — Premium IT Solutions & AI Consultancy" maxLength={70} />
+                  <p className="text-xs text-muted-foreground mt-1">Keep under 60 characters · {(formValues.seo_site_title || "").length}/60</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium block mb-1">Meta Description</label>
+                  <Textarea name="seo_meta_description" value={formValues.seo_meta_description || ""} onChange={handleChange} rows={3} placeholder="ZeeActs solves your toughest operational hurdles with custom software, AI tools, and business automation." maxLength={160} />
+                  <p className="text-xs text-muted-foreground mt-1">Ideal: 120–155 chars · {(formValues.seo_meta_description || "").length}/155</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium block mb-1">Canonical URL</label>
+                  <Input name="seo_canonical_url" value={formValues.seo_canonical_url || ""} onChange={handleChange} placeholder="https://zeeacts.com" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium block mb-1">Robots</label>
+                  <select name="seo_robots" value={formValues.seo_robots || "index, follow"} onChange={handleChange} className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm">
+                    <option value="index, follow">index, follow (recommended)</option>
+                    <option value="noindex, follow">noindex, follow</option>
+                    <option value="noindex, nofollow">noindex, nofollow</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Open Graph */}
+            <div className="space-y-4">
+              <h3 className="font-medium text-lg border-b pb-2">Open Graph (Social Sharing)</h3>
+              <p className="text-sm text-muted-foreground">Controls how your site appears when shared on LinkedIn, Facebook, and other platforms.</p>
+              <div className="grid gap-4">
+                <div>
+                  <label className="text-sm font-medium block mb-1">OG Title</label>
+                  <Input name="seo_og_title" value={formValues.seo_og_title || ""} onChange={handleChange} placeholder="ZeeActs — Software That Builds. AI That Scales." />
+                </div>
+                <div>
+                  <label className="text-sm font-medium block mb-1">OG Description</label>
+                  <Textarea name="seo_og_description" value={formValues.seo_og_description || ""} onChange={handleChange} rows={2} placeholder="Custom software, AI tools and automation for ambitious businesses." />
+                </div>
+                <div>
+                  <label className="text-sm font-medium block mb-1">OG Image URL <span className="text-muted-foreground font-normal">(1200×630px recommended)</span></label>
+                  <Input name="seo_og_image" value={formValues.seo_og_image || ""} onChange={handleChange} placeholder="https://zeeacts.com/og-image.jpg" />
+                  {formValues.seo_og_image && (
+                    <img src={formValues.seo_og_image} alt="OG preview" className="mt-2 h-24 rounded-md object-cover border" />
+                  )}
+                </div>
+                <div>
+                  <label className="text-sm font-medium block mb-1">Twitter Card Type</label>
+                  <select name="seo_twitter_card" value={formValues.seo_twitter_card || "summary_large_image"} onChange={handleChange} className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm">
+                    <option value="summary_large_image">summary_large_image (recommended)</option>
+                    <option value="summary">summary</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Verification */}
+            <div className="space-y-4">
+              <h3 className="font-medium text-lg border-b pb-2">Google Search Console</h3>
+              <div>
+                <label className="text-sm font-medium block mb-1">Verification Meta Tag Content</label>
+                <Input name="seo_google_verification" value={formValues.seo_google_verification || ""} onChange={handleChange} placeholder="Paste the content value from Google Search Console (not the full tag)" />
+                <p className="text-xs text-muted-foreground mt-1">In Search Console → Settings → Ownership verification → HTML tag. Copy only the <code>content="..."</code> value.</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium block mb-1">Bing Webmaster Verification</label>
+                <Input name="seo_bing_verification" value={formValues.seo_bing_verification || ""} onChange={handleChange} placeholder="Bing verification content value" />
+              </div>
+            </div>
+
+            <Button type="submit" disabled={updateSettings.isPending} className="bg-[#E63950] hover:bg-[#B52C3E] text-white">
+              {updateSettings.isPending ? "Saving..." : "Save SEO Settings"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+// --- Analytics View ---
+function AnalyticsView() {
+  const { data: settings } = useGetSettings();
+  const updateSettings = useUpdateSettings();
+  const queryClient = useQueryClient();
+  const [formValues, setFormValues] = useState<Record<string, string>>({});
+  const [showCustom, setShowCustom] = useState(false);
+
+  useEffect(() => {
+    if (settings) setFormValues(settings as Record<string, string>);
+  }, [settings]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormValues({ ...formValues, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateSettings.mutate({ data: formValues as SiteSettings }, {
+      onSuccess: () => {
+        toast.success("Analytics settings saved — reload the site to activate scripts");
+        queryClient.invalidateQueries({ queryKey: getGetSettingsQueryKey() });
+      },
+    });
+  };
+
+  const Field = ({ name, label, hint, placeholder }: { name: string; label: string; hint?: string; placeholder?: string }) => (
+    <div>
+      <label className="text-sm font-medium block mb-1">{label}</label>
+      <Input name={name} value={formValues[name] || ""} onChange={handleChange} placeholder={placeholder} />
+      {hint && <p className="text-xs text-muted-foreground mt-1">{hint}</p>}
+    </div>
+  );
+
+  return (
+    <div className="space-y-6 max-w-3xl">
+      <div>
+        <h1 className="text-3xl font-display font-bold">Analytics</h1>
+        <p className="text-muted-foreground text-sm mt-1">
+          Tracking scripts are automatically injected on every page. Conversion events fire when the contact form is submitted.
+        </p>
+      </div>
+
+      <Card>
+        <CardContent className="pt-6">
+          <form onSubmit={handleSubmit} className="space-y-8">
+
+            {/* Google */}
+            <div className="space-y-4">
+              <h3 className="font-medium text-lg border-b pb-2 flex items-center gap-2">
+                <span className="text-xl">🔵</span> Google
+              </h3>
+              <div className="grid gap-4">
+                <Field
+                  name="analytics_ga4_id"
+                  label="Google Analytics 4 — Measurement ID"
+                  placeholder="G-XXXXXXXXXX"
+                  hint="Found in GA4 → Admin → Data Streams → your stream → Measurement ID"
+                />
+                <Field
+                  name="analytics_gtm_id"
+                  label="Google Tag Manager — Container ID"
+                  placeholder="GTM-XXXXXXX"
+                  hint="Found in GTM → your workspace → Container ID (top right)"
+                />
+                <div className="grid grid-cols-2 gap-4">
+                  <Field
+                    name="analytics_google_ads_id"
+                    label="Google Ads — Conversion ID"
+                    placeholder="AW-XXXXXXXXXX"
+                    hint="Google Ads → Conversions → your conversion → Tag setup"
+                  />
+                  <Field
+                    name="analytics_google_ads_label"
+                    label="Google Ads — Conversion Label"
+                    placeholder="AbCdEfGhIjK"
+                    hint="The second part after AW-XXXXXXXXXX/"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Meta / Facebook */}
+            <div className="space-y-4">
+              <h3 className="font-medium text-lg border-b pb-2 flex items-center gap-2">
+                <span className="text-xl">🔵</span> Meta (Facebook)
+              </h3>
+              <Field
+                name="analytics_fb_pixel_id"
+                label="Facebook Pixel ID"
+                placeholder="123456789012345"
+                hint="Facebook Ads Manager → Events Manager → your pixel → Pixel ID"
+              />
+              <p className="text-xs text-muted-foreground -mt-2">Tracks PageView on load and Lead event on contact form submission.</p>
+            </div>
+
+            {/* LinkedIn */}
+            <div className="space-y-4">
+              <h3 className="font-medium text-lg border-b pb-2 flex items-center gap-2">
+                <span className="text-xl">🔵</span> LinkedIn
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                <Field
+                  name="analytics_linkedin_partner_id"
+                  label="LinkedIn Insight Tag — Partner ID"
+                  placeholder="1234567"
+                  hint="LinkedIn Campaign Manager → Account Assets → Insight Tag"
+                />
+                <Field
+                  name="analytics_linkedin_conversion_id"
+                  label="LinkedIn Conversion ID"
+                  placeholder="12345678"
+                  hint="LinkedIn Ads → Conversion tracking → your conversion → ID"
+                />
+              </div>
+            </div>
+
+            {/* Custom scripts */}
+            <div className="space-y-4">
+              <button
+                type="button"
+                onClick={() => setShowCustom(!showCustom)}
+                className="flex items-center gap-2 font-medium text-lg w-full border-b pb-2 text-left"
+              >
+                <Code className="w-4 h-4" /> Custom Scripts
+                <span className="text-sm font-normal text-muted-foreground ml-auto">{showCustom ? "▲ Hide" : "▼ Show"}</span>
+              </button>
+              {showCustom && (
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground">Add any additional tracking code (HotJar, Intercom, Clarity, etc). Paste the full script tags.</p>
+                  <div>
+                    <label className="text-sm font-medium block mb-1">Head Scripts <span className="text-muted-foreground font-normal">(injected in &lt;head&gt;)</span></label>
+                    <Textarea
+                      name="analytics_custom_head"
+                      value={formValues.analytics_custom_head || ""}
+                      onChange={handleChange}
+                      rows={5}
+                      className="font-mono text-xs"
+                      placeholder={'<script>\n  // your script here\n</script>'}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium block mb-1">Body Scripts <span className="text-muted-foreground font-normal">(injected at start of &lt;body&gt;)</span></label>
+                    <Textarea
+                      name="analytics_custom_body"
+                      value={formValues.analytics_custom_body || ""}
+                      onChange={handleChange}
+                      rows={5}
+                      className="font-mono text-xs"
+                      placeholder={'<script>\n  // your script here\n</script>'}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Conversion events info */}
+            <div className="bg-[#E63950]/5 border border-[#E63950]/20 rounded-xl p-4 space-y-2">
+              <h4 className="font-semibold text-sm flex items-center gap-2"><span>🎯</span> Conversion Events</h4>
+              <p className="text-sm text-muted-foreground">When a visitor submits the contact form, ZeeActs automatically fires:</p>
+              <ul className="text-sm text-muted-foreground space-y-1 list-none">
+                <li>• <strong>GA4</strong> — <code className="bg-black/5 px-1 rounded text-xs">generate_lead</code> event</li>
+                <li>• <strong>Google Ads</strong> — Conversion with your ID/Label</li>
+                <li>• <strong>Facebook Pixel</strong> — <code className="bg-black/5 px-1 rounded text-xs">Lead</code> standard event</li>
+                <li>• <strong>LinkedIn</strong> — Conversion event with your Conversion ID</li>
+              </ul>
+            </div>
+
+            <Button type="submit" disabled={updateSettings.isPending} className="bg-[#E63950] hover:bg-[#B52C3E] text-white">
+              {updateSettings.isPending ? "Saving..." : "Save Analytics Settings"}
+            </Button>
+          </form>
+        </CardContent>
       </Card>
     </div>
   );

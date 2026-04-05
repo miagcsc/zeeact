@@ -7,6 +7,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/HomePage";
 import AdminPage from "@/pages/AdminPage";
+import BlogPage from "@/pages/BlogPage";
+import BlogPostPage from "@/pages/BlogPostPage";
+import AnalyticsInjector from "@/components/AnalyticsInjector";
 
 const queryClient = new QueryClient();
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
@@ -84,9 +87,12 @@ function ClerkProviderWithRoutes() {
     >
       <QueryClientProvider client={queryClient}>
         <ClerkQueryClientCacheInvalidator />
+        <AnalyticsInjector />
         <TooltipProvider>
           <Switch>
             <Route path="/" component={HomePage} />
+            <Route path="/blog" component={BlogPage} />
+            <Route path="/blog/:slug" component={BlogPostPage} />
             <Route path="/sign-in/*?" component={SignInPage} />
             <Route path="/sign-up/*?"><Redirect to="/sign-in" /></Route>
             <Route path="/admin" component={AdminRoute} />

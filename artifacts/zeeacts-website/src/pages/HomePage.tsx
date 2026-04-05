@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { trackConversion } from "@/components/AnalyticsInjector";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -177,6 +178,7 @@ export default function HomePage() {
         onSuccess: () => {
           toast.success("Message sent successfully! We'll get back to you soon.");
           form.reset();
+          trackConversion("contact_form");
         },
         onError: () => {
           toast.error("Failed to send message. Please try again.");
@@ -268,6 +270,14 @@ export default function HomePage() {
                 </a>
               </li>
             ))}
+            <li>
+              <a
+                href="/blog"
+                className="font-body text-sm font-medium text-black/55 hover:text-black hover:bg-black/07 px-3.5 py-2 rounded-md transition-colors"
+              >
+                Blog
+              </a>
+            </li>
           </ul>
 
           <div className="flex items-center gap-4">
@@ -307,6 +317,7 @@ export default function HomePage() {
                 href={`#${item.toLowerCase()}`}
                 onClick={(e) => {
                   e.preventDefault();
+                  setIsMobileMenuOpen(false);
                   scrollTo(`#${item.toLowerCase()}`);
                 }}
                 className="font-display font-extrabold text-[40px] text-[#0A0A0F] py-3 border-b border-black/10"
@@ -314,6 +325,12 @@ export default function HomePage() {
                 {item}
               </a>
             ))}
+            <a
+              href="/blog"
+              className="font-display font-extrabold text-[40px] text-[#0A0A0F] py-3 border-b border-black/10"
+            >
+              Blog
+            </a>
           </div>
         </div>
       )}

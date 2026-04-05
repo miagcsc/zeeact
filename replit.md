@@ -27,6 +27,12 @@ A premium single-page marketing website for ZeeActs, an IT solutions company fou
 
 All in PostgreSQL, managed via Drizzle ORM (`lib/db/src/schema/`):
 
+`blog_posts` — Blog posts with title, slug, excerpt, content (HTML), cover image, tags, status (draft/published), per-post meta title/description, publishedAt, createdAt, updatedAt.
+
+Additional `site_settings` keys added:
+- `analytics_ga4_id`, `analytics_gtm_id`, `analytics_fb_pixel_id`, `analytics_linkedin_partner_id`, `analytics_linkedin_conversion_id`, `analytics_google_ads_id`, `analytics_google_ads_label`, `analytics_custom_head`, `analytics_custom_body`
+- `seo_site_title`, `seo_meta_description`, `seo_og_title`, `seo_og_description`, `seo_og_image`, `seo_twitter_card`, `seo_google_verification`, `seo_bing_verification`, `seo_robots`, `seo_canonical_url`
+
 | Table | Purpose |
 |-------|---------|
 | `services` | Service cards (icon, title, description, sort_order) |
