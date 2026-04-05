@@ -229,9 +229,9 @@ export default function HomePage() {
 
         <div className="max-w-[1160px] w-full mx-auto px-[5%] py-[60px] grid lg:grid-cols-[1fr_420px] gap-[60px] items-center relative z-10">
           <div className="hero-content">
-            <div className="inline-flex items-center gap-2 bg-[#E63950]/10 border border-[#E63950]/25 px-4 py-1.5 rounded-full mb-6 text-[#E63950] font-mono text-[10px] tracking-[3px] uppercase">
-              <span className="w-[7px] h-[7px] bg-[#E63950] rounded-full animate-[pulse_2s_ease_infinite]" />
-              <span>{settings?.heroBadge || "IT Solutions · SaaS · AI Consultancy"}</span>
+            <div className="inline-flex items-center gap-2 bg-[#E63950]/10 border border-[#E63950]/25 px-4 py-1.5 rounded-full mb-6 text-[#E63950] font-mono text-[10px] tracking-[1px] sm:tracking-[3px] uppercase max-w-full flex-wrap">
+              <span className="w-[7px] h-[7px] bg-[#E63950] rounded-full animate-[pulse_2s_ease_infinite] flex-shrink-0" />
+              <span className="leading-relaxed">{settings?.heroBadge || "IT Solutions · SaaS · AI Consultancy"}</span>
             </div>
 
             <h1 className="font-display font-extrabold text-[clamp(42px,6vw,76px)] leading-[1.0] tracking-[-2.5px] text-white mb-6">
@@ -686,7 +686,7 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="bg-[#0A0A0F] py-12 border-t border-white/10">
         <div className="max-w-[1160px] mx-auto px-[5%] flex flex-col md:flex-row justify-between items-center gap-6">
-          <Logo onClick={() => scrollTo("#hero")} light />
+          <Logo onClick={() => scrollTo("#hero")} />
           <div className="text-white/40 text-sm">
             © {new Date().getFullYear()} ZeeActs. All rights reserved.
           </div>
