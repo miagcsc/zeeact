@@ -26,7 +26,7 @@ if (!clerkPubKey) {
 function SignInPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-zinc-950">
-      <SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={undefined} />
+      <SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={undefined} fallbackRedirectUrl="/admin" />
     </div>
   );
 }
