@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { RichTextEditor } from "@/components/RichTextEditor";
 import type { Service, PortfolioItem, Testimonial, ContactSubmission, SiteSettings } from "@workspace/api-client-react";
 import { useUser, useClerk } from "@clerk/react";
 import {
@@ -832,7 +833,7 @@ function slugify(text: string) {
 function BlogView() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
-  const [preview, setPreview] = useState(false);
+  const [preview, setPreview] = useState(false); // kept for rendered-HTML preview toggle
   const queryClient = useQueryClient();
 
   const { data: posts, isLoading } = useQuery<BlogPost[]>({
@@ -899,7 +900,7 @@ function BlogView() {
     setIsDialogOpen(true);
   };
 
-  const contentValue = form.watch("content");
+
 
   return (
     <div className="space-y-6">
@@ -981,22 +982,24 @@ function BlogView() {
               <FormField control={form.control} name="content" render={({ field }) => (
                 <FormItem>
                   <div className="flex items-center justify-between mb-1">
-                    <FormLabel>Content (HTML)</FormLabel>
+                    <FormLabel>Content</FormLabel>
                     <button type="button" onClick={() => setPreview(!preview)} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
-                      {preview ? <><EyeOff className="w-3.5 h-3.5" /> Edit</> : <><Eye className="w-3.5 h-3.5" /> Preview</>}
+                      {preview ? <><EyeOff className="w-3.5 h-3.5" /> Editor</> : <><Eye className="w-3.5 h-3.5" /> HTML preview</>}
                     </button>
                   </div>
                   {preview ? (
                     <div
                       className="min-h-[300px] border rounded-md p-4 prose prose-sm max-w-none overflow-auto"
-                      dangerouslySetInnerHTML={{ __html: contentValue || "<p class='text-muted-foreground'>Nothing to preview yet...</p>" }}
+                      dangerouslySetInnerHTML={{ __html: field.value || "<p class='text-muted-foreground'>Nothing to preview yet...</p>" }}
                     />
                   ) : (
-                    <FormControl>
-                      <Textarea {...field} rows={14} className="font-mono text-sm" placeholder="Write your article in HTML. Use <h2>, <p>, <strong>, <ul>, <li>, <blockquote>, <code>, <pre> tags for formatting..." />
-                    </FormControl>
+                    <RichTextEditor
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Start writing your article... Use the toolbar above to add headings, bold, lists, quotes, links and images."
+                      minHeight={420}
+                    />
                   )}
-                  <p className="text-xs text-muted-foreground">Write in HTML. Use h2, h3, p, strong, em, ul, ol, li, blockquote, code, pre tags. Images: &lt;img src="..." alt="..." /&gt;</p>
                   <FormMessage />
                 </FormItem>
               )} />
