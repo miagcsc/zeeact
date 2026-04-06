@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Github, Twitter, Linkedin, Mail } from "lucide-react";
+import { Twitter, Linkedin, Facebook, Instagram, Mail } from "lucide-react";
 import { ZeeActsLogo } from "../components/ZeeActsLogo";
 
 const Logo = ZeeActsLogo;
@@ -849,11 +849,30 @@ export default function HomePage() {
                 <Mail className="w-6 h-6 text-[#E63950]" />
                 {settings?.contactEmail || 'hello@zeeacts.com'}
               </a>
-              <div className="flex gap-4 pt-6">
-                <a href="#" className="w-12 h-12 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:border-[#E63950] hover:text-[#E63950] transition-colors"><Github className="w-5 h-5" /></a>
-                <a href="#" className="w-12 h-12 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:border-[#E63950] hover:text-[#E63950] transition-colors"><Twitter className="w-5 h-5" /></a>
-                <a href="#" className="w-12 h-12 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:border-[#E63950] hover:text-[#E63950] transition-colors"><Linkedin className="w-5 h-5" /></a>
-              </div>
+              {(settings?.socialLinkedin || settings?.socialFacebook || settings?.socialInstagram || settings?.socialTwitter) && (
+                <div className="flex gap-3 pt-6 flex-wrap">
+                  {settings?.socialLinkedin && (
+                    <a href={settings.socialLinkedin} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:border-[#E63950] hover:text-[#E63950] transition-colors">
+                      <Linkedin className="w-5 h-5" />
+                    </a>
+                  )}
+                  {settings?.socialFacebook && (
+                    <a href={settings.socialFacebook} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:border-[#E63950] hover:text-[#E63950] transition-colors">
+                      <Facebook className="w-5 h-5" />
+                    </a>
+                  )}
+                  {settings?.socialInstagram && (
+                    <a href={settings.socialInstagram} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:border-[#E63950] hover:text-[#E63950] transition-colors">
+                      <Instagram className="w-5 h-5" />
+                    </a>
+                  )}
+                  {settings?.socialTwitter && (
+                    <a href={settings.socialTwitter} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:border-[#E63950] hover:text-[#E63950] transition-colors">
+                      <Twitter className="w-5 h-5" />
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 

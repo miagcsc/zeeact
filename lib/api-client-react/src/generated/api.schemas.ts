@@ -108,5 +108,9 @@ export interface SiteSettings {
   founderName?: string;
   founderBio?: string;
   contactEmail?: string;
+  socialLinkedin?: string;
+  socialFacebook?: string;
+  socialInstagram?: string;
+  socialTwitter?: string;
   [key: string]: string | undefined;
 }

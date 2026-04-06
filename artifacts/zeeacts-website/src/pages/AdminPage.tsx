@@ -28,6 +28,12 @@ import {
   ChevronDown,
   GripVertical,
   ExternalLink,
+  Menu,
+  X,
+  Linkedin,
+  Facebook,
+  Instagram,
+  Twitter,
 } from "lucide-react";
 import {
   useListServices,
@@ -168,6 +174,7 @@ function CoverImageUpload({ value, onChange }: { value: string; onChange: (url: 
 
 export default function AdminPage() {
   const [activeView, setActiveView] = useState<View>("dashboard");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user } = useUser();
   const { signOut } = useClerk();
 
@@ -184,68 +191,123 @@ export default function AdminPage() {
     { id: "settings", label: "Settings", icon: Settings },
   ] as const;
 
-  return (
-    <div className="flex h-screen overflow-hidden bg-zinc-50 dark:bg-zinc-950">
-      {/* Sidebar */}
-      <aside className="w-64 bg-[#0A0A0F] border-r border-white/10 flex flex-col">
-        <div className="h-[68px] flex items-center px-6 border-b border-white/10">
-          <span className="font-display font-extrabold text-2xl text-white">
-            Zee<span className="text-[#E63950]">Acts</span>
-          </span>
-        </div>
+  function handleNavClick(id: View) {
+    setActiveView(id);
+    setSidebarOpen(false);
+  }
 
-        <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-1">
-          {navItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setActiveView(item.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                activeView === item.id
-                  ? "bg-[#E63950] text-white"
-                  : "text-white/60 hover:text-white hover:bg-white/5"
-              }`}
-            >
-              <item.icon className="w-5 h-5" />
-              {item.label}
-            </button>
-          ))}
-        </nav>
+  const sidebarContent = (
+    <>
+      <div className="h-[60px] flex items-center px-6 border-b border-white/10 shrink-0">
+        <span className="font-display font-extrabold text-xl text-white">
+          Zee<span className="text-[#E63950]">Acts</span>
+          <span className="text-white/30 text-sm font-normal ml-2">Admin</span>
+        </span>
+      </div>
 
-        <div className="p-4 border-t border-white/10">
-          <div className="flex items-center gap-3 mb-4 px-2">
-            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white text-xs font-bold">
-              {user?.firstName?.[0] || "A"}
-            </div>
-            <div className="flex-1 truncate">
-              <div className="text-sm font-medium text-white truncate">{user?.fullName || "Admin User"}</div>
-              <div className="text-xs text-white/50 truncate">{user?.primaryEmailAddress?.emailAddress}</div>
-            </div>
-          </div>
+      <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-0.5">
+        {navItems.map((item) => (
           <button
-            onClick={() => signOut()}
-            className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+            key={item.id}
+            onClick={() => handleNavClick(item.id as View)}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              activeView === item.id
+                ? "bg-[#E63950] text-white"
+                : "text-white/60 hover:text-white hover:bg-white/5"
+            }`}
           >
-            <LogOut className="w-4 h-4" />
-            Sign Out
+            <item.icon className="w-4 h-4 shrink-0" />
+            {item.label}
           </button>
+        ))}
+      </nav>
+
+      <div className="p-3 border-t border-white/10 shrink-0">
+        <div className="flex items-center gap-3 mb-3 px-2">
+          <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-white text-xs font-bold shrink-0">
+            {user?.firstName?.[0] || "A"}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-xs font-medium text-white truncate">{user?.fullName || "Admin User"}</div>
+            <div className="text-[10px] text-white/40 truncate">{user?.primaryEmailAddress?.emailAddress}</div>
+          </div>
         </div>
+        <button
+          onClick={() => signOut()}
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+        >
+          <LogOut className="w-4 h-4" />
+          Sign Out
+        </button>
+      </div>
+    </>
+  );
+
+  return (
+    <div className="flex h-screen overflow-hidden bg-zinc-50">
+
+      {/* Mobile backdrop */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-black/50 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar — desktop: always visible; mobile: slide-in drawer */}
+      <aside
+        className={`
+          fixed inset-y-0 left-0 z-40 w-60 bg-[#0A0A0F] flex flex-col transition-transform duration-200
+          md:relative md:translate-x-0 md:z-auto md:shrink-0
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+        `}
+      >
+        {/* Mobile close button */}
+        <button
+          className="absolute top-3 right-3 md:hidden w-8 h-8 flex items-center justify-center rounded-md text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+          onClick={() => setSidebarOpen(false)}
+          aria-label="Close sidebar"
+        >
+          <X className="w-4 h-4" />
+        </button>
+        {sidebarContent}
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-y-auto">
-        <div className="p-8">
-          {activeView === "dashboard" && <DashboardView />}
-          {activeView === "services" && <ServicesView />}
-          {activeView === "portfolio" && <PortfolioView />}
-          {activeView === "testimonials" && <TestimonialsView />}
-          {activeView === "contacts" && <ContactsView />}
-          {activeView === "solutions" && <SolutionsView />}
-          {activeView === "blog" && <BlogView />}
-          {activeView === "seo" && <SeoView />}
-          {activeView === "analytics" && <AnalyticsView />}
-          {activeView === "settings" && <SettingsView />}
-        </div>
-      </main>
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+
+        {/* Mobile top bar */}
+        <header className="md:hidden h-[56px] bg-white border-b border-black/08 flex items-center px-4 gap-3 shrink-0">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-black/05 transition-colors"
+            aria-label="Open menu"
+          >
+            <Menu className="w-5 h-5 text-[#0A0A0F]" />
+          </button>
+          <span className="font-display font-extrabold text-lg text-[#0A0A0F]">
+            Zee<span className="text-[#E63950]">Acts</span>
+          </span>
+          <span className="text-xs text-black/30 font-normal">Admin</span>
+        </header>
+
+        {/* Page content */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="p-4 md:p-8">
+            {activeView === "dashboard" && <DashboardView />}
+            {activeView === "services" && <ServicesView />}
+            {activeView === "portfolio" && <PortfolioView />}
+            {activeView === "testimonials" && <TestimonialsView />}
+            {activeView === "contacts" && <ContactsView />}
+            {activeView === "solutions" && <SolutionsView />}
+            {activeView === "blog" && <BlogView />}
+            {activeView === "seo" && <SeoView />}
+            {activeView === "analytics" && <AnalyticsView />}
+            {activeView === "settings" && <SettingsView />}
+          </div>
+        </main>
+      </div>
+
     </div>
   );
 }
@@ -1577,7 +1639,38 @@ function SettingsView() {
               <h3 className="font-medium text-lg border-b pb-2">General</h3>
               <div>
                 <label className="text-sm font-medium leading-none block mb-1">Contact Email</label>
-                <Input name="contactEmail" value={formValues.contactEmail || ""} onChange={handleChange} />
+                <Input name="contactEmail" value={formValues.contactEmail || ""} onChange={handleChange} placeholder="hello@zeeacts.com" />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="font-medium text-lg border-b pb-2">Social Links</h3>
+              <p className="text-sm text-muted-foreground">Leave blank to hide an icon on the website. Add full URLs (https://...).</p>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="text-sm font-medium leading-none flex items-center gap-2 mb-1">
+                    <Linkedin className="w-4 h-4 text-[#0A66C2]" /> LinkedIn
+                  </label>
+                  <Input name="socialLinkedin" value={formValues.socialLinkedin || ""} onChange={handleChange} placeholder="https://linkedin.com/company/zeeacts" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium leading-none flex items-center gap-2 mb-1">
+                    <Facebook className="w-4 h-4 text-[#1877F2]" /> Facebook
+                  </label>
+                  <Input name="socialFacebook" value={formValues.socialFacebook || ""} onChange={handleChange} placeholder="https://facebook.com/zeeacts" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium leading-none flex items-center gap-2 mb-1">
+                    <Instagram className="w-4 h-4 text-[#E1306C]" /> Instagram
+                  </label>
+                  <Input name="socialInstagram" value={formValues.socialInstagram || ""} onChange={handleChange} placeholder="https://instagram.com/zeeacts" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium leading-none flex items-center gap-2 mb-1">
+                    <Twitter className="w-4 h-4 text-[#1DA1F2]" /> Twitter / X
+                  </label>
+                  <Input name="socialTwitter" value={formValues.socialTwitter || ""} onChange={handleChange} placeholder="https://twitter.com/zeeacts" />
+                </div>
               </div>
             </div>
 
