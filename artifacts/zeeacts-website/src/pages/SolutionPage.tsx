@@ -88,109 +88,129 @@ export default function SolutionPage() {
     <div className="min-h-screen bg-white text-[#0A0A0F] font-body">
 
       {/* Nav */}
-      <nav className="fixed top-0 inset-x-0 z-50 bg-white/95 backdrop-blur-md border-b border-black/08">
-        <div className="max-w-[1160px] mx-auto px-[5%] h-[68px] flex items-center justify-between">
-          {/* Left: solution branding (desktop) / ZeeActs logo (mobile) */}
-          <div className="flex items-center gap-3">
-            {/* Mobile: show ZeeActs logo */}
-            <a href="/" className="md:hidden">
-              <ZeeActsLogo light />
-            </a>
-            {/* Desktop: show solution branding */}
-            <a href="/" className="hidden md:flex items-center gap-3 group">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center font-display font-extrabold text-sm text-white shrink-0" style={{ background: accent }}>
-                {solution.logoText?.[0] ?? "A"}
-              </div>
-              <div>
-                <span className="font-display font-extrabold text-lg text-[#0A0A0F]">{solution.logoText || solution.name}</span>
-                {solution.tagline && <span className="hidden xl:inline text-xs text-black/40 ml-2 font-mono">— {solution.tagline}</span>}
-              </div>
-            </a>
+      <nav className="fixed top-0 inset-x-0 z-50 bg-white/95 backdrop-blur-md border-b border-black/[0.08]">
+        <div className="max-w-[1160px] mx-auto px-[5%] h-[68px] flex items-center justify-between gap-6">
+
+          {/* Left: solution branding */}
+          <a href="/" className="flex items-center gap-2.5 group shrink-0">
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center font-display font-extrabold text-sm text-white shrink-0"
+              style={{ background: accent }}
+            >
+              {solution.logoText?.[0] ?? "A"}
+            </div>
+            <span className="font-display font-extrabold text-base text-[#0A0A0F] leading-none">
+              {solution.logoText || solution.name}
+            </span>
+          </a>
+
+          {/* Centre: page anchor links — desktop only */}
+          <div className="hidden md:flex items-center gap-6 text-sm font-display font-semibold text-black/60">
+            <a href="#features"     className="hover:text-[#0A0A0F] transition-colors">Features</a>
+            <a href="#how-it-works" className="hover:text-[#0A0A0F] transition-colors">How It Works</a>
+            <a href="#contact-solution" className="hover:text-[#0A0A0F] transition-colors">Contact</a>
           </div>
 
-          {/* Right: desktop nav items / mobile hamburger */}
-          <div className="flex items-center gap-3">
-            {/* Desktop only: ZeeActs logo + CTA */}
-            <a href="/" className="hidden md:block">
+          {/* Right: ZeeActs back-link + CTA (desktop) / hamburger (mobile) */}
+          <div className="flex items-center gap-3 shrink-0">
+            <a href="/" className="hidden md:block opacity-70 hover:opacity-100 transition-opacity">
               <ZeeActsLogo light />
             </a>
             <a
               href="#contact-solution"
-              className="hidden md:inline-flex px-5 py-2.5 rounded-xl font-display font-bold text-sm text-white transition-all hover:opacity-90 hover:shadow-lg"
+              className="hidden md:inline-flex px-5 py-2.5 rounded-xl font-display font-bold text-sm text-white whitespace-nowrap transition-all hover:opacity-90 hover:shadow-lg"
               style={{ background: accent }}
             >
               {solution.heroCta}
             </a>
-            {/* Mobile hamburger */}
+
+            {/* Mobile hamburger — clean 3 equal bars */}
             <button
-              className="md:hidden w-10 h-10 flex flex-col items-center justify-center gap-[5px]"
+              className="md:hidden w-10 h-10 flex flex-col items-center justify-center gap-[5px] rounded-lg hover:bg-black/05 transition-colors"
               onClick={() => setMobileOpen(true)}
               aria-label="Open menu"
             >
               <span className="w-5 h-[2px] bg-[#0A0A0F] rounded-full" />
               <span className="w-5 h-[2px] bg-[#0A0A0F] rounded-full" />
-              <span className="w-3 h-[2px] bg-[#0A0A0F] rounded-full self-start ml-[4px]" />
+              <span className="w-5 h-[2px] bg-[#0A0A0F] rounded-full" />
             </button>
           </div>
+
         </div>
       </nav>
 
-      {/* Mobile Menu */}
+      {/* Mobile full-screen menu */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "tween", duration: 0.25 }}
             className="fixed inset-0 z-[9999] bg-white flex flex-col"
           >
-            {/* Header */}
-            <div className="flex items-center justify-between px-6 h-[68px] border-b border-black/08 shrink-0">
-              <ZeeActsLogo light onClick={() => setMobileOpen(false)} />
+            {/* Menu header */}
+            <div className="flex items-center justify-between px-6 h-[68px] border-b border-black/[0.08] shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div
+                  className="w-8 h-8 rounded-lg flex items-center justify-center font-display font-extrabold text-sm text-white shrink-0"
+                  style={{ background: accent }}
+                >
+                  {solution.logoText?.[0] ?? "A"}
+                </div>
+                <span className="font-display font-extrabold text-base text-[#0A0A0F]">
+                  {solution.logoText || solution.name}
+                </span>
+              </div>
               <button
-                className="p-2 text-[#0A0A0F] hover:text-[#E63950] transition-colors"
+                className="w-10 h-10 flex items-center justify-center rounded-lg text-[#0A0A0F] hover:bg-black/05 transition-colors text-xl leading-none"
                 onClick={() => setMobileOpen(false)}
                 aria-label="Close menu"
               >
-                <span className="text-2xl leading-none">✕</span>
+                ✕
               </button>
             </div>
-            {/* Solution badge */}
-            <div className="px-6 py-5 border-b border-black/08 shrink-0 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg flex items-center justify-center font-display font-extrabold text-base text-white shrink-0" style={{ background: accent }}>
-                {solution.logoText?.[0] ?? "A"}
-              </div>
-              <div>
-                <div className="font-display font-bold text-base text-[#0A0A0F]">{solution.logoText || solution.name}</div>
-                {solution.badge && <div className="text-[10px] font-mono tracking-[2px] uppercase" style={{ color: accent }}>{solution.badge}</div>}
-              </div>
-            </div>
-            {/* Links */}
-            <div className="flex-1 flex flex-col px-6 py-8 gap-4">
-              <a
-                href="#contact-solution"
-                onClick={() => setMobileOpen(false)}
-                className="w-full py-4 rounded-xl font-display font-bold text-base text-white text-center transition-all hover:opacity-90"
-                style={{ background: accent }}
-              >
-                {solution.heroCta} →
-              </a>
-              <a
-                href="#features"
-                onClick={() => setMobileOpen(false)}
-                className="group flex items-center justify-between font-display font-bold text-[22px] text-[#0A0A0F] hover:text-[#E63950] py-3.5 border-b border-black/08 transition-colors"
-              >
-                <span>Features</span>
-                <span className="text-base text-black/20 group-hover:text-[#E63950] group-hover:translate-x-1 transition-all">→</span>
-              </a>
+
+            {/* Nav links */}
+            <div className="flex-1 flex flex-col px-6 pt-6 pb-8 gap-1 overflow-y-auto">
+              {[
+                { href: "#features",        label: "Features" },
+                { href: "#how-it-works",    label: "How It Works" },
+                { href: "#contact-solution",label: "Contact" },
+              ].map(({ href, label }) => (
+                <a
+                  key={href}
+                  href={href}
+                  onClick={() => setMobileOpen(false)}
+                  className="group flex items-center justify-between font-display font-bold text-[22px] text-[#0A0A0F] py-4 border-b border-black/[0.06] transition-colors hover:text-[#E63950]"
+                >
+                  <span>{label}</span>
+                  <span className="text-base text-black/20 group-hover:text-[#E63950] group-hover:translate-x-1 transition-all">→</span>
+                </a>
+              ))}
+
               <a
                 href="/"
-                className="group flex items-center justify-between font-display font-bold text-[22px] text-[#0A0A0F] hover:text-[#E63950] py-3.5 border-b border-black/08 transition-colors"
+                className="group flex items-center justify-between font-display font-bold text-[22px] text-black/40 py-4 border-b border-black/[0.06] transition-colors hover:text-[#0A0A0F]"
               >
                 <span>Back to ZeeActs</span>
-                <span className="text-base text-black/20 group-hover:text-[#E63950] group-hover:translate-x-1 transition-all">→</span>
+                <span className="text-base text-black/20 group-hover:translate-x-1 transition-all">→</span>
               </a>
+
+              {/* CTA */}
+              <div className="mt-6">
+                <a
+                  href="#contact-solution"
+                  onClick={() => setMobileOpen(false)}
+                  className="block w-full py-4 rounded-xl font-display font-bold text-base text-white text-center transition-all hover:opacity-90"
+                  style={{ background: accent }}
+                >
+                  {solution.heroCta} →
+                </a>
+                <a href="/" className="flex justify-center mt-5 opacity-50 hover:opacity-80 transition-opacity">
+                  <ZeeActsLogo light />
+                </a>
+              </div>
             </div>
           </motion.div>
         )}
