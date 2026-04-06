@@ -8,6 +8,7 @@ import settingsRouter from "./settings";
 import blogRouter from "./blog";
 import solutionsRouter from "./solutions";
 import uploadRouter from "./upload";
+import demoBookingsRouter from "./demoBookings";
 
 const router: IRouter = Router();
 
@@ -20,5 +21,6 @@ router.use(settingsRouter);
 router.use(blogRouter);
 router.use(solutionsRouter);
 router.use(uploadRouter);
+router.use(demoBookingsRouter);
 
 export default router;

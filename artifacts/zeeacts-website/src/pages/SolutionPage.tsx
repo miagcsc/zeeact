@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRoute } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
@@ -60,6 +60,27 @@ export default function SolutionPage() {
   const [, params] = useRoute("/solutions/:slug");
   const slug = params?.slug ?? "";
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const [bookForm, setBookForm] = useState({ name: "", email: "", phone: "", company: "", role: "", companySize: "", message: "" });
+  const [bookStatus, setBookStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const bookFormRef = useRef<HTMLDivElement>(null);
+
+  async function handleBookSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setBookStatus("submitting");
+    try {
+      const res = await fetch(`${BASE}/api/demo-bookings`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...bookForm, solutionSlug: slug }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      setBookStatus("success");
+      setBookForm({ name: "", email: "", phone: "", company: "", role: "", companySize: "", message: "" });
+    } catch {
+      setBookStatus("error");
+    }
+  }
 
   const { data: solution, isLoading, isError } = useQuery<Solution>({
     queryKey: ["solution", slug],
@@ -169,7 +190,7 @@ export default function SolutionPage() {
           <div className="hidden md:flex items-center gap-6 text-sm font-display font-semibold text-black/60">
             <a href="#features"     className="hover:text-[#0A0A0F] transition-colors">Features</a>
             <a href="#how-it-works" className="hover:text-[#0A0A0F] transition-colors">How It Works</a>
-            <a href="#contact-solution" className="hover:text-[#0A0A0F] transition-colors">Contact</a>
+            <a href="#book-demo" className="hover:text-[#0A0A0F] transition-colors">Book Demo</a>
           </div>
 
           {/* Right: ZeeActs back-link + CTA (desktop) / hamburger (mobile) */}
@@ -178,7 +199,7 @@ export default function SolutionPage() {
               <ZeeActsLogo light />
             </a>
             <a
-              href="#contact-solution"
+              href="#book-demo"
               className="hidden md:inline-flex px-5 py-2.5 rounded-xl font-display font-bold text-sm text-white whitespace-nowrap transition-all hover:opacity-90 hover:shadow-lg"
               style={{ background: accent }}
             >
@@ -237,7 +258,7 @@ export default function SolutionPage() {
               {[
                 { href: "#features",        label: "Features" },
                 { href: "#how-it-works",    label: "How It Works" },
-                { href: "#contact-solution",label: "Contact" },
+                { href: "#book-demo",label: "Contact" },
               ].map(({ href, label }) => (
                 <a
                   key={href}
@@ -261,7 +282,7 @@ export default function SolutionPage() {
               {/* CTA */}
               <div className="mt-6">
                 <a
-                  href="#contact-solution"
+                  href="#book-demo"
                   onClick={() => setMobileOpen(false)}
                   className="block w-full py-4 rounded-xl font-display font-bold text-base text-white text-center transition-all hover:opacity-90"
                   style={{ background: accent }}
@@ -298,7 +319,7 @@ export default function SolutionPage() {
             </p>
             <div className="flex flex-wrap gap-4">
               <a
-                href="#contact-solution"
+                href="#book-demo"
                 className="px-8 py-4 rounded-xl font-display font-bold text-base text-white transition-all hover:opacity-90 hover:shadow-xl hover:-translate-y-0.5"
                 style={{ background: accent }}
               >
@@ -500,34 +521,132 @@ export default function SolutionPage() {
         </section>
       )}
 
-      {/* CTA / Contact */}
-      <section id="contact-solution" className="py-[100px] bg-[#F5F5F0]">
-        <div className="max-w-[1160px] mx-auto px-[5%] text-center">
-          <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+      {/* Book a Free Demo */}
+      <section id="book-demo" className="py-[100px] bg-[#F5F5F0]">
+        <div className="max-w-[960px] mx-auto px-[5%]">
+          <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
             {solution.badge && (
               <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full text-xs font-semibold font-mono tracking-widest uppercase border" style={{ color: accent, borderColor: `${accent}40`, background: `${accent}12` }}>
                 <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: accent }} />
                 {solution.badge}
               </div>
             )}
-            <h2 className="font-display font-extrabold text-[clamp(30px,5vw,60px)] leading-[1.05] tracking-[-2px] text-[#0A0A0F] mb-5 max-w-3xl mx-auto">
+            <h2 className="font-display font-extrabold text-[clamp(30px,5vw,56px)] leading-[1.05] tracking-[-2px] text-[#0A0A0F] mb-4 max-w-3xl mx-auto">
               {solution.ctaHeadline}
             </h2>
-            <p className="text-black/50 text-lg mb-10 max-w-xl mx-auto leading-relaxed">
+            <p className="text-black/50 text-lg max-w-xl mx-auto leading-relaxed">
               {solution.ctaSubheadline}
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <a
-                href="/#contact"
-                className="px-10 py-4 rounded-xl font-display font-bold text-base text-white transition-all hover:opacity-90 hover:shadow-2xl hover:-translate-y-0.5"
-                style={{ background: accent }}
-              >
-                {solution.ctaButtonText} →
-              </a>
-              <a href="/" className="text-sm text-black/40 hover:text-[#0A0A0F] transition-colors">
-                Learn about ZeeActs →
-              </a>
-            </div>
+          </motion.div>
+
+          <motion.div ref={bookFormRef} initial={{ opacity: 0, y: 32 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }} className="bg-white rounded-3xl shadow-[0_8px_64px_rgba(0,0,0,0.08)] p-8 md:p-12">
+            {bookStatus === "success" ? (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: `${accent}18` }}>
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <h3 className="font-display font-extrabold text-2xl text-[#0A0A0F] mb-3">Demo Booked!</h3>
+                <p className="text-black/50 text-base max-w-sm mx-auto mb-8">Thanks for reaching out. Our team will contact you within 24 hours to schedule your personalized demo.</p>
+                <button onClick={() => setBookStatus("idle")} className="text-sm font-semibold underline underline-offset-4 transition-colors" style={{ color: accent }}>Book another demo</button>
+              </div>
+            ) : (
+              <form onSubmit={handleBookSubmit} noValidate>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+                  <div>
+                    <label className="block text-xs font-semibold text-[#0A0A0F] mb-1.5 tracking-wide uppercase">Full Name <span style={{ color: accent }}>*</span></label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Jane Smith"
+                      value={bookForm.name}
+                      onChange={e => setBookForm(f => ({ ...f, name: e.target.value }))}
+                      className="w-full h-12 px-4 rounded-xl border border-black/12 bg-[#F9F9F7] text-sm text-[#0A0A0F] placeholder:text-black/30 focus:outline-none focus:border-current transition-colors"
+                      style={{ ["--tw-ring-color" as string]: accent } as React.CSSProperties}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#0A0A0F] mb-1.5 tracking-wide uppercase">Work Email <span style={{ color: accent }}>*</span></label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="jane@company.com"
+                      value={bookForm.email}
+                      onChange={e => setBookForm(f => ({ ...f, email: e.target.value }))}
+                      className="w-full h-12 px-4 rounded-xl border border-black/12 bg-[#F9F9F7] text-sm text-[#0A0A0F] placeholder:text-black/30 focus:outline-none focus:border-current transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#0A0A0F] mb-1.5 tracking-wide uppercase">Phone Number</label>
+                    <input
+                      type="tel"
+                      placeholder="+1 (555) 000-0000"
+                      value={bookForm.phone}
+                      onChange={e => setBookForm(f => ({ ...f, phone: e.target.value }))}
+                      className="w-full h-12 px-4 rounded-xl border border-black/12 bg-[#F9F9F7] text-sm text-[#0A0A0F] placeholder:text-black/30 focus:outline-none focus:border-current transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#0A0A0F] mb-1.5 tracking-wide uppercase">Company Name</label>
+                    <input
+                      type="text"
+                      placeholder="Acme HVAC Services"
+                      value={bookForm.company}
+                      onChange={e => setBookForm(f => ({ ...f, company: e.target.value }))}
+                      className="w-full h-12 px-4 rounded-xl border border-black/12 bg-[#F9F9F7] text-sm text-[#0A0A0F] placeholder:text-black/30 focus:outline-none focus:border-current transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#0A0A0F] mb-1.5 tracking-wide uppercase">Your Role / Job Title</label>
+                    <input
+                      type="text"
+                      placeholder="Operations Manager"
+                      value={bookForm.role}
+                      onChange={e => setBookForm(f => ({ ...f, role: e.target.value }))}
+                      className="w-full h-12 px-4 rounded-xl border border-black/12 bg-[#F9F9F7] text-sm text-[#0A0A0F] placeholder:text-black/30 focus:outline-none focus:border-current transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#0A0A0F] mb-1.5 tracking-wide uppercase">Company Size</label>
+                    <select
+                      value={bookForm.companySize}
+                      onChange={e => setBookForm(f => ({ ...f, companySize: e.target.value }))}
+                      className="w-full h-12 px-4 rounded-xl border border-black/12 bg-[#F9F9F7] text-sm text-[#0A0A0F] focus:outline-none focus:border-current transition-colors appearance-none"
+                    >
+                      <option value="">Select size…</option>
+                      <option value="1-10">1–10 employees</option>
+                      <option value="11-50">11–50 employees</option>
+                      <option value="51-200">51–200 employees</option>
+                      <option value="201-500">201–500 employees</option>
+                      <option value="500+">500+ employees</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="mb-7">
+                  <label className="block text-xs font-semibold text-[#0A0A0F] mb-1.5 tracking-wide uppercase">Anything you'd like us to know? <span className="text-black/30 font-normal normal-case">(Optional)</span></label>
+                  <textarea
+                    rows={4}
+                    placeholder="Tell us about your current challenges or what you hope to see in the demo…"
+                    value={bookForm.message}
+                    onChange={e => setBookForm(f => ({ ...f, message: e.target.value }))}
+                    className="w-full px-4 py-3 rounded-xl border border-black/12 bg-[#F9F9F7] text-sm text-[#0A0A0F] placeholder:text-black/30 focus:outline-none focus:border-current transition-colors resize-none"
+                  />
+                </div>
+                {bookStatus === "error" && (
+                  <p className="text-sm text-red-500 mb-4">Something went wrong. Please try again or contact us directly.</p>
+                )}
+                <div className="flex flex-col sm:flex-row gap-4 items-center">
+                  <button
+                    type="submit"
+                    disabled={bookStatus === "submitting"}
+                    className="px-10 py-4 rounded-xl font-display font-bold text-base text-white transition-all hover:opacity-90 hover:shadow-2xl hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed"
+                    style={{ background: accent }}
+                  >
+                    {bookStatus === "submitting" ? "Booking…" : `${solution.ctaButtonText} →`}
+                  </button>
+                  <p className="text-xs text-black/30">No credit card required. Free 30-minute session.</p>
+                </div>
+              </form>
+            )}
           </motion.div>
         </div>
       </section>

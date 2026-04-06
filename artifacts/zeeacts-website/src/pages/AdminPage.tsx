@@ -34,6 +34,7 @@ import {
   Facebook,
   Instagram,
   Twitter,
+  CalendarCheck,
 } from "lucide-react";
 import {
   useListServices,
@@ -75,7 +76,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-type View = "dashboard" | "services" | "portfolio" | "testimonials" | "contacts" | "settings" | "blog" | "seo" | "analytics" | "solutions";
+type View = "dashboard" | "services" | "portfolio" | "testimonials" | "contacts" | "demoBookings" | "settings" | "blog" | "seo" | "analytics" | "solutions";
 
 function CoverImageUpload({ value, onChange }: { value: string; onChange: (url: string) => void }) {
   const [uploading, setUploading] = useState(false);
@@ -185,6 +186,7 @@ export default function AdminPage() {
     { id: "portfolio", label: "Portfolio", icon: FolderKanban },
     { id: "testimonials", label: "Testimonials", icon: MessageSquareQuote },
     { id: "contacts", label: "Contacts", icon: Mails },
+    { id: "demoBookings", label: "Demo Bookings", icon: CalendarCheck },
     { id: "blog", label: "Blog", icon: FileText },
     { id: "seo", label: "SEO", icon: Search },
     { id: "analytics", label: "Analytics", icon: BarChart2 },
@@ -299,6 +301,7 @@ export default function AdminPage() {
             {activeView === "portfolio" && <PortfolioView />}
             {activeView === "testimonials" && <TestimonialsView />}
             {activeView === "contacts" && <ContactsView />}
+            {activeView === "demoBookings" && <DemoBookingsView />}
             {activeView === "solutions" && <SolutionsView />}
             {activeView === "blog" && <BlogView />}
             {activeView === "seo" && <SeoView />}
@@ -946,6 +949,161 @@ function ContactsView() {
             ))}
             {contacts?.length === 0 && (
               <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No contacts found</TableCell></TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </Card>
+    </div>
+  );
+}
+
+// --- Demo Bookings View ---
+interface DemoBooking {
+  id: number;
+  solutionSlug: string;
+  name: string;
+  email: string;
+  phone: string;
+  company: string;
+  role: string;
+  companySize: string;
+  message: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
+function DemoBookingsView() {
+  const queryClient = useQueryClient();
+  const [selectedBooking, setSelectedBooking] = useState<DemoBooking | null>(null);
+
+  const { data: bookings } = useQuery<DemoBooking[]>({
+    queryKey: ["demo-bookings"],
+    queryFn: () => apiFetch(`/api/demo-bookings`),
+  });
+
+  const toggleRead = useMutation({
+    mutationFn: (id: number) => apiFetch(`/api/demo-bookings/${id}/read`, { method: "PATCH" }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["demo-bookings"] }),
+  });
+
+  const deleteBooking = useMutation({
+    mutationFn: async (id: number) => {
+      const res = await fetch(`${BASE_API}/api/demo-bookings/${id}`, { method: "DELETE", credentials: "include" });
+      if (!res.ok) throw new Error("Failed");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["demo-bookings"] });
+      setSelectedBooking(null);
+    },
+  });
+
+  const unreadCount = bookings?.filter(b => !b.isRead).length ?? 0;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-3">
+        <h1 className="text-3xl font-display font-bold">Demo Bookings</h1>
+        {unreadCount > 0 && (
+          <Badge className="bg-[#E63950]">{unreadCount} new</Badge>
+        )}
+      </div>
+
+      <Dialog open={!!selectedBooking} onOpenChange={(o) => !o && setSelectedBooking(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Demo Request — {selectedBooking?.name}</DialogTitle>
+          </DialogHeader>
+          {selectedBooking && (
+            <div className="space-y-4 mt-2">
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <div className="text-muted-foreground text-xs uppercase tracking-wide mb-0.5">Email</div>
+                  <div className="font-medium">{selectedBooking.email}</div>
+                </div>
+                <div>
+                  <div className="text-muted-foreground text-xs uppercase tracking-wide mb-0.5">Phone</div>
+                  <div className="font-medium">{selectedBooking.phone || "—"}</div>
+                </div>
+                <div>
+                  <div className="text-muted-foreground text-xs uppercase tracking-wide mb-0.5">Company</div>
+                  <div className="font-medium">{selectedBooking.company || "—"}</div>
+                </div>
+                <div>
+                  <div className="text-muted-foreground text-xs uppercase tracking-wide mb-0.5">Role</div>
+                  <div className="font-medium">{selectedBooking.role || "—"}</div>
+                </div>
+                <div>
+                  <div className="text-muted-foreground text-xs uppercase tracking-wide mb-0.5">Company Size</div>
+                  <div className="font-medium">{selectedBooking.companySize || "—"}</div>
+                </div>
+                <div>
+                  <div className="text-muted-foreground text-xs uppercase tracking-wide mb-0.5">Solution</div>
+                  <div className="font-medium capitalize">{selectedBooking.solutionSlug || "—"}</div>
+                </div>
+              </div>
+              {selectedBooking.message && (
+                <div>
+                  <div className="text-muted-foreground text-xs uppercase tracking-wide mb-1">Notes</div>
+                  <div className="p-4 bg-muted rounded-md text-sm whitespace-pre-wrap">{selectedBooking.message}</div>
+                </div>
+              )}
+              <div className="flex gap-2 pt-1">
+                <Button
+                  variant={selectedBooking.isRead ? "outline" : "default"}
+                  className="flex-1"
+                  onClick={() => { toggleRead.mutate(selectedBooking.id); setSelectedBooking(null); }}
+                >
+                  <CheckCircle2 className="w-4 h-4 mr-2" />
+                  {selectedBooking.isRead ? "Mark as Unread" : "Mark as Read"}
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => deleteBooking.mutate(selectedBooking.id)}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Card>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Date</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Company</TableHead>
+              <TableHead>Solution</TableHead>
+              <TableHead>Company Size</TableHead>
+              <TableHead className="w-[90px]">Status</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {bookings?.map((b) => (
+              <TableRow
+                key={b.id}
+                className={`cursor-pointer hover:bg-muted/50 ${!b.isRead ? "font-semibold bg-primary/5" : ""}`}
+                onClick={() => setSelectedBooking(b)}
+              >
+                <TableCell>{format(new Date(b.createdAt), "MMM d, yyyy")}</TableCell>
+                <TableCell>
+                  <div>{b.name}</div>
+                  <div className="text-xs text-muted-foreground font-normal">{b.email}</div>
+                </TableCell>
+                <TableCell>{b.company || "—"}</TableCell>
+                <TableCell className="capitalize">{b.solutionSlug || "—"}</TableCell>
+                <TableCell>{b.companySize || "—"}</TableCell>
+                <TableCell onClick={(e) => e.stopPropagation()}>
+                  <button onClick={() => toggleRead.mutate(b.id)} className="focus:outline-none" title={b.isRead ? "Mark unread" : "Mark read"}>
+                    {!b.isRead ? <Badge className="bg-[#E63950] cursor-pointer">New</Badge> : <Badge variant="outline" className="cursor-pointer">Read</Badge>}
+                  </button>
+                </TableCell>
+              </TableRow>
+            ))}
+            {bookings?.length === 0 && (
+              <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No demo bookings yet</TableCell></TableRow>
             )}
           </TableBody>
         </Table>
