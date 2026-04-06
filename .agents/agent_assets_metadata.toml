@@ -24,6 +24,30 @@ uri = "file://artifacts/zeeacts-website/public/hvac-dashboard-hero.png"
 type = "image"
 title = "HVAC software dashboard product mockup"
 
+[[generated]]
+id = "w-yUyVmH2dj1pApBv5jaz"
+uri = "file://artifacts/zeeacts-website/public/hvac-complaints-mobile.png"
+type = "image"
+title = "HVAC complaints mobile app"
+
+[[generated]]
+id = "MUo4OtOxgwrk1QABliXHP"
+uri = "file://artifacts/zeeacts-website/public/hvac-dispatch-map.png"
+type = "image"
+title = "HVAC dispatch map dashboard"
+
+[[generated]]
+id = "uFla8jsiug7LRuExjJ3yl"
+uri = "file://artifacts/zeeacts-website/public/hvac-inventory.png"
+type = "image"
+title = "HVAC inventory management dashboard"
+
+[[generated]]
+id = "FF03qDlDvA_MVw_JBQqYD"
+uri = "file://artifacts/zeeacts-website/public/hvac-analytics.png"
+type = "image"
+title = "HVAC analytics dashboard"
+
 [[outputs]]
 id = "dGJ2UYwCfvSYHDIZgHbrz"
 uri = "file://logo-exports/zeeacts-logo-dark.png"
