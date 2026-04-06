@@ -1791,10 +1791,11 @@ function SolutionsView() {
 
   const saveMutation = useMutation({
     mutationFn: async (values: Partial<SolutionAdmin>) => {
+      const { id: _id, createdAt: _c, updatedAt: _u, ...payload } = values as SolutionAdmin;
       if (editingSolution?.id) {
-        return apiFetch(`/api/solutions/${editingSolution.id}`, { method: "PUT", body: JSON.stringify(values) });
+        return apiFetch(`/api/solutions/${editingSolution.id}`, { method: "PUT", body: JSON.stringify(payload) });
       }
-      return apiFetch("/api/solutions", { method: "POST", body: JSON.stringify(values) });
+      return apiFetch("/api/solutions", { method: "POST", body: JSON.stringify(payload) });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-solutions"] });
