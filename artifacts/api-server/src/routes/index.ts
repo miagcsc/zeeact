@@ -9,6 +9,7 @@ import blogRouter from "./blog";
 import solutionsRouter from "./solutions";
 import uploadRouter from "./upload";
 import demoBookingsRouter from "./demoBookings";
+import sitemapRouter from "./sitemap";
 
 const router: IRouter = Router();
 
@@ -22,5 +23,6 @@ router.use(blogRouter);
 router.use(solutionsRouter);
 router.use(uploadRouter);
 router.use(demoBookingsRouter);
+router.use(sitemapRouter);
 
 export default router;

@@ -3,10 +3,20 @@ import { db } from "@workspace/db";
 import { demoBookingsTable } from "@workspace/db";
 import { eq, desc } from "drizzle-orm";
 import { requireAuth } from "../middlewares/requireAuth";
+import rateLimit from "express-rate-limit";
+import { notifyNewDemoBooking } from "../lib/email";
 
 const router = Router();
 
-router.post("/demo-bookings", async (req, res) => {
+const demoLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many submissions. Please try again later." },
+});
+
+router.post("/demo-bookings", demoLimiter, async (req, res) => {
   const { name, email, phone = "", company = "", role = "", companySize = "", message = "", solutionSlug = "" } = req.body as Record<string, string>;
   if (!name || !email) { res.status(400).json({ error: "name and email are required" }); return; }
   const body = { name, email, phone, company, role, companySize, message, solutionSlug };
@@ -14,6 +24,7 @@ router.post("/demo-bookings", async (req, res) => {
     .insert(demoBookingsTable)
     .values({ ...body })
     .returning();
+  notifyNewDemoBooking(body).catch(() => {});
   res.status(201).json(booking);
 });
 
