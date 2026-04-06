@@ -1,5 +1,22 @@
 uploads = []
-generated = []
+
+[[generated]]
+id = "Ijp66DWeXKxYe7ngp6_gt"
+uri = "file://artifacts/mockup-sandbox/public/images/ad-pain.png"
+type = "image"
+title = "stressed business owner whatsapp chaos"
+
+[[generated]]
+id = "WSEQ_P-JDUdrZEoAwQtwL"
+uri = "file://artifacts/mockup-sandbox/public/images/ad-outcome.png"
+type = "image"
+title = "HVAC technician tablet dashboard success"
+
+[[generated]]
+id = "tWduVz33QPsZXEQQCLkHs"
+uri = "file://artifacts/mockup-sandbox/public/images/ad-identity.png"
+type = "image"
+title = "aerial city Pakistan HVAC service van"
 
 [[outputs]]
 id = "dGJ2UYwCfvSYHDIZgHbrz"
