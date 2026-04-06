@@ -89,3 +89,9 @@ id = "22RfI_CUs6kwHe6Nv8qCD"
 uri = "file://exports/zeeacts-ad-identity.png"
 type = "image"
 title = "Ad 3 — Built for Pakistan's HVAC Cos (Identity)"
+
+[[outputs]]
+id = "BtSdX6FBGTYHxsRgsNUg4"
+uri = "file://exports/zeeacts-brand-guidelines.pdf"
+type = "pdf"
+title = "ZeeActs Brand Guidelines 2025"

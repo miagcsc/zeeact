@@ -78,6 +78,17 @@ Clerk-protected admin CMS with dark sidebar navigation and views:
 - **Testimonials** — CRUD table with modal forms
 - **Contacts** — list of submissions with read/unread status, mark as read
 - **Settings** — form for hero text, about content, founder bio, contact email
+- **Solutions** — full solution page editor with 9 tabs: Basic, Hero (with image upload), Pain Points, Features, How It Works, Stats, **Showcases** (custom ShowcaseEditor with image upload + imagePosition), CTA, SEO
+
+### Solution Landing Pages (`/solutions/:slug`) — `src/pages/SolutionPage.tsx`
+Each solution gets a full standalone page with:
+- Dynamic hero section with optional uploaded hero image
+- Stats bar, pain points grid, features grid, how-it-works steps
+- **Dynamic alternating showcases** — driven entirely by DB `showcases` JSON column, each with badge, headline, description, bullets, image (via upload), and imagePosition (left|right)
+- CTA section and SEO meta tags
+
+### Brand Guidelines PDF
+Generated PDF at `exports/zeeacts-brand-guidelines.pdf` using `@react-pdf/renderer`. 12 pages covering: Cover, Brand Philosophy, Logo System (3 variants), Color Palette (WCAG contrast table), Typography Scale, Voice & Tone, Business Card (front + back), Letterhead, Social Posts 4:5 (3 templates), Ad Creatives 4:5 (3 templates), LinkedIn Cover (1584×396), Brand Do's & Don'ts. Regenerate with: `cd scripts/brand-pdf && node dist.mjs`
 
 ## Running Locally
 

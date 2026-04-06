@@ -22,6 +22,7 @@ interface Solution {
   features: string;
   howItWorks: string;
   stats: string;
+  showcases: string;
   ctaHeadline: string;
   ctaSubheadline: string;
   ctaButtonText: string;
@@ -32,8 +33,24 @@ interface Solution {
 interface Block { icon?: string; title: string; description: string }
 interface Step { step: string; title: string; description: string }
 interface Stat { value: string; label: string }
+interface Showcase {
+  badge: string;
+  headline: string;
+  description: string;
+  bullets: string[];
+  image: string;
+  imageAlt: string;
+  imagePosition: "left" | "right";
+}
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+function resolveImg(url: string): string {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  if (url.startsWith("/api/")) return url;
+  return `${BASE}${url}`;
+}
 
 function safeParse<T>(json: string, fallback: T): T {
   try { return JSON.parse(json) as T; } catch { return fallback; }
@@ -126,6 +143,7 @@ export default function SolutionPage() {
   const features = safeParse<Block[]>(solution.features, []);
   const howItWorks = safeParse<Step[]>(solution.howItWorks, []);
   const stats = safeParse<Stat[]>(solution.stats, []);
+  const showcases = safeParse<Showcase[]>(solution.showcases, []);
 
   return (
     <div className="min-h-screen bg-white text-[#0A0A0F] font-body">
@@ -295,7 +313,8 @@ export default function SolutionPage() {
             </div>
           </motion.div>
 
-          {/* Product visual — shown on all screens */}
+          {/* Product visual — shown on all screens (only if heroImage set) */}
+          {solution.heroImage && (
           <motion.div
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
@@ -304,8 +323,8 @@ export default function SolutionPage() {
           >
             <div className="relative rounded-2xl overflow-hidden shadow-[0_24px_80px_rgba(0,0,0,0.14)] border border-black/06">
               <img
-                src={`${BASE}/hvac-dashboard-hero.png`}
-                alt="AeroSoft OS — HVAC complaint management dashboard"
+                src={resolveImg(solution.heroImage)}
+                alt={`${solution.name} — ${solution.tagline}`}
                 className="w-full h-auto block"
               />
               <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-black/08" />
@@ -335,6 +354,7 @@ export default function SolutionPage() {
               </div>
             </div>
           </motion.div>
+          )}
         </div>
       </section>
 
@@ -378,65 +398,63 @@ export default function SolutionPage() {
         </section>
       )}
 
-      {/* Product showcase — complaints + dispatch (HVAC) */}
-      {solution.slug === 'hvac' && (
+      {/* Product showcases — dynamic, admin-managed */}
+      {showcases.length > 0 && (
         <section className="py-[80px] bg-white overflow-hidden">
-          <div className="max-w-[1160px] mx-auto px-[5%]">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-                <div className="inline-flex items-center gap-2 mb-5 px-3 py-1.5 rounded-full text-[11px] font-semibold font-mono tracking-widest uppercase border" style={{ color: accent, borderColor: `${accent}40`, background: `${accent}0D` }}>
-                  <span className="w-1.5 h-1.5 rounded-full" style={{ background: accent }} />
-                  Complaint Management
+          <div className="max-w-[1160px] mx-auto px-[5%] space-y-24">
+            {showcases.map((sc, i) => {
+              const isImgLeft = sc.imagePosition === "left";
+              return (
+                <div key={i} className="grid lg:grid-cols-2 gap-12 items-center">
+                  {/* Text block */}
+                  <motion.div
+                    initial={{ opacity: 0, x: isImgLeft ? 30 : -30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: isImgLeft ? 0.15 : 0 }}
+                    className={isImgLeft ? "order-1 lg:order-2" : "order-1"}
+                  >
+                    {sc.badge && (
+                      <div className="inline-flex items-center gap-2 mb-5 px-3 py-1.5 rounded-full text-[11px] font-semibold font-mono tracking-widest uppercase border" style={{ color: accent, borderColor: `${accent}40`, background: `${accent}0D` }}>
+                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: accent }} />
+                        {sc.badge}
+                      </div>
+                    )}
+                    <h2
+                      className="font-display font-extrabold text-[clamp(26px,3.5vw,44px)] leading-[1.06] tracking-[-1.5px] text-[#0A0A0F] mb-5"
+                      dangerouslySetInnerHTML={{ __html: sc.headline.replace(/\n/g, "<br />") }}
+                    />
+                    <p className="text-black/50 text-base leading-relaxed mb-8">{sc.description}</p>
+                    {sc.bullets && sc.bullets.length > 0 && (
+                      <ul className="space-y-3">
+                        {sc.bullets.map((bullet, j) => (
+                          <li key={j} className="flex items-center gap-3 text-sm text-[#0A0A0F]">
+                            <span className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[10px] shrink-0" style={{ background: accent }}>✓</span>
+                            {bullet}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </motion.div>
+                  {/* Image block */}
+                  <motion.div
+                    initial={{ opacity: 0, x: isImgLeft ? -30 : 30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: isImgLeft ? 0 : 0.15 }}
+                    className={isImgLeft ? "order-2 lg:order-1" : "order-2"}
+                  >
+                    <div className="rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.13)] border border-black/07">
+                      <img
+                        src={resolveImg(sc.image)}
+                        alt={sc.imageAlt || sc.headline}
+                        className="w-full h-auto block"
+                      />
+                    </div>
+                  </motion.div>
                 </div>
-                <h2 className="font-display font-extrabold text-[clamp(26px,3.5vw,44px)] leading-[1.06] tracking-[-1.5px] text-[#0A0A0F] mb-5">
-                  Every Complaint Tracked.<br />Nothing Slips Through.
-                </h2>
-                <p className="text-black/50 text-base leading-relaxed mb-8">
-                  Customers log complaints via WhatsApp, web, or phone. Your team sees everything in one real-time dashboard — no lost tickets, no angry callbacks.
-                </p>
-                <ul className="space-y-3">
-                  {['Auto-assign complaints to nearest technician', 'Real-time status updates sent to customer', 'Priority escalation for urgent jobs', 'Full audit trail per complaint'].map((item, i) => (
-                    <li key={i} className="flex items-center gap-3 text-sm text-[#0A0A0F]">
-                      <span className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[10px] shrink-0" style={{ background: accent }}>✓</span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-              <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.15 }} className="relative">
-                <div className="rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.13)] border border-black/07">
-                  <img src={`${BASE}/hvac-complaints-mobile.png`} alt="AeroSoft OS — complaint management list on mobile" className="w-full h-auto block" />
-                </div>
-              </motion.div>
-            </div>
-
-            <div className="mt-20 grid lg:grid-cols-2 gap-12 items-center">
-              <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="order-2 lg:order-1 relative">
-                <div className="rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.13)] border border-black/07">
-                  <img src={`${BASE}/hvac-dispatch-map.png`} alt="AeroSoft OS — live technician dispatch map" className="w-full h-auto block" />
-                </div>
-              </motion.div>
-              <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.15 }} className="order-1 lg:order-2">
-                <div className="inline-flex items-center gap-2 mb-5 px-3 py-1.5 rounded-full text-[11px] font-semibold font-mono tracking-widest uppercase border" style={{ color: accent, borderColor: `${accent}40`, background: `${accent}0D` }}>
-                  <span className="w-1.5 h-1.5 rounded-full" style={{ background: accent }} />
-                  Live Dispatch
-                </div>
-                <h2 className="font-display font-extrabold text-[clamp(26px,3.5vw,44px)] leading-[1.06] tracking-[-1.5px] text-[#0A0A0F] mb-5">
-                  Right Technician.<br />Right Job. Right Now.
-                </h2>
-                <p className="text-black/50 text-base leading-relaxed mb-8">
-                  See all your technicians on a live map. Assign jobs with one click based on skill, proximity, and availability — and get ETA confirmations sent straight to the customer.
-                </p>
-                <ul className="space-y-3">
-                  {['Live GPS tracking per technician', 'Skill-based smart job routing', 'WhatsApp ETA notification to customer', 'Route optimization to cut fuel costs'].map((item, i) => (
-                    <li key={i} className="flex items-center gap-3 text-sm text-[#0A0A0F]">
-                      <span className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[10px] shrink-0" style={{ background: accent }}>✓</span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-            </div>
+              );
+            })}
           </div>
         </section>
       )}
@@ -488,41 +506,6 @@ export default function SolutionPage() {
                   )}
                 </motion.div>
               ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Inventory + Analytics showcase (HVAC) */}
-      {solution.slug === 'hvac' && (
-        <section className="py-[80px] overflow-hidden" style={{ background: `linear-gradient(180deg, white 0%, ${accent}06 100%)` }}>
-          <div className="max-w-[1160px] mx-auto px-[5%]">
-            <div className="text-center mb-14">
-              <div className="inline-flex items-center gap-2 mb-4 px-3 py-1.5 rounded-full text-[11px] font-semibold font-mono tracking-widest uppercase border" style={{ color: accent, borderColor: `${accent}40`, background: `${accent}0D` }}>
-                <span className="w-1.5 h-1.5 rounded-full" style={{ background: accent }} />
-                Built for Growth
-              </div>
-              <h2 className="font-display font-extrabold text-[clamp(28px,4vw,52px)] leading-[1.05] tracking-[-1.5px] text-[#0A0A0F]">
-                More Tools. One Platform.
-              </h2>
-            </div>
-            <div className="grid lg:grid-cols-2 gap-8">
-              <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.11)] border border-black/07">
-                <div className="px-6 pt-6 pb-3 bg-white">
-                  <div className="text-2xl mb-1">📦</div>
-                  <h3 className="font-display font-bold text-base text-[#0A0A0F] mb-1">Inventory & Parts Management</h3>
-                  <p className="text-xs text-black/45 leading-relaxed">Track spare parts, set reorder alerts, and know your stock before a technician arrives on-site.</p>
-                </div>
-                <img src={`${BASE}/hvac-inventory.png`} alt="AeroSoft OS — inventory management dashboard" className="w-full h-auto block" />
-              </motion.div>
-              <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.12 }} className="rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.11)] border border-black/07">
-                <div className="px-6 pt-6 pb-3 bg-white">
-                  <div className="text-2xl mb-1">📊</div>
-                  <h3 className="font-display font-bold text-base text-[#0A0A0F] mb-1">Business Analytics</h3>
-                  <p className="text-xs text-black/45 leading-relaxed">Revenue, technician performance, resolution rates, and trends — all in one live dashboard you can actually act on.</p>
-                </div>
-                <img src={`${BASE}/hvac-analytics.png`} alt="AeroSoft OS — business analytics dashboard" className="w-full h-auto block" />
-              </motion.div>
             </div>
           </div>
         </section>

@@ -23,6 +23,7 @@ export const solutionsTable = pgTable("solutions", {
   ctaHeadline: text("cta_headline").notNull().default("Ready to get started?"),
   ctaSubheadline: text("cta_subheadline").notNull().default("Book a free demo today."),
   ctaButtonText: text("cta_button_text").notNull().default("Book a Demo"),
+  showcases: text("showcases").notNull().default("[]"),
   metaTitle: text("meta_title").default(""),
   metaDescription: text("meta_description").default(""),
   sortOrder: integer("sort_order").notNull().default(0),

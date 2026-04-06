@@ -1706,6 +1706,7 @@ interface SolutionAdmin {
   features: string;
   howItWorks: string;
   stats: string;
+  showcases: string;
   ctaHeadline: string;
   ctaSubheadline: string;
   ctaButtonText: string;
@@ -1869,7 +1870,155 @@ function RepeaterEditor({
   );
 }
 
-type SolutionTab = "basic" | "hero" | "painPoints" | "features" | "howItWorks" | "stats" | "cta" | "seo";
+type SolutionTab = "basic" | "hero" | "painPoints" | "features" | "howItWorks" | "stats" | "showcases" | "cta" | "seo";
+
+// ── ShowcaseEditor ──────────────────────────────────────────────────────────
+interface ShowcaseItem {
+  badge: string;
+  headline: string;
+  description: string;
+  bullets: string;
+  image: string;
+  imageAlt: string;
+  imagePosition: "left" | "right";
+}
+
+function ShowcaseEditor({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const items: ShowcaseItem[] = (() => {
+    try {
+      const parsed = JSON.parse(value) as Array<Record<string, unknown>>;
+      return parsed.map((sc) => ({
+        badge: String(sc.badge ?? ""),
+        headline: String(sc.headline ?? ""),
+        description: String(sc.description ?? ""),
+        bullets: Array.isArray(sc.bullets) ? (sc.bullets as string[]).join("\n") : "",
+        image: String(sc.image ?? ""),
+        imageAlt: String(sc.imageAlt ?? ""),
+        imagePosition: (sc.imagePosition === "left" ? "left" : "right") as "left" | "right",
+      }));
+    } catch { return []; }
+  })();
+
+  const save = (next: ShowcaseItem[]) => {
+    onChange(JSON.stringify(next.map((sc) => ({
+      ...sc,
+      bullets: sc.bullets.split("\n").map((b) => b.trim()).filter(Boolean),
+    }))));
+  };
+
+  const [editing, setEditing] = useState<number | null>(null);
+  const [draft, setDraft] = useState<ShowcaseItem>({
+    badge: "", headline: "", description: "", bullets: "", image: "", imageAlt: "", imagePosition: "right",
+  });
+
+  const setDraftField = (k: keyof ShowcaseItem, v: string) => setDraft((d) => ({ ...d, [k]: v }));
+
+  const startAdd = () => {
+    setDraft({ badge: "", headline: "", description: "", bullets: "", image: "", imageAlt: "", imagePosition: "right" });
+    setEditing(items.length);
+  };
+
+  const startEdit = (idx: number) => {
+    const sc = items[idx];
+    setDraft({ ...sc });
+    setEditing(idx);
+  };
+
+  const commitDraft = () => {
+    if (editing === null) return;
+    const next = [...items];
+    if (editing < items.length) { next[editing] = draft; } else { next.push(draft); }
+    save(next);
+    setEditing(null);
+  };
+
+  const remove = (idx: number) => save(items.filter((_, i) => i !== idx));
+  const move = (idx: number, dir: -1 | 1) => {
+    const next = [...items];
+    const swap = idx + dir;
+    if (swap < 0 || swap >= next.length) return;
+    [next[idx], next[swap]] = [next[swap], next[idx]];
+    save(next);
+  };
+
+  return (
+    <div className="space-y-3">
+      {items.length === 0 && (
+        <div className="text-center py-10 text-muted-foreground border border-dashed rounded-lg text-sm">
+          No showcase blocks yet. Add one to create an alternating image/text section on the solution page.
+        </div>
+      )}
+      {items.map((sc, i) => (
+        <div key={i} className="border rounded-lg p-4 flex items-start gap-3 group hover:border-[#E63950]/30 transition-colors">
+          <div className="flex flex-col gap-1 shrink-0">
+            <button type="button" onClick={() => move(i, -1)} disabled={i === 0} className="p-1 rounded hover:bg-muted disabled:opacity-30 text-xs">↑</button>
+            <button type="button" onClick={() => move(i, 1)} disabled={i === items.length - 1} className="p-1 rounded hover:bg-muted disabled:opacity-30 text-xs">↓</button>
+          </div>
+          <div className="flex-1 min-w-0">
+            {sc.image && (
+              <img src={sc.image} alt={sc.imageAlt} className="w-16 h-10 object-cover rounded mb-2 border" />
+            )}
+            <p className="text-sm font-medium truncate">{sc.headline || <span className="text-muted-foreground italic">Untitled showcase</span>}</p>
+            <p className="text-xs text-muted-foreground truncate">{sc.badge} · Image {sc.imagePosition}</p>
+          </div>
+          <div className="flex gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button type="button" onClick={() => startEdit(i)} className="px-2 py-1 text-xs border rounded hover:bg-muted">Edit</button>
+            <button type="button" onClick={() => remove(i)} className="px-2 py-1 text-xs border border-red-200 text-red-500 rounded hover:bg-red-50">×</button>
+          </div>
+        </div>
+      ))}
+
+      {editing !== null ? (
+        <div className="border-2 border-[#E63950]/30 rounded-xl p-5 space-y-4 bg-[#E63950]/02">
+          <h4 className="font-semibold text-sm">{editing < items.length ? "Edit Showcase Block" : "New Showcase Block"}</h4>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium mb-1">Badge Label</label>
+              <Input value={draft.badge} onChange={(e) => setDraftField("badge", e.target.value)} placeholder="e.g. Complaint Management" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-1">Image Position</label>
+              <select value={draft.imagePosition} onChange={(e) => setDraftField("imagePosition", e.target.value as "left" | "right")} className="w-full text-sm border border-input rounded-md px-3 py-2 bg-background">
+                <option value="right">Image Right (text left)</option>
+                <option value="left">Image Left (text right)</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-medium mb-1">Headline</label>
+            <Textarea rows={2} value={draft.headline} onChange={(e) => setDraftField("headline", e.target.value)} placeholder="Every Complaint Tracked. Nothing Slips Through." />
+            <p className="text-xs text-muted-foreground mt-0.5">Use a newline to create a line break on the page.</p>
+          </div>
+          <div>
+            <label className="block text-xs font-medium mb-1">Description</label>
+            <Textarea rows={3} value={draft.description} onChange={(e) => setDraftField("description", e.target.value)} placeholder="Describe what this module does in 2–3 sentences..." />
+          </div>
+          <div>
+            <label className="block text-xs font-medium mb-1">Bullet Points</label>
+            <Textarea rows={4} value={draft.bullets} onChange={(e) => setDraftField("bullets", e.target.value)} placeholder={"Auto-assign to nearest technician\nReal-time status updates\nPriority escalation for urgent jobs"} />
+            <p className="text-xs text-muted-foreground mt-0.5">One bullet per line.</p>
+          </div>
+          <div>
+            <label className="block text-xs font-medium mb-1">Showcase Image</label>
+            <CoverImageUpload value={draft.image} onChange={(url) => setDraftField("image", url)} />
+          </div>
+          <div>
+            <label className="block text-xs font-medium mb-1">Image Alt Text</label>
+            <Input value={draft.imageAlt} onChange={(e) => setDraftField("imageAlt", e.target.value)} placeholder="AeroSoft OS — complaint management dashboard" />
+          </div>
+          <div className="flex gap-2 pt-2">
+            <Button onClick={commitDraft} className="bg-[#E63950] hover:bg-[#B52C3E] text-white text-sm">Save Block</Button>
+            <Button variant="outline" onClick={() => setEditing(null)} className="text-sm">Cancel</Button>
+          </div>
+        </div>
+      ) : (
+        <Button variant="outline" onClick={startAdd} className="w-full gap-2 border-dashed">
+          <Plus className="w-4 h-4" /> Add Showcase Block
+        </Button>
+      )}
+    </div>
+  );
+}
 
 function SolutionsView() {
   const queryClient = useQueryClient();
@@ -1916,7 +2065,7 @@ function SolutionsView() {
       status: "draft", name: "", slug: "", tagline: "", badge: "", accentColor: "#0EA5E9",
       logoText: "", heroHeadline: "", heroSubheadline: "", heroCta: "Book a Demo",
       heroCtaSecondary: "See Features", heroImage: "", painPoints: "[]", features: "[]",
-      howItWorks: "[]", stats: "[]", ctaHeadline: "", ctaSubheadline: "", ctaButtonText: "Book a Demo",
+      howItWorks: "[]", stats: "[]", showcases: "[]", ctaHeadline: "", ctaSubheadline: "", ctaButtonText: "Book a Demo",
       metaTitle: "", metaDescription: "", sortOrder: 0,
     });
     setActiveTab("basic");
@@ -1937,6 +2086,7 @@ function SolutionsView() {
     { id: "features", label: "Features" },
     { id: "howItWorks", label: "How It Works" },
     { id: "stats", label: "Stats" },
+    { id: "showcases", label: "Showcases" },
     { id: "cta", label: "CTA" },
     { id: "seo", label: "SEO" },
   ];
@@ -2062,9 +2212,9 @@ function SolutionsView() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1">Hero Image URL (optional)</label>
-                    <Input value={form.heroImage ?? ""} onChange={(e) => set("heroImage", e.target.value)} placeholder="https://..." />
-                    {form.heroImage && <img src={form.heroImage} alt="Hero preview" className="mt-2 rounded-lg max-h-40 object-cover w-full" />}
+                    <label className="block text-sm font-medium mb-1">Hero Image (optional)</label>
+                    <CoverImageUpload value={form.heroImage ?? ""} onChange={(url) => set("heroImage", url)} />
+                    <p className="text-xs text-muted-foreground mt-1">Shown next to the hero headline on the solution page. Recommended: 1200×800px or wider.</p>
                   </div>
                 </div>
               </>
@@ -2133,6 +2283,19 @@ function SolutionsView() {
                     { key: "value", label: "Value", placeholder: "60%" },
                     { key: "label", label: "Label", placeholder: "Reduction in customer calls" },
                   ]}
+                />
+              </>
+            )}
+
+            {activeTab === "showcases" && (
+              <>
+                <h3 className="font-semibold text-lg">Product Showcases <span className="text-muted-foreground text-sm font-normal">(alternating image + text sections)</span></h3>
+                <p className="text-sm text-muted-foreground">
+                  Each block renders as a full-width two-column section with your image on the left or right. Use these to highlight key modules of your solution with a screenshot and bullet points.
+                </p>
+                <ShowcaseEditor
+                  value={form.showcases ?? "[]"}
+                  onChange={(v) => set("showcases", v)}
                 />
               </>
             )}
