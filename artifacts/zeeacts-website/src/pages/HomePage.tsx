@@ -944,7 +944,7 @@ export default function HomePage() {
                 />
 
                 <Button type="submit" disabled={submitContact.isPending} className="w-full bg-[#E63950] hover:bg-[#B52C3E] text-white py-6 text-lg font-display">
-                  {submitContact.isPending ? "Sending..." : "Send Message"}
+                  {submitContact.isPending ? "Submitting..." : "Submit"}
                 </Button>
               </form>
             </Form>
