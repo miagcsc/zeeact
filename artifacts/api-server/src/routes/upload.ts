@@ -1,8 +1,8 @@
 import { Router } from "express";
 import multer from "multer";
 import { requireAuth } from "@clerk/express";
-import { objectStorageClient } from "../lib/objectStorage";
-import { randomUUID } from "crypto";
+import { Readable } from "stream";
+import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
 
 const router = Router();
 
@@ -19,58 +19,30 @@ const upload = multer({
   },
 });
 
-function parseGCSPath(rawPath: string): { bucketName: string; objectName: string } {
-  const path = rawPath.startsWith("/") ? rawPath.slice(1) : rawPath;
-  const parts = path.split("/");
-  return { bucketName: parts[0], objectName: parts.slice(1).join("/") };
-}
+const storageService = new ObjectStorageService();
 
 router.post("/upload", requireAuth(), upload.single("file"), async (req, res) => {
   if (!req.file) {
     res.status(400).json({ error: "No file uploaded" });
     return;
   }
-
-  const privateDir = process.env.PRIVATE_OBJECT_DIR || "";
-  if (!privateDir) {
-    res.status(500).json({ error: "Object storage not configured" });
-    return;
-  }
-
   try {
-    const { bucketName, objectName: dirName } = parseGCSPath(privateDir);
-    const ext = req.file.mimetype.split("/")[1] || "bin";
-    const filename = `${randomUUID()}.${ext}`;
-    const objectName = `${dirName}/uploads/${filename}`.replace(/\/+/g, "/");
-
-    const bucket = objectStorageClient.bucket(bucketName);
-    const gcsFile = bucket.file(objectName);
-    await gcsFile.save(req.file.buffer, {
-      metadata: { contentType: req.file.mimetype },
-    });
-
-    const url = `/api/storage/objects/${bucketName}/${objectName}`;
+    const key = storageService.generateUploadKey(req.file.mimetype);
+    const url = await storageService.uploadObject(key, req.file.buffer, req.file.mimetype);
     res.json({ url });
   } catch (err) {
-    console.error("[upload] GCS error:", err);
-    res.status(500).json({ error: "Upload failed" });
+    console.error("[upload] R2 error:", err);
+    res.status(500).json({ error: "Upload failed — check R2 credentials" });
   }
 });
-
-import { Readable } from "stream";
-import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
-
-const objectStorageService = new ObjectStorageService();
 
 router.get("/storage/objects/*filePath", async (req, res) => {
   try {
     const rawPath = req.params.filePath as string | string[];
-    const filePath = Array.isArray(rawPath) ? rawPath.join("/") : rawPath;
-    const objectPath = `/objects/${filePath}`;
-    const file = await objectStorageService.getObjectEntityFile(objectPath);
-    const response = await objectStorageService.downloadObject(file, 86400);
-    res.status(response.status);
-    response.headers.forEach((value, key) => res.setHeader(key, value));
+    const key = Array.isArray(rawPath) ? rawPath.join("/") : rawPath;
+    const response = await storageService.streamObject(key, 86400);
+    res.status(response.status || 200);
+    response.headers.forEach((value, headerKey) => res.setHeader(headerKey, value));
     if (response.body) {
       const nodeStream = Readable.fromWeb(response.body as ReadableStream<Uint8Array>);
       nodeStream.pipe(res);

@@ -1,55 +1,24 @@
-// Resend integration via Replit connector
 import { Resend } from "resend";
 
-async function getResendClient(): Promise<{ client: Resend; from: string; to: string } | null> {
+function getResendClient(): { client: Resend; from: string; to: string } | null {
+  const apiKey = process.env.RESEND_API_KEY;
   const adminEmail = process.env.ADMIN_EMAIL || "";
+
+  if (!apiKey) {
+    console.warn("[email] RESEND_API_KEY not set — skipping notification");
+    return null;
+  }
   if (!adminEmail) {
     console.warn("[email] ADMIN_EMAIL not set — skipping notification");
     return null;
   }
 
-  const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME;
-  const xReplitToken = process.env.REPL_IDENTITY
-    ? "repl " + process.env.REPL_IDENTITY
-    : process.env.WEB_REPL_RENEWAL
-    ? "depl " + process.env.WEB_REPL_RENEWAL
-    : null;
-
-  if (!hostname || !xReplitToken) {
-    console.warn("[email] Resend connector not available");
-    return null;
-  }
-
-  try {
-    const res = await fetch(
-      `https://${hostname}/api/v2/connection?include_secrets=true&connector_names=resend`,
-      {
-        headers: {
-          Accept: "application/json",
-          "X-Replit-Token": xReplitToken,
-        },
-      }
-    );
-    const data = await res.json();
-    const settings = data?.items?.[0]?.settings;
-    if (!settings?.api_key) {
-      console.warn("[email] Resend API key not found in connector settings");
-      return null;
-    }
-
-    return {
-      client: new Resend(settings.api_key),
-      from: settings.from_email || "ZeeActs <noreply@zeeacts.com>",
-      to: adminEmail,
-    };
-  } catch (err) {
-    console.error("[email] Failed to fetch Resend credentials:", err);
-    return null;
-  }
+  const from = process.env.RESEND_FROM || "ZeeActs <noreply@zeeacts.com>";
+  return { client: new Resend(apiKey), from, to: adminEmail };
 }
 
 async function sendEmail(subject: string, html: string): Promise<void> {
-  const ctx = await getResendClient();
+  const ctx = getResendClient();
   if (!ctx) return;
   try {
     const { error } = await ctx.client.emails.send({
@@ -58,7 +27,7 @@ async function sendEmail(subject: string, html: string): Promise<void> {
       subject,
       html,
     });
-    if (error) console.error("[email] Resend send error:", error);
+    if (error) console.error("[email] Resend error:", error);
   } catch (err) {
     console.error("[email] Failed to send:", err);
   }
@@ -83,7 +52,7 @@ export async function notifyNewContact(data: {
   <tr><td style="padding:6px 14px;font-weight:600;color:#555">Budget</td><td style="padding:6px 14px">${data.budget || "—"}</td></tr>
   <tr><td style="padding:6px 14px;font-weight:600;color:#555;vertical-align:top">Message</td><td style="padding:6px 14px;white-space:pre-wrap">${data.message}</td></tr>
 </table>
-<p style="font-family:sans-serif;font-size:12px;color:#999;margin-top:24px">Sent via ZeeActs website contact form</p>`,
+<p style="font-family:sans-serif;font-size:12px;color:#999;margin-top:24px">Sent via ZeeActs contact form</p>`,
   );
 }
 

@@ -48,16 +48,14 @@ function buildAllowedOrigins(): Set<string> {
     .filter(Boolean)
     .forEach((o) => origins.add(o));
 
-  const devDomain = process.env.REPLIT_DEV_DOMAIN;
-  if (devDomain) {
-    origins.add(`https://${devDomain}`);
-  }
-
   (process.env.REPLIT_DOMAINS ?? "")
     .split(",")
     .map((d) => d.trim())
     .filter(Boolean)
     .forEach((d) => origins.add(`https://${d}`));
+
+  const devDomain = process.env.REPLIT_DEV_DOMAIN;
+  if (devDomain) origins.add(`https://${devDomain}`);
 
   return origins;
 }
@@ -91,6 +89,7 @@ app.use(
     },
   }),
 );
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -101,5 +100,16 @@ if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 app.use("/api/uploads", express.static(uploadsDir));
 
 app.use("/api", router);
+
+const websiteDistDir = path.join(
+  process.cwd(),
+  "artifacts/zeeacts-website/dist/public"
+);
+if (fs.existsSync(websiteDistDir)) {
+  app.use(express.static(websiteDistDir));
+  app.use((_req, res) => {
+    res.sendFile(path.join(websiteDistDir, "index.html"));
+  });
+}
 
 export default app;
