@@ -1,23 +1,64 @@
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const RESEND_FROM = process.env.RESEND_FROM || "ZeeActs <noreply@zeeacts.com>";
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || process.env.RESEND_ADMIN_EMAIL || "";
+// Resend integration via Replit connector
+import { Resend } from "resend";
 
-async function sendEmail(to: string, subject: string, html: string): Promise<void> {
-  if (!RESEND_API_KEY) return;
-  if (!to) return;
+async function getResendClient(): Promise<{ client: Resend; from: string; to: string } | null> {
+  const adminEmail = process.env.ADMIN_EMAIL || "";
+  if (!adminEmail) {
+    console.warn("[email] ADMIN_EMAIL not set — skipping notification");
+    return null;
+  }
+
+  const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME;
+  const xReplitToken = process.env.REPL_IDENTITY
+    ? "repl " + process.env.REPL_IDENTITY
+    : process.env.WEB_REPL_RENEWAL
+    ? "depl " + process.env.WEB_REPL_RENEWAL
+    : null;
+
+  if (!hostname || !xReplitToken) {
+    console.warn("[email] Resend connector not available");
+    return null;
+  }
+
   try {
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${RESEND_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ from: RESEND_FROM, to: [to], subject, html }),
-    });
-    if (!res.ok) {
-      const err = await res.text();
-      console.error("[email] Resend error:", err);
+    const res = await fetch(
+      `https://${hostname}/api/v2/connection?include_secrets=true&connector_names=resend`,
+      {
+        headers: {
+          Accept: "application/json",
+          "X-Replit-Token": xReplitToken,
+        },
+      }
+    );
+    const data = await res.json();
+    const settings = data?.items?.[0]?.settings;
+    if (!settings?.api_key) {
+      console.warn("[email] Resend API key not found in connector settings");
+      return null;
     }
+
+    return {
+      client: new Resend(settings.api_key),
+      from: settings.from_email || "ZeeActs <noreply@zeeacts.com>",
+      to: adminEmail,
+    };
+  } catch (err) {
+    console.error("[email] Failed to fetch Resend credentials:", err);
+    return null;
+  }
+}
+
+async function sendEmail(subject: string, html: string): Promise<void> {
+  const ctx = await getResendClient();
+  if (!ctx) return;
+  try {
+    const { error } = await ctx.client.emails.send({
+      from: ctx.from,
+      to: [ctx.to],
+      subject,
+      html,
+    });
+    if (error) console.error("[email] Resend send error:", error);
   } catch (err) {
     console.error("[email] Failed to send:", err);
   }
@@ -32,17 +73,17 @@ export async function notifyNewContact(data: {
   message: string;
 }): Promise<void> {
   await sendEmail(
-    ADMIN_EMAIL,
     `New Contact Form: ${data.name}`,
-    `<h2>New Contact Submission</h2>
-<table style="border-collapse:collapse;font-family:sans-serif">
-  <tr><td style="padding:6px 12px;font-weight:bold">Name</td><td style="padding:6px 12px">${data.name}</td></tr>
-  <tr><td style="padding:6px 12px;font-weight:bold">Email</td><td style="padding:6px 12px"><a href="mailto:${data.email}">${data.email}</a></td></tr>
-  <tr><td style="padding:6px 12px;font-weight:bold">Company</td><td style="padding:6px 12px">${data.company || "—"}</td></tr>
-  <tr><td style="padding:6px 12px;font-weight:bold">Project Type</td><td style="padding:6px 12px">${data.projectType || "—"}</td></tr>
-  <tr><td style="padding:6px 12px;font-weight:bold">Budget</td><td style="padding:6px 12px">${data.budget || "—"}</td></tr>
-  <tr><td style="padding:6px 12px;font-weight:bold;vertical-align:top">Message</td><td style="padding:6px 12px;white-space:pre-wrap">${data.message}</td></tr>
-</table>`,
+    `<h2 style="font-family:sans-serif;color:#0A0A0F">New Contact Submission</h2>
+<table style="border-collapse:collapse;font-family:sans-serif;font-size:14px">
+  <tr><td style="padding:6px 14px;font-weight:600;color:#555">Name</td><td style="padding:6px 14px">${data.name}</td></tr>
+  <tr><td style="padding:6px 14px;font-weight:600;color:#555">Email</td><td style="padding:6px 14px"><a href="mailto:${data.email}" style="color:#E63950">${data.email}</a></td></tr>
+  <tr><td style="padding:6px 14px;font-weight:600;color:#555">Company</td><td style="padding:6px 14px">${data.company || "—"}</td></tr>
+  <tr><td style="padding:6px 14px;font-weight:600;color:#555">Project Type</td><td style="padding:6px 14px">${data.projectType || "—"}</td></tr>
+  <tr><td style="padding:6px 14px;font-weight:600;color:#555">Budget</td><td style="padding:6px 14px">${data.budget || "—"}</td></tr>
+  <tr><td style="padding:6px 14px;font-weight:600;color:#555;vertical-align:top">Message</td><td style="padding:6px 14px;white-space:pre-wrap">${data.message}</td></tr>
+</table>
+<p style="font-family:sans-serif;font-size:12px;color:#999;margin-top:24px">Sent via ZeeActs website contact form</p>`,
   );
 }
 
@@ -57,18 +98,18 @@ export async function notifyNewDemoBooking(data: {
   solutionSlug: string;
 }): Promise<void> {
   await sendEmail(
-    ADMIN_EMAIL,
     `New Demo Booking: ${data.name} — ${data.company || data.email}`,
-    `<h2>New Demo Booking Request</h2>
-<table style="border-collapse:collapse;font-family:sans-serif">
-  <tr><td style="padding:6px 12px;font-weight:bold">Name</td><td style="padding:6px 12px">${data.name}</td></tr>
-  <tr><td style="padding:6px 12px;font-weight:bold">Email</td><td style="padding:6px 12px"><a href="mailto:${data.email}">${data.email}</a></td></tr>
-  <tr><td style="padding:6px 12px;font-weight:bold">Phone</td><td style="padding:6px 12px">${data.phone || "—"}</td></tr>
-  <tr><td style="padding:6px 12px;font-weight:bold">Company</td><td style="padding:6px 12px">${data.company || "—"}</td></tr>
-  <tr><td style="padding:6px 12px;font-weight:bold">Role</td><td style="padding:6px 12px">${data.role || "—"}</td></tr>
-  <tr><td style="padding:6px 12px;font-weight:bold">Company Size</td><td style="padding:6px 12px">${data.companySize || "—"}</td></tr>
-  <tr><td style="padding:6px 12px;font-weight:bold">Solution</td><td style="padding:6px 12px;text-transform:capitalize">${data.solutionSlug || "—"}</td></tr>
-  <tr><td style="padding:6px 12px;font-weight:bold;vertical-align:top">Notes</td><td style="padding:6px 12px;white-space:pre-wrap">${data.message || "—"}</td></tr>
-</table>`,
+    `<h2 style="font-family:sans-serif;color:#0A0A0F">New Demo Booking Request</h2>
+<table style="border-collapse:collapse;font-family:sans-serif;font-size:14px">
+  <tr><td style="padding:6px 14px;font-weight:600;color:#555">Name</td><td style="padding:6px 14px">${data.name}</td></tr>
+  <tr><td style="padding:6px 14px;font-weight:600;color:#555">Email</td><td style="padding:6px 14px"><a href="mailto:${data.email}" style="color:#E63950">${data.email}</a></td></tr>
+  <tr><td style="padding:6px 14px;font-weight:600;color:#555">Phone</td><td style="padding:6px 14px">${data.phone || "—"}</td></tr>
+  <tr><td style="padding:6px 14px;font-weight:600;color:#555">Company</td><td style="padding:6px 14px">${data.company || "—"}</td></tr>
+  <tr><td style="padding:6px 14px;font-weight:600;color:#555">Role</td><td style="padding:6px 14px">${data.role || "—"}</td></tr>
+  <tr><td style="padding:6px 14px;font-weight:600;color:#555">Company Size</td><td style="padding:6px 14px">${data.companySize || "—"}</td></tr>
+  <tr><td style="padding:6px 14px;font-weight:600;color:#555">Solution</td><td style="padding:6px 14px;text-transform:capitalize">${data.solutionSlug || "—"}</td></tr>
+  <tr><td style="padding:6px 14px;font-weight:600;color:#555;vertical-align:top">Notes</td><td style="padding:6px 14px;white-space:pre-wrap">${data.message || "—"}</td></tr>
+</table>
+<p style="font-family:sans-serif;font-size:12px;color:#999;margin-top:24px">Sent via ZeeActs demo booking form</p>`,
   );
 }
