@@ -52,7 +52,7 @@ export default function BlogPage() {
       </nav>
 
       {/* Hero */}
-      <section className="pt-32 pb-16 px-6 bg-gradient-to-b from-[#fff0f2] to-white">
+      <section className="pt-32 pb-8 px-6 bg-gradient-to-b from-[#fff0f2] to-white">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 text-xs font-mono tracking-widest text-[#E63950] bg-[#E63950]/10 px-4 py-2 rounded-full mb-6">
             <span className="w-1.5 h-1.5 rounded-full bg-[#E63950] animate-pulse" />
@@ -68,7 +68,7 @@ export default function BlogPage() {
       </section>
 
       {/* Posts */}
-      <section className="py-16 px-6">
+      <section className="pt-8 pb-16 px-6">
         <div className="max-w-4xl mx-auto">
           {isLoading && (
             <div className="grid gap-8">

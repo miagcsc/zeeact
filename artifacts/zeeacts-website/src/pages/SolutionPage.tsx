@@ -260,11 +260,11 @@ export default function SolutionPage() {
       </AnimatePresence>
 
       {/* Hero */}
-      <section className="pt-[120px] pb-[100px] relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${accent}0D 0%, white 60%)` }}>
+      <section className="pt-[120px] pb-[80px] relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${accent}0D 0%, white 60%)` }}>
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full blur-[120px] opacity-20" style={{ background: accent }} />
         </div>
-        <div className="max-w-[1160px] mx-auto px-[5%] relative">
+        <div className="max-w-[1160px] mx-auto px-[5%] relative grid lg:grid-cols-[1fr_500px] gap-[60px] items-center">
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             {solution.badge && (
               <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full text-xs font-semibold font-mono tracking-widest uppercase border" style={{ color: accent, borderColor: `${accent}40`, background: `${accent}10` }}>
@@ -292,6 +292,38 @@ export default function SolutionPage() {
               >
                 {solution.heroCtaSecondary}
               </a>
+            </div>
+          </motion.div>
+
+          {/* Product visual */}
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7, delay: 0.2, ease: [0.4, 0, 0.2, 1] }}
+            className="relative hidden lg:block"
+          >
+            <div className="relative rounded-2xl overflow-hidden shadow-[0_24px_80px_rgba(0,0,0,0.14)] border border-black/06">
+              <img
+                src={`${BASE}/hvac-dashboard-hero.png`}
+                alt="AeroSoft OS — HVAC complaint management dashboard"
+                className="w-full h-auto block"
+              />
+              <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-black/08" />
+            </div>
+            {/* Floating stat pill */}
+            <div
+              className="absolute -bottom-4 -left-6 bg-white rounded-xl px-4 py-3 shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-black/06 flex items-center gap-3"
+            >
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm" style={{ background: accent }}>✓</div>
+              <div>
+                <p className="text-[11px] font-semibold text-[#0A0A0F] leading-tight">60% fewer callbacks</p>
+                <p className="text-[10px] text-black/40">avg. across HVAC clients</p>
+              </div>
+            </div>
+            {/* Floating live pill */}
+            <div className="absolute -top-3 -right-3 bg-[#0A0A0F] text-white rounded-full px-3 py-1.5 text-[10px] font-mono tracking-widest flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#27c93f] animate-pulse" />
+              LIVE DEMO
             </div>
           </motion.div>
         </div>

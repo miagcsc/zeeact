@@ -434,6 +434,24 @@ export default function HomePage() {
               </div>
               <p className="text-[14px] text-black/50">50+ businesses powered by ZeeActs Solutions</p>
             </motion.div>
+
+            {/* Mobile stat strip — visible only below lg */}
+            <motion.div {...fadeUp(0.65)} className="lg:hidden mt-6 grid grid-cols-2 gap-3">
+              <div className="bg-white border border-black/08 rounded-2xl p-4 shadow-[0_4px_20px_rgba(0,0,0,0.06)]">
+                <p className="text-[10px] text-black/35 mb-1 font-mono">Projects Shipped</p>
+                <div className="flex items-end gap-1.5">
+                  <span className="font-display font-extrabold text-2xl text-[#0A0A0F]">127+</span>
+                  <span className="text-[11px] text-[#E63950] mb-0.5">↑40%</span>
+                </div>
+              </div>
+              <div className="bg-white border border-black/08 rounded-2xl p-4 shadow-[0_4px_20px_rgba(0,0,0,0.06)]">
+                <p className="text-[10px] text-black/35 mb-1 font-mono">Cost Saved via AI</p>
+                <div className="flex items-end gap-1.5">
+                  <span className="font-display font-extrabold text-2xl text-[#0A0A0F]">62%</span>
+                  <span className="text-[11px] text-[#E63950] mb-0.5">faster↑</span>
+                </div>
+              </div>
+            </motion.div>
           </div>
 
           <HeroDashboardCard />

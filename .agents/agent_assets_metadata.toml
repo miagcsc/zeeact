@@ -18,6 +18,12 @@ uri = "file://artifacts/mockup-sandbox/public/images/ad-identity.png"
 type = "image"
 title = "aerial city Pakistan HVAC service van"
 
+[[generated]]
+id = "wx3OAcMOikfXDlGP4_GyT"
+uri = "file://artifacts/zeeacts-website/public/hvac-dashboard-hero.png"
+type = "image"
+title = "HVAC software dashboard product mockup"
+
 [[outputs]]
 id = "dGJ2UYwCfvSYHDIZgHbrz"
 uri = "file://logo-exports/zeeacts-logo-dark.png"
