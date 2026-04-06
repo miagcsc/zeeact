@@ -304,7 +304,7 @@ export default function HomePage() {
           <div className="flex items-center gap-4">
             <button
               onClick={() => scrollTo("#contact")}
-              className="bg-[#E63950] hover:bg-[#B52C3E] text-white font-display font-bold text-[13px] px-[22px] py-[10px] rounded-md transition-all hover:-translate-y-[1px] hidden sm:block"
+              className="bg-[#E63950] hover:bg-[#B52C3E] text-white font-display font-bold text-[13px] px-[22px] py-[10px] rounded-md transition-all hover:-translate-y-[1px] whitespace-nowrap hidden sm:inline-flex items-center"
             >
               Get a Free Quote →
             </button>
