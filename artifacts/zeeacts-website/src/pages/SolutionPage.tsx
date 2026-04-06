@@ -342,17 +342,6 @@ export default function SolutionPage() {
               <span className="w-1.5 h-1.5 rounded-full bg-[#27c93f] animate-pulse" />
               LIVE DEMO
             </div>
-            {/* Mobile stat strip */}
-            <div className="lg:hidden mt-4 grid grid-cols-2 gap-3">
-              <div className="bg-white border border-black/08 rounded-xl p-3 text-center shadow-sm">
-                <div className="font-display font-extrabold text-xl" style={{ color: accent }}>60%</div>
-                <div className="text-[10px] text-black/45 mt-0.5">Fewer Callbacks</div>
-              </div>
-              <div className="bg-white border border-black/08 rounded-xl p-3 text-center shadow-sm">
-                <div className="font-display font-extrabold text-xl" style={{ color: accent }}>3×</div>
-                <div className="text-[10px] text-black/45 mt-0.5">Faster Dispatch</div>
-              </div>
-            </div>
           </motion.div>
           )}
         </div>
