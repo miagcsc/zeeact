@@ -55,11 +55,54 @@ export default function SolutionPage() {
   });
 
   useEffect(() => {
-    if (solution) {
-      document.title = solution.metaTitle || `${solution.name} — ${solution.tagline} | ZeeActs`;
-      const desc = document.querySelector("meta[name='description']");
-      if (desc && solution.metaDescription) desc.setAttribute("content", solution.metaDescription);
+    if (!solution) return;
+
+    const pageTitle = solution.metaTitle || `${solution.name} — ${solution.tagline} | ZeeActs`;
+    const pageDesc  = solution.metaDescription || solution.heroSubheadline || `${solution.name} — ${solution.tagline}. Powered by ZeeActs.`;
+    const pageUrl   = `https://zeeacts.com/solutions/${solution.slug}`;
+
+    document.title = pageTitle;
+
+    function setMeta(sel: string, attr: string, val: string) {
+      let el = document.querySelector(sel);
+      if (!el) { el = document.createElement("meta"); document.head.appendChild(el); }
+      el.setAttribute(attr, val);
     }
+
+    setMeta("meta[name='description']",         "content",  pageDesc);
+    setMeta("meta[name='keywords']",            "content",  `${solution.name}, ${solution.tagline}, complaint management system, HVAC complaint management, field service management, ZeeActs`);
+    setMeta("link[rel='canonical']",            "href",     pageUrl);
+    setMeta("meta[property='og:title']",        "content",  pageTitle);
+    setMeta("meta[property='og:description']",  "content",  pageDesc);
+    setMeta("meta[property='og:url']",          "content",  pageUrl);
+    setMeta("meta[property='og:type']",         "content",  "website");
+    setMeta("meta[name='twitter:title']",       "content",  pageTitle);
+    setMeta("meta[name='twitter:description']", "content",  pageDesc);
+
+    const schemaId = "solution-ld-json";
+    let existingScript = document.getElementById(schemaId);
+    if (!existingScript) {
+      existingScript = document.createElement("script");
+      existingScript.id = schemaId;
+      (existingScript as HTMLScriptElement).type = "application/ld+json";
+      document.head.appendChild(existingScript);
+    }
+    existingScript.textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": solution.name,
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web",
+      "url": pageUrl,
+      "description": pageDesc,
+      "creator": { "@type": "Organization", "name": "ZeeActs", "url": "https://zeeacts.com" },
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "PKR", "description": "Free demo available" }
+    });
+
+    return () => {
+      const s = document.getElementById(schemaId);
+      if (s) s.remove();
+    };
   }, [solution]);
 
   if (isLoading) return (
@@ -321,7 +364,7 @@ export default function SolutionPage() {
 
       {/* How it works */}
       {howItWorks.length > 0 && (
-        <section className="py-[100px]" style={{ background: `linear-gradient(180deg, ${accent}06 0%, white 100%)` }}>
+        <section id="how-it-works" className="py-[100px]" style={{ background: `linear-gradient(180deg, ${accent}06 0%, white 100%)` }}>
           <div className="max-w-[1160px] mx-auto px-[5%]">
             <div className="flex items-center gap-3 mb-4">
               <span className="w-6 h-[2px] shrink-0" style={{ background: accent }} />

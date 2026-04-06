@@ -194,18 +194,21 @@ export default function HomePage() {
   };
 
   useEffect(() => {
-    document.title = "ZeeActs — Premium IT Solutions & AI-Powered Software";
+    document.title = "ZeeActs — Complaint Management & IT Solutions Pakistan";
     const setMeta = (name: string, content: string, prop = false) => {
       const attr = prop ? "property" : "name";
       let el = document.querySelector(`meta[${attr}="${name}"]`);
       if (!el) { el = document.createElement("meta"); el.setAttribute(attr, name); document.head.appendChild(el); }
       el.setAttribute("content", content);
     };
-    const desc = "ZeeActs delivers premium IT solutions powered by AI — custom software, automation, ERP systems and industry-specific platforms. 50+ businesses powered across Pakistan.";
+    const desc = "ZeeActs builds complaint management systems, HVAC field service software, custom ERP, and AI-powered automation for Pakistani businesses. Deployed in days, not months.";
     setMeta("description", desc);
-    setMeta("og:title", "ZeeActs — Premium IT Solutions & AI-Powered Software", true);
+    setMeta("keywords", "complaint management system, HVAC complaint management, field service management software, IT solutions Pakistan, custom software development, AI automation, ERP Pakistan, ZeeActs");
+    setMeta("og:title", "ZeeActs — Complaint Management & IT Solutions Pakistan", true);
     setMeta("og:description", desc, true);
-    setMeta("og:url", window.location.href, true);
+    setMeta("og:url", "https://zeeacts.com/", true);
+    const canonical = document.querySelector("link[rel='canonical']") as HTMLLinkElement | null;
+    if (canonical) canonical.href = "https://zeeacts.com/";
   }, []);
 
   useEffect(() => {
