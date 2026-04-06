@@ -41,3 +41,21 @@ id = "0tMmuXcJIWiugL5aiugLB"
 uri = "file://logo-exports/zeeacts-icon-light.png"
 type = "image"
 title = "ZeeActs Icon — Light Background (900×900px)"
+
+[[outputs]]
+id = "32tuzTpO5ks7SFB4l3OYd"
+uri = "file://exports/zeeacts-ad-pain-point.png"
+type = "image"
+title = "Ad 1 — Stop Losing Jobs to WhatsApp Chaos (Pain Point)"
+
+[[outputs]]
+id = "HwZsDbmC7jzaGT180W45v"
+uri = "file://exports/zeeacts-ad-outcome.png"
+type = "image"
+title = "Ad 2 — 60% Fewer Customer Callbacks (Outcome)"
+
+[[outputs]]
+id = "22RfI_CUs6kwHe6Nv8qCD"
+uri = "file://exports/zeeacts-ad-identity.png"
+type = "image"
+title = "Ad 3 — Built for Pakistan's HVAC Cos (Identity)"
