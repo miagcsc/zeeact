@@ -43,7 +43,7 @@ export default defineConfig({
         manualChunks: {
           "vendor-react": ["react", "react-dom"],
           "vendor-motion": ["framer-motion"],
-          "vendor-clerk": ["@clerk/react", "@clerk/clerk-react"],
+          "vendor-clerk": ["@clerk/react"],
           "vendor-query": ["@tanstack/react-query"],
           "vendor-ui": ["lucide-react", "sonner"],
         },
