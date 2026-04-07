@@ -168,7 +168,6 @@ export default function SolutionPage() {
 
   return (
     <div className="min-h-screen bg-white text-[#0A0A0F] font-body">
-
       {/* Nav */}
       <nav className="fixed top-0 inset-x-0 z-50 bg-white/95 backdrop-blur-md border-b border-black/[0.08]">
         <div className="max-w-[1160px] mx-auto px-[5%] h-[68px] flex items-center justify-between gap-6">
@@ -220,7 +219,6 @@ export default function SolutionPage() {
 
         </div>
       </nav>
-
       {/* Mobile full-screen menu */}
       <AnimatePresence>
         {mobileOpen && (
@@ -297,7 +295,6 @@ export default function SolutionPage() {
           </motion.div>
         )}
       </AnimatePresence>
-
       {/* Hero */}
       <section className="pt-[120px] pb-[80px] relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${accent}0D 0%, white 60%)` }}>
         <div className="absolute inset-0 pointer-events-none">
@@ -311,7 +308,7 @@ export default function SolutionPage() {
                 {solution.badge}
               </div>
             )}
-            <h1 className="font-display font-extrabold text-[clamp(36px,5.5vw,72px)] leading-[1.03] tracking-[-2px] text-[#0A0A0F] mb-6 max-w-3xl">
+            <h1 className="font-display font-extrabold tracking-[-2px] text-[#0A0A0F] mb-6 max-w-3xl text-[50px]">
               {solution.heroHeadline}
             </h1>
             <p className="text-lg text-black/55 leading-relaxed max-w-2xl mb-10">
@@ -367,7 +364,6 @@ export default function SolutionPage() {
           )}
         </div>
       </section>
-
       {/* Stats bar */}
       {stats.length > 0 && (
         <section className="border-y border-black/08 bg-gray-50/50">
@@ -381,7 +377,6 @@ export default function SolutionPage() {
           </div>
         </section>
       )}
-
       {/* Pain points */}
       {painPoints.length > 0 && (
         <section className="py-[100px] bg-[#F5F5F0]">
@@ -407,7 +402,6 @@ export default function SolutionPage() {
           </div>
         </section>
       )}
-
       {/* Product showcases — dynamic, admin-managed */}
       {showcases.length > 0 && (
         <section className="py-[80px] bg-white overflow-hidden">
@@ -468,7 +462,6 @@ export default function SolutionPage() {
           </div>
         </section>
       )}
-
       {/* Features */}
       {features.length > 0 && (
         <section id="features" className="py-[100px] bg-white">
@@ -493,7 +486,6 @@ export default function SolutionPage() {
           </div>
         </section>
       )}
-
       {/* How it works */}
       {howItWorks.length > 0 && (
         <section id="how-it-works" className="py-[100px]" style={{ background: `linear-gradient(180deg, ${accent}06 0%, white 100%)` }}>
@@ -520,7 +512,6 @@ export default function SolutionPage() {
           </div>
         </section>
       )}
-
       {/* Book a Free Demo */}
       <section id="book-demo" className="py-[100px] bg-[#F5F5F0]">
         <div className="max-w-[960px] mx-auto px-[5%]">
@@ -650,7 +641,6 @@ export default function SolutionPage() {
           </motion.div>
         </div>
       </section>
-
       {/* Footer */}
       <footer className="bg-[#F5F5F0] border-t border-black/08 py-8">
         <div className="max-w-[1160px] mx-auto px-[5%] flex flex-col sm:flex-row items-center justify-between gap-4">
