@@ -38,7 +38,11 @@ app.use(
   }),
 );
 
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+  }),
+);
 
 app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 
