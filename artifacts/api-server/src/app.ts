@@ -1,6 +1,8 @@
 import express, { type Express } from "express";
 import cors from "cors";
+import helmet from "helmet";
 import pinoHttp from "pino-http";
+import rateLimit from "express-rate-limit";
 import { clerkMiddleware } from "@clerk/express";
 import path from "path";
 import fs from "fs";
@@ -36,6 +38,8 @@ app.use(
   }),
 );
 
+app.use(helmet());
+
 app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 
 const isProduction = process.env.NODE_ENV === "production";
@@ -55,15 +59,6 @@ function buildAllowedOrigins(): Set<string> {
     try { origins.add(new URL(siteUrl).origin); } catch {}
   }
 
-  (process.env.REPLIT_DOMAINS ?? "")
-    .split(",")
-    .map((d) => d.trim())
-    .filter(Boolean)
-    .forEach((d) => origins.add(`https://${d}`));
-
-  const devDomain = process.env.REPLIT_DEV_DOMAIN;
-  if (devDomain) origins.add(`https://${devDomain}`);
-
   return origins;
 }
 
@@ -82,7 +77,7 @@ app.use(
       try {
         parsedOrigin = new URL(origin).origin;
       } catch {
-        cb(new Error(`CORS policy: malformed origin — ${origin}`));
+        cb(null, false);
         return;
       }
 
@@ -97,15 +92,20 @@ app.use(
   }),
 );
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "10kb" }));
+app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 
 app.use(clerkMiddleware());
 
-const uploadsDir = path.join(process.cwd(), "uploads");
-if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
-app.use("/api/uploads", express.static(uploadsDir));
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests, please try again later." },
+});
 
+app.use("/api", apiLimiter);
 app.use("/api", router);
 
 // Derive path from this file's location so it works regardless of process.cwd()
