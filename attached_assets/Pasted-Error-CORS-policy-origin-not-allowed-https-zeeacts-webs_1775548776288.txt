@@ -1,0 +1,75 @@
+Error: CORS policy: origin not allowed — https://zeeacts-website-production.up.railway.app
+    at origin (file:///app/artifacts/api-server/dist/index.mjs:134938:12)
+    at file:///app/artifacts/api-server/dist/index.mjs:23811:17
+    at optionsCallback (file:///app/artifacts/api-server/dist/index.mjs:23793:13)
+    at corsMiddleware (file:///app/artifacts/api-server/dist/index.mjs:23797:11)
+    at Layer.handleRequest (file:///app/artifacts/api-server/dist/index.mjs:20292:21)
+    at trimPrefix (file:///app/artifacts/api-server/dist/index.mjs:20651:17)
+    at file:///app/artifacts/api-server/dist/index.mjs:20622:13
+    at processParams (file:///app/artifacts/api-server/dist/index.mjs:20767:16)
+    at next (file:///app/artifacts/api-server/dist/index.mjs:20616:9)
+    at loggingMiddleware (file:///app/artifacts/api-server/dist/index.mjs:28334:11)
+request errored
+Error: CORS policy: origin not allowed — https://zeeacts-website-production.up.railway.app
+    at origin (file:///app/artifacts/api-server/dist/index.mjs:134938:12)
+    at file:///app/artifacts/api-server/dist/index.mjs:23811:17
+    at optionsCallback (file:///app/artifacts/api-server/dist/index.mjs:23793:13)
+    at corsMiddleware (file:///app/artifacts/api-server/dist/index.mjs:23797:11)
+    at Layer.handleRequest (file:///app/artifacts/api-server/dist/index.mjs:20292:21)
+    at trimPrefix (file:///app/artifacts/api-server/dist/index.mjs:20651:17)
+    at file:///app/artifacts/api-server/dist/index.mjs:20622:13
+    at processParams (file:///app/artifacts/api-server/dist/index.mjs:20767:16)
+    at next (file:///app/artifacts/api-server/dist/index.mjs:20616:9)
+    at loggingMiddleware (file:///app/artifacts/api-server/dist/index.mjs:28334:11)
+request completed
+request errored
+Error: CORS policy: origin not allowed — https://zeeacts-website-production.up.railway.app
+    at origin (file:///app/artifacts/api-server/dist/index.mjs:134938:12)
+    at file:///app/artifacts/api-server/dist/index.mjs:23811:17
+    at optionsCallback (file:///app/artifacts/api-server/dist/index.mjs:23793:13)
+    at corsMiddleware (file:///app/artifacts/api-server/dist/index.mjs:23797:11)
+    at Layer.handleRequest (file:///app/artifacts/api-server/dist/index.mjs:20292:21)
+    at trimPrefix (file:///app/artifacts/api-server/dist/index.mjs:20651:17)
+    at file:///app/artifacts/api-server/dist/index.mjs:20622:13
+    at processParams (file:///app/artifacts/api-server/dist/index.mjs:20767:16)
+    at next (file:///app/artifacts/api-server/dist/index.mjs:20616:9)
+    at loggingMiddleware (file:///app/artifacts/api-server/dist/index.mjs:28334:11)
+request errored
+Error: CORS policy: origin not allowed — https://zeeacts-website-production.up.railway.app
+    at origin (file:///app/artifacts/api-server/dist/index.mjs:134938:12)
+    at file:///app/artifacts/api-server/dist/index.mjs:23811:17
+    at optionsCallback (file:///app/artifacts/api-server/dist/index.mjs:23793:13)
+    at corsMiddleware (file:///app/artifacts/api-server/dist/index.mjs:23797:11)
+    at Layer.handleRequest (file:///app/artifacts/api-server/dist/index.mjs:20292:21)
+    at trimPrefix (file:///app/artifacts/api-server/dist/index.mjs:20651:17)
+    at file:///app/artifacts/api-server/dist/index.mjs:20622:13
+    at processParams (file:///app/artifacts/api-server/dist/index.mjs:20767:16)
+    at next (file:///app/artifacts/api-server/dist/index.mjs:20616:9)
+    at loggingMiddleware (file:///app/artifacts/api-server/dist/index.mjs:28334:11)
+request completed
+request completed
+request errored
+Error: CORS policy: origin not allowed — https://zeeacts-website-production.up.railway.app
+    at origin (file:///app/artifacts/api-server/dist/index.mjs:134938:12)
+    at file:///app/artifacts/api-server/dist/index.mjs:23811:17
+    at optionsCallback (file:///app/artifacts/api-server/dist/index.mjs:23793:13)
+    at corsMiddleware (file:///app/artifacts/api-server/dist/index.mjs:23797:11)
+    at Layer.handleRequest (file:///app/artifacts/api-server/dist/index.mjs:20292:21)
+    at trimPrefix (file:///app/artifacts/api-server/dist/index.mjs:20651:17)
+    at file:///app/artifacts/api-server/dist/index.mjs:20622:13
+    at processParams (file:///app/artifacts/api-server/dist/index.mjs:20767:16)
+    at next (file:///app/artifacts/api-server/dist/index.mjs:20616:9)
+    at loggingMiddleware (file:///app/artifacts/api-server/dist/index.mjs:28334:11)
+request errored
+Error: CORS policy: origin not allowed — https://zeeacts-website-production.up.railway.app
+    at origin (file:///app/artifacts/api-server/dist/index.mjs:134938:12)
+    at file:///app/artifacts/api-server/dist/index.mjs:23811:17
+    at optionsCallback (file:///app/artifacts/api-server/dist/index.mjs:23793:13)
+    at corsMiddleware (file:///app/artifacts/api-server/dist/index.mjs:23797:11)
+    at Layer.handleRequest (file:///app/artifacts/api-server/dist/index.mjs:20292:21)
+    at trimPrefix (file:///app/artifacts/api-server/dist/index.mjs:20651:17)
+    at file:///app/artifacts/api-server/dist/index.mjs:20622:13
+    at processParams (file:///app/artifacts/api-server/dist/index.mjs:20767:16)
+    at next (file:///app/artifacts/api-server/dist/index.mjs:20616:9)
+    at loggingMiddleware (file:///app/artifacts/api-server/dist/index.mjs:28334:11)
+request completed

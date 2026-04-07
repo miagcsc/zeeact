@@ -49,6 +49,12 @@ function buildAllowedOrigins(): Set<string> {
     .filter(Boolean)
     .forEach((o) => origins.add(o));
 
+  // Auto-allow the site's own public URL (e.g. Railway domain or custom domain)
+  const siteUrl = process.env.SITE_URL;
+  if (siteUrl) {
+    try { origins.add(new URL(siteUrl).origin); } catch {}
+  }
+
   (process.env.REPLIT_DOMAINS ?? "")
     .split(",")
     .map((d) => d.trim())
