@@ -1,7 +1,7 @@
 import { db } from "./index";
 import { blogPostsTable } from "./schema/blog";
 
-async function seedBlog() {
+export async function seedBlog() {
   const existing = await db.select().from(blogPostsTable).limit(1);
   if (existing.length > 0) {
     console.log("Blog already seeded. Skipping.");
@@ -70,4 +70,3 @@ async function seedBlog() {
   console.log("Blog posts seeded!");
 }
 
-seedBlog().catch(console.error).finally(() => process.exit(0));

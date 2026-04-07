@@ -37,7 +37,7 @@ const stats = JSON.stringify([
   { value: "₨ 0", label: "Lost revenue from forgotten jobs" },
 ]);
 
-async function seedSolutions() {
+export async function seedSolutions() {
   await db.insert(solutionsTable).values({
     slug: "hvac",
     status: "published",
@@ -64,7 +64,5 @@ async function seedSolutions() {
   }).onConflictDoNothing();
 
   console.log("Solutions seeded!");
-  process.exit(0);
 }
 
-seedSolutions().catch((e) => { console.error(e); process.exit(1); });
