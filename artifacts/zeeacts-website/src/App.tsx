@@ -24,7 +24,7 @@ function stripBase(path: string): string {
 }
 
 if (!clerkPubKey) {
-  throw new Error('Missing VITE_CLERK_PUBLISHABLE_KEY in .env file');
+  console.error('Missing VITE_CLERK_PUBLISHABLE_KEY — set this variable and redeploy.');
 }
 
 function SignInPage() {
@@ -72,6 +72,17 @@ function AdminRoute() {
 
 function ClerkProviderWithRoutes() {
   const [, setLocation] = useLocation();
+
+  if (!clerkPubKey) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-white text-center p-8">
+        <div>
+          <h1 className="text-2xl font-bold mb-4">Configuration Error</h1>
+          <p className="text-zinc-400">VITE_CLERK_PUBLISHABLE_KEY is not set. Please add it to your environment variables and redeploy.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <ClerkProvider
