@@ -4,6 +4,7 @@ import pinoHttp from "pino-http";
 import { clerkMiddleware } from "@clerk/express";
 import path from "path";
 import fs from "fs";
+import { fileURLToPath } from "url";
 import {
   CLERK_PROXY_PATH,
   clerkProxyMiddleware,
@@ -101,15 +102,21 @@ app.use("/api/uploads", express.static(uploadsDir));
 
 app.use("/api", router);
 
-const websiteDistDir = path.join(
-  process.cwd(),
-  "artifacts/zeeacts-website/dist/public"
-);
+// Derive path from this file's location so it works regardless of process.cwd()
+// Compiled output: artifacts/api-server/dist/index.mjs
+// Website dist:    artifacts/zeeacts-website/dist/public
+const __serverDir = path.dirname(fileURLToPath(import.meta.url));
+const websiteDistDir = path.resolve(__serverDir, "../../zeeacts-website/dist/public");
+
+logger.info({ websiteDistDir, exists: fs.existsSync(websiteDistDir) }, "Static files path");
+
 if (fs.existsSync(websiteDistDir)) {
-  app.use(express.static(websiteDistDir));
+  app.use(express.static(websiteDistDir, { maxAge: "1d" }));
   app.use((_req, res) => {
     res.sendFile(path.join(websiteDistDir, "index.html"));
   });
+} else {
+  logger.warn({ websiteDistDir }, "Website dist directory not found — static serving disabled");
 }
 
 export default app;
