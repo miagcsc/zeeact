@@ -1,2 +1,8 @@
 [variables]
 NIXPACKS_NODE_VERSION = "20"
+
+# This repo intentionally installs with `--no-frozen-lockfile` in CI/build environments
+# because pnpm's lockfile strictness can fail across differing pnpm/node environments.
+# Railway already uses `--no-frozen-lockfile` (see `railway.toml`).
+[phases.install]
+cmds = ["pnpm install --no-frozen-lockfile"]
