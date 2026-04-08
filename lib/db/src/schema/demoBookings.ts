@@ -21,5 +21,5 @@ export const insertDemoBookingSchema = createInsertSchema(demoBookingsTable).omi
   createdAt: true,
 });
 
-export type InsertDemoBooking = typeof insertDemoBookingSchema._type;
+export type InsertDemoBooking = typeof demoBookingsTable.$inferInsert;
 export type DemoBooking = typeof demoBookingsTable.$inferSelect;
