@@ -1,6 +1,5 @@
 import { pgTable, text, serial, boolean, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
-import { z } from "zod";
 
 export const demoBookingsTable = pgTable("demo_bookings", {
   id: serial("id").primaryKey(),
@@ -22,5 +21,5 @@ export const insertDemoBookingSchema = createInsertSchema(demoBookingsTable).omi
   createdAt: true,
 });
 
-export type InsertDemoBooking = z.infer<typeof insertDemoBookingSchema>;
+export type InsertDemoBooking = typeof insertDemoBookingSchema._type;
 export type DemoBooking = typeof demoBookingsTable.$inferSelect;
