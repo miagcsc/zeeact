@@ -6,6 +6,11 @@ import { eq, asc } from "drizzle-orm";
 
 const router = Router();
 
+function getSingleParam(value: string | string[] | undefined): string | null {
+  if (typeof value === "string") return value;
+  return null;
+}
+
 router.get("/solutions", async (_req, res) => {
   const rows = await db
     .select()
@@ -24,10 +29,15 @@ router.get("/solutions/all", requireAuth, async (_req, res) => {
 });
 
 router.get("/solutions/:slug", async (req, res) => {
+  const slug = getSingleParam(req.params.slug);
+  if (!slug) {
+    res.status(400).json({ error: "Invalid slug" });
+    return;
+  }
   const row = await db
     .select()
     .from(solutionsTable)
-    .where(eq(solutionsTable.slug, req.params.slug))
+    .where(eq(solutionsTable.slug, slug))
     .limit(1);
   if (!row[0]) {
     res.status(404).json({ error: "Not found" });
@@ -46,7 +56,12 @@ router.post("/solutions", requireAuth, async (req, res) => {
 });
 
 router.post("/solutions/:id/duplicate", requireAuth, async (req, res) => {
-  const id = parseInt(req.params.id);
+  const rawId = getSingleParam(req.params.id);
+  const id = Number.parseInt(rawId ?? "", 10);
+  if (!rawId || Number.isNaN(id)) {
+    res.status(400).json({ error: "Invalid id" });
+    return;
+  }
   const existing = await db
     .select()
     .from(solutionsTable)
@@ -65,7 +80,12 @@ router.post("/solutions/:id/duplicate", requireAuth, async (req, res) => {
 });
 
 router.put("/solutions/:id", requireAuth, async (req, res) => {
-  const id = parseInt(req.params.id);
+  const rawId = getSingleParam(req.params.id);
+  const id = Number.parseInt(rawId ?? "", 10);
+  if (!rawId || Number.isNaN(id)) {
+    res.status(400).json({ error: "Invalid id" });
+    return;
+  }
   const body = req.body as Partial<typeof solutionsTable.$inferInsert>;
   const existing = await db
     .select()
@@ -85,7 +105,12 @@ router.put("/solutions/:id", requireAuth, async (req, res) => {
 });
 
 router.delete("/solutions/:id", requireAuth, async (req, res) => {
-  const id = parseInt(req.params.id);
+  const rawId = getSingleParam(req.params.id);
+  const id = Number.parseInt(rawId ?? "", 10);
+  if (!rawId || Number.isNaN(id)) {
+    res.status(400).json({ error: "Invalid id" });
+    return;
+  }
   await db.delete(solutionsTable).where(eq(solutionsTable.id, id));
   res.json({ deleted: true });
 });

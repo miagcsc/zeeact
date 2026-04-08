@@ -23,7 +23,14 @@ router.post("/contact", contactLimiter, async (req, res) => {
     .insert(contactSubmissionsTable)
     .values({ ...body })
     .returning();
-  notifyNewContact(body).catch(() => {});
+  notifyNewContact({
+    name: body.name,
+    email: body.email,
+    company: body.company ?? "",
+    projectType: body.projectType ?? "",
+    budget: body.budget ?? "",
+    message: body.message,
+  }).catch(() => {});
   res.status(201).json(submission);
 });
 

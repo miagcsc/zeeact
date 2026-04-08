@@ -7,6 +7,11 @@ import sanitizeHtml from "sanitize-html";
 
 const router = Router();
 
+function getSingleParam(value: string | string[] | undefined): string | null {
+  if (typeof value === "string") return value;
+  return null;
+}
+
 const ALLOWED_TAGS = [
   "h1","h2","h3","h4","h5","h6","p","br","hr",
   "strong","em","u","s","del","ins","mark","small","sub","sup",
@@ -53,10 +58,15 @@ router.get("/blog/all", requireAuth, async (_req, res) => {
 });
 
 router.get("/blog/:slug", async (req, res) => {
+  const slug = getSingleParam(req.params.slug);
+  if (!slug) {
+    res.status(400).json({ error: "Invalid slug" });
+    return;
+  }
   const post = await db
     .select()
     .from(blogPostsTable)
-    .where(eq(blogPostsTable.slug, req.params.slug))
+    .where(eq(blogPostsTable.slug, slug))
     .limit(1);
   if (!post[0]) {
     res.status(404).json({ error: "Not found" });
@@ -77,7 +87,12 @@ router.post("/blog", requireAuth, async (req, res) => {
 });
 
 router.put("/blog/:id", requireAuth, async (req, res) => {
-  const id = parseInt(req.params.id);
+  const rawId = getSingleParam(req.params.id);
+  const id = Number.parseInt(rawId ?? "", 10);
+  if (!rawId || Number.isNaN(id)) {
+    res.status(400).json({ error: "Invalid id" });
+    return;
+  }
   const body = req.body as Partial<typeof blogPostsTable.$inferInsert>;
   if (body.content) body.content = sanitize(body.content);
   const existing = await db
@@ -102,7 +117,12 @@ router.put("/blog/:id", requireAuth, async (req, res) => {
 });
 
 router.delete("/blog/:id", requireAuth, async (req, res) => {
-  const id = parseInt(req.params.id);
+  const rawId = getSingleParam(req.params.id);
+  const id = Number.parseInt(rawId ?? "", 10);
+  if (!rawId || Number.isNaN(id)) {
+    res.status(400).json({ error: "Invalid id" });
+    return;
+  }
   await db.delete(blogPostsTable).where(eq(blogPostsTable.id, id));
   res.json({ deleted: true });
 });
