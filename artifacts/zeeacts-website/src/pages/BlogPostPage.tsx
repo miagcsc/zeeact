@@ -4,6 +4,7 @@ import { Link, useParams } from "wouter";
 import { ArrowLeft, Calendar, Tag } from "lucide-react";
 import { format } from "date-fns";
 import { ZeeActsLogo } from "../components/ZeeActsLogo";
+import { getRuntimeApiBaseUrl } from "../runtime-env";
 
 interface BlogPost {
   id: number;
@@ -21,9 +22,10 @@ interface BlogPost {
 }
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+const apiBaseUrl = getRuntimeApiBaseUrl(BASE);
 
 async function fetchPost(slug: string): Promise<BlogPost> {
-  const res = await fetch(`${BASE}/api/blog/${slug}`);
+  const res = await fetch(`${apiBaseUrl}/api/blog/${slug}`);
   if (!res.ok) throw new Error("Post not found");
   return res.json() as Promise<BlogPost>;
 }

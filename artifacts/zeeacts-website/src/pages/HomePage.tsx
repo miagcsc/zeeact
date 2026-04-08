@@ -20,6 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Twitter, Linkedin, Facebook, Instagram, Mail } from "lucide-react";
 import { ZeeActsLogo } from "../components/ZeeActsLogo";
+import { getRuntimeApiBaseUrl } from "../runtime-env";
 
 const Logo = ZeeActsLogo;
 
@@ -146,10 +147,11 @@ export default function HomePage() {
   const submitContact = useSubmitContact();
 
   const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+  const apiBaseUrl = getRuntimeApiBaseUrl(BASE);
   const { data: blogPosts } = useQuery<{ id: number; title: string; slug: string; excerpt: string | null; tags: string | null; publishedAt: string | null; coverImage: string | null }[]>({
     queryKey: ["blog-home"],
     queryFn: async () => {
-      const res = await fetch(`${BASE}/api/blog`);
+      const res = await fetch(`${apiBaseUrl}/api/blog`);
       if (!res.ok) return [];
       return res.json();
     },
@@ -159,7 +161,7 @@ export default function HomePage() {
   const { data: solutions } = useQuery<{ id: number; slug: string; name: string; tagline: string; badge: string; accentColor: string; logoText: string }[]>({
     queryKey: ["solutions-home"],
     queryFn: async () => {
-      const res = await fetch(`${BASE}/api/solutions`);
+      const res = await fetch(`${apiBaseUrl}/api/solutions`);
       if (!res.ok) return [];
       return res.json();
     },

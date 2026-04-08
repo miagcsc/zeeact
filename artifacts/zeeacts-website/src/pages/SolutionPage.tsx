@@ -3,6 +3,7 @@ import { useRoute } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { ZeeActsLogo } from "../components/ZeeActsLogo";
+import { getRuntimeApiBaseUrl } from "../runtime-env";
 
 interface Solution {
   id: number;
@@ -44,11 +45,14 @@ interface Showcase {
 }
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+const apiBaseUrl = getRuntimeApiBaseUrl(BASE);
 
 function resolveImg(url: string): string {
   if (!url) return "";
   if (url.startsWith("http")) return url;
-  if (url.startsWith("/api/")) return url;
+  // When backend is deployed separately, uploaded image URLs may be returned as `/api/...`.
+  // Prefix them with the runtime API origin so browsers can reach the backend.
+  if (url.startsWith("/api/")) return `${apiBaseUrl}${url}`;
   return `${BASE}${url}`;
 }
 
@@ -69,7 +73,7 @@ export default function SolutionPage() {
     e.preventDefault();
     setBookStatus("submitting");
     try {
-      const res = await fetch(`${BASE}/api/demo-bookings`, {
+      const res = await fetch(`${apiBaseUrl}/api/demo-bookings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...bookForm, solutionSlug: slug }),
@@ -85,7 +89,7 @@ export default function SolutionPage() {
   const { data: solution, isLoading, isError } = useQuery<Solution>({
     queryKey: ["solution", slug],
     queryFn: async () => {
-      const res = await fetch(`${BASE}/api/solutions/${slug}`);
+      const res = await fetch(`${apiBaseUrl}/api/solutions/${slug}`);
       if (!res.ok) throw new Error("Not found");
       return res.json();
     },

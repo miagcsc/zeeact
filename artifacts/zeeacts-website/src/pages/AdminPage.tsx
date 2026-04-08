@@ -62,6 +62,7 @@ import {
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { getRuntimeApiBaseUrl } from "../runtime-env";
 
 // UI Components
 import { Button } from "@/components/ui/button";
@@ -82,6 +83,7 @@ function CoverImageUpload({ value, onChange }: { value: string; onChange: (url: 
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+  const apiBaseUrl = getRuntimeApiBaseUrl(BASE);
 
   const convertToWebP = (file: File): Promise<Blob> =>
     new Promise((resolve, reject) => {
@@ -112,7 +114,7 @@ function CoverImageUpload({ value, onChange }: { value: string; onChange: (url: 
       const webp = await convertToWebP(file);
       const fd = new FormData();
       fd.append("file", webp, `cover-${Date.now()}.webp`);
-      const res = await fetch(`${BASE}/api/upload`, { method: "POST", credentials: "include", body: fd });
+      const res = await fetch(`${apiBaseUrl}/api/upload`, { method: "POST", credentials: "include", body: fd });
       if (!res.ok) throw new Error("Upload failed");
       const { url: uploaded } = (await res.json()) as { url: string };
       onChange(uploaded);
@@ -128,7 +130,11 @@ function CoverImageUpload({ value, onChange }: { value: string; onChange: (url: 
     <div className="space-y-2">
       {value && (
         <div className="relative w-full h-36 rounded-lg overflow-hidden border border-black/10 bg-gray-50">
-          <img src={value} alt="Cover preview" className="w-full h-full object-cover" />
+          <img
+            src={value.startsWith("/api/") ? `${apiBaseUrl}${value}` : value}
+            alt="Cover preview"
+            className="w-full h-full object-cover"
+          />
           <button
             type="button"
             onClick={() => onChange("")}
@@ -1140,7 +1146,11 @@ const blogPostSchema = z.object({
   metaDescription: z.string().default(""),
 });
 
-const BASE_API = import.meta.env.BASE_URL.replace(/\/$/, "");
+const BASE_API = getRuntimeApiBaseUrl(import.meta.env.BASE_URL.replace(/\/$/, ""));
+
+function resolveApiImg(url: string): string {
+  return url.startsWith("/api/") ? `${BASE_API}${url}` : url;
+}
 
 async function apiFetch(path: string, options?: RequestInit) {
   const headers: Record<string, string> = { "Content-Type": "application/json", ...((options?.headers as Record<string, string>) ?? {}) };
@@ -1500,7 +1510,7 @@ function SeoView() {
                   <label className="text-sm font-medium block mb-1">OG Image URL <span className="text-muted-foreground font-normal">(1200×630px recommended)</span></label>
                   <Input name="seo_og_image" value={formValues.seo_og_image || ""} onChange={handleChange} placeholder="https://zeeacts.com/og-image.jpg" />
                   {formValues.seo_og_image && (
-                    <img src={formValues.seo_og_image} alt="OG preview" className="mt-2 h-24 rounded-md object-cover border" />
+                    <img src={resolveApiImg(formValues.seo_og_image)} alt="OG preview" className="mt-2 h-24 rounded-md object-cover border" />
                   )}
                 </div>
                 <div>
@@ -2114,7 +2124,7 @@ function ShowcaseEditor({ value, onChange }: { value: string; onChange: (v: stri
           </div>
           <div className="flex-1 min-w-0">
             {sc.image && (
-              <img src={sc.image} alt={sc.imageAlt} className="w-16 h-10 object-cover rounded mb-2 border" />
+              <img src={resolveApiImg(sc.image)} alt={sc.imageAlt} className="w-16 h-10 object-cover rounded mb-2 border" />
             )}
             <p className="text-sm font-medium truncate">{sc.headline || <span className="text-muted-foreground italic">Untitled showcase</span>}</p>
             <p className="text-xs text-muted-foreground truncate">{sc.badge} · Image {sc.imagePosition}</p>

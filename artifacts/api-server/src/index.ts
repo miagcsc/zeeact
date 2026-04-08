@@ -18,15 +18,17 @@ if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
+const host = process.env["HOST"] || "0.0.0.0";
+
 Promise.all([seedIfEmpty(), seedBlog(), seedSolutions()])
   .then(() => {
-    app.listen(port, (err) => {
+    app.listen(port, host, (err) => {
       if (err) {
         logger.error({ err }, "Error listening on port");
         process.exit(1);
       }
 
-      logger.info({ port }, "Server listening");
+      logger.info({ port, host }, "Server listening");
     });
   })
   .catch((err) => {

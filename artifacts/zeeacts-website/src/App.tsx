@@ -2,11 +2,13 @@ import { lazy, Suspense, useEffect, useRef } from "react";
 import { ClerkProvider, SignIn, Show, useClerk } from '@clerk/react';
 import { Switch, Route, useLocation, Router as WouterRouter, Redirect } from 'wouter';
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
+import { setBaseUrl } from "@workspace/api-client-react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/HomePage";
 import AnalyticsInjector from "@/components/AnalyticsInjector";
+import { getRuntimeApiBaseUrl } from "./runtime-env";
 
 const AdminPage = lazy(() => import("@/pages/AdminPage"));
 const BlogPage = lazy(() => import("@/pages/BlogPage"));
@@ -17,6 +19,12 @@ const queryClient = new QueryClient();
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
+const apiBaseUrl = getRuntimeApiBaseUrl(basePath);
+
+// Configure the API client hooks to call the right backend origin.
+// - Railway/local: `API_URL` is unset, so this falls back to `basePath` (usually '').
+// - Coolify separate frontend/backend: set `API_URL` and the frontend will call it at runtime.
+setBaseUrl(apiBaseUrl);
 
 function stripBase(path: string): string {
   return basePath && path.startsWith(basePath)
