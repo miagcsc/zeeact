@@ -34,7 +34,7 @@ function injectTag(id: string, src: string, attrs: Record<string, string> = {}) 
 
 export function trackConversion(label = "contact_form") {
   if (!_cfg) return;
-  const w = window as Record<string, unknown>;
+  const w = window as unknown as Record<string, unknown>;
 
   if (_cfg.ga4Id && typeof w.gtag === "function") {
     (w.gtag as (...a: unknown[]) => void)("event", "generate_lead", {

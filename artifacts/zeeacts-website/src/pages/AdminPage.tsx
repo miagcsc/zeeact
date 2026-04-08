@@ -2201,7 +2201,7 @@ function SolutionsView() {
 
   const saveMutation = useMutation({
     mutationFn: async (values: Partial<SolutionAdmin>) => {
-      const { id: _id, createdAt: _c, updatedAt: _u, ...payload } = values as SolutionAdmin;
+      const { id: _id, ...payload } = values as SolutionAdmin;
       if (editingSolution?.id) {
         return apiFetch(`/api/solutions/${editingSolution.id}`, { method: "PUT", body: JSON.stringify(payload) });
       }
