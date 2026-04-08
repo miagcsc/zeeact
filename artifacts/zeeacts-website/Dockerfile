@@ -4,7 +4,7 @@
 # - Coolify: set build context to the repository root (`d:/Cursor/zeeact`)
 # - Dockerfile path: `artifacts/zeeacts-website/Dockerfile`
 
-FROM node:20-alpine AS builder
+FROM node:20-slim AS builder
 
 WORKDIR /app
 

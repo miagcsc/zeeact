@@ -2,7 +2,7 @@
 # - Coolify: set build context to repository root (`d:/Cursor/zeeact`)
 # - Dockerfile path: `artifacts/api-server/Dockerfile`
 
-FROM node:20-alpine AS builder
+FROM node:20-slim AS builder
 WORKDIR /app
 
 RUN npm install -g pnpm
@@ -19,7 +19,7 @@ RUN pnpm install --no-frozen-lockfile
 RUN pnpm --filter @workspace/zeeacts-website run build
 RUN pnpm --filter @workspace/api-server run build
 
-FROM node:20-alpine AS runner
+FROM node:20-slim AS runner
 WORKDIR /app
 
 RUN npm install -g pnpm
