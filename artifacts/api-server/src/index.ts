@@ -19,8 +19,15 @@ if (Number.isNaN(port) || port <= 0) {
 }
 
 const host = process.env["HOST"] || "0.0.0.0";
+const shouldSeedOnBoot = process.env["SEED_ON_BOOT"] === "true";
 
-Promise.all([seedIfEmpty(), seedBlog(), seedSolutions()])
+const startup = shouldSeedOnBoot
+  ? Promise.all([seedIfEmpty(), seedBlog(), seedSolutions()]).then(() => {
+      logger.info("Startup seeds completed");
+    })
+  : Promise.resolve();
+
+startup
   .then(() => {
     app.listen(port, host, (err) => {
       if (err) {
@@ -32,6 +39,6 @@ Promise.all([seedIfEmpty(), seedBlog(), seedSolutions()])
     });
   })
   .catch((err) => {
-    logger.error({ err }, "Failed to seed database on startup");
+    logger.error({ err }, "Startup initialization failed");
     process.exit(1);
   });
