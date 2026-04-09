@@ -61,33 +61,31 @@ function buildAllowedOrigins(): Set<string> {
 
 const ALLOWED_ORIGINS = buildAllowedOrigins();
 
-app.use(
-  cors({
-    credentials: true,
-    origin: (origin, cb) => {
-      if (!origin) {
-        cb(null, true);
-        return;
-      }
+const apiCors = cors({
+  credentials: true,
+  origin: (origin, cb) => {
+    if (!origin) {
+      cb(null, true);
+      return;
+    }
 
-      let parsedOrigin: string;
-      try {
-        parsedOrigin = new URL(origin).origin;
-      } catch {
-        cb(null, false);
-        return;
-      }
+    let parsedOrigin: string;
+    try {
+      parsedOrigin = new URL(origin).origin;
+    } catch {
+      cb(null, false);
+      return;
+    }
 
-      if (ALLOWED_ORIGINS.has(parsedOrigin)) {
-        cb(null, true);
-      } else if (!isProduction) {
-        cb(null, true);
-      } else {
-        cb(new Error(`CORS policy: origin not allowed — ${origin}`));
-      }
-    },
-  }),
-);
+    if (ALLOWED_ORIGINS.has(parsedOrigin)) {
+      cb(null, true);
+    } else if (!isProduction) {
+      cb(null, true);
+    } else {
+      cb(new Error(`CORS policy: origin not allowed — ${origin}`));
+    }
+  },
+});
 
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
@@ -100,6 +98,7 @@ const apiLimiter = rateLimit({
   message: { error: "Too many requests, please try again later." },
 });
 
+app.use("/api", apiCors);
 app.use("/api", apiLimiter);
 app.use("/api", router);
 
