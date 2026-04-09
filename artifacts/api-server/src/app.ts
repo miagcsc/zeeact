@@ -3,14 +3,9 @@ import cors from "cors";
 import helmet from "helmet";
 import pinoHttp from "pino-http";
 import rateLimit from "express-rate-limit";
-import { clerkMiddleware } from "@clerk/express";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
-import {
-  CLERK_PROXY_PATH,
-  clerkProxyMiddleware,
-} from "./middlewares/clerkProxyMiddleware";
 import router from "./routes";
 import { logger } from "./lib/logger";
 
@@ -43,8 +38,6 @@ app.use(
     contentSecurityPolicy: false,
   }),
 );
-
-app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -98,22 +91,6 @@ app.use(
 
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
-
-const hasClerkPublishableKey = Boolean(process.env.CLERK_PUBLISHABLE_KEY);
-const hasClerkSecretKey = Boolean(process.env.CLERK_SECRET_KEY);
-const shouldEnableClerk = hasClerkPublishableKey && hasClerkSecretKey;
-
-if (shouldEnableClerk) {
-  app.use(clerkMiddleware());
-} else {
-  logger.warn(
-    {
-      hasClerkPublishableKey,
-      hasClerkSecretKey,
-    },
-    "Clerk middleware disabled: missing CLERK_PUBLISHABLE_KEY or CLERK_SECRET_KEY",
-  );
-}
 
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,

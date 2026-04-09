@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, type ChangeEvent } from "react";
 import { RichTextEditor } from "@/components/RichTextEditor";
 import type { Service, PortfolioItem, Testimonial, ContactSubmission, SiteSettings } from "@workspace/api-client-react";
-import { useUser, useClerk } from "@clerk/react";
 import {
   LayoutDashboard,
   Briefcase,
@@ -182,8 +181,12 @@ function CoverImageUpload({ value, onChange }: { value: string; onChange: (url: 
 export default function AdminPage() {
   const [activeView, setActiveView] = useState<View>("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { user } = useUser();
-  const { signOut } = useClerk();
+  const user = {
+    firstName: "A",
+    fullName: "Admin User",
+    primaryEmailAddress: { emailAddress: "admin@example.com" },
+  } as const;
+  const signOut = () => {};
 
   const navItems = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },

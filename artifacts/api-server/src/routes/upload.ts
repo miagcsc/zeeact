@@ -1,6 +1,6 @@
 import { Router } from "express";
 import multer from "multer";
-import { requireAuth } from "@clerk/express";
+import { requireAuth } from "../middlewares/requireAuth";
 import { Readable } from "stream";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
 
@@ -21,7 +21,7 @@ const upload = multer({
 
 const storageService = new ObjectStorageService();
 
-router.post("/upload", requireAuth(), upload.single("file"), async (req, res) => {
+router.post("/upload", requireAuth, upload.single("file"), async (req, res) => {
   if (!req.file) {
     res.status(400).json({ error: "No file uploaded" });
     return;
