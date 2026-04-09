@@ -99,7 +99,21 @@ app.use(
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 
-app.use(clerkMiddleware());
+const hasClerkPublishableKey = Boolean(process.env.CLERK_PUBLISHABLE_KEY);
+const hasClerkSecretKey = Boolean(process.env.CLERK_SECRET_KEY);
+const shouldEnableClerk = hasClerkPublishableKey && hasClerkSecretKey;
+
+if (shouldEnableClerk) {
+  app.use(clerkMiddleware());
+} else {
+  logger.warn(
+    {
+      hasClerkPublishableKey,
+      hasClerkSecretKey,
+    },
+    "Clerk middleware disabled: missing CLERK_PUBLISHABLE_KEY or CLERK_SECRET_KEY",
+  );
+}
 
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
